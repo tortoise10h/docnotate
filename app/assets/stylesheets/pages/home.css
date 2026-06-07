@@ -51,10 +51,20 @@
 }
 
 .recent-files__link {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
   text-decoration: none;
   color: #6b7280;
 }
 
-.recent-files__link:hover {
+.recent-files__link:hover .recent-files__name {
   text-decoration: underline;
+}
+
+.recent-files__time {
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  color: #9ca3af;
 }

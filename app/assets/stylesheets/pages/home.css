@@ -41,3 +41,20 @@
   text-align: center;
   margin-bottom: 2em;
 }
+
+.recent-files {
+  padding-left: 1.5em;
+}
+
+.recent-files__item {
+  margin-bottom: 0.5em;
+}
+
+.recent-files__link {
+  text-decoration: none;
+  color: #6b7280;
+}
+
+.recent-files__link:hover {
+  text-decoration: underline;
+}

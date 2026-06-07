@@ -27,8 +27,21 @@
 
   <section class="home__recent">
     <h2 class="section-title">Recent files</h2>
-    <div class="card card--transparent empty-state">
-      <p>No recent files yet. Open a file to get started.</p>
-    </div>
+    <% if @recent_documents.any? %>
+      <ul class="recent-files">
+        <% @recent_documents.each do |document| %>
+          <li class="recent-files__item">
+            <%= link_to document_path(document), class: "recent-files__link" do %>
+              <span class="recent-files__name"><%= File.basename(document.file_path) %></span>
+              <span class="recent-files__time"><%= time_ago_in_words(document.last_opened_at) %> ago</span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="card card--transparent empty-state">
+        <p>No recent files yet. Open a file to get started.</p>
+      </div>
+    <% end %>
   </section>
 </div>

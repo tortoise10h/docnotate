@@ -1,6 +1,4 @@
-/* Re-usable components */
-
-/* ---- Button ---- */
+/* Button component */
 .button {
   display: inline-flex;
   align-items: center;
@@ -33,38 +31,4 @@
   font-weight: 300;
   color: #6b7280;
   line-height: 1;
-}
-
-/* ---- Card ---- */
-.card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 32px;
-}
-
-/* ---- Empty state ---- */
-.empty-state {
-  text-align: center;
-  color: #9ca3af;
-  font-size: 1rem;
-}
-
-/* ---- Section title ---- */
-.section-title {
-  font-size: 0.875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #6b7280;
-  margin-bottom: 16px;
-}
-
-/* ---- File input (hidden) ---- */
-.file-input {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  overflow: hidden;
 }

@@ -6,16 +6,26 @@
 
   <section class="home__recent">
     <h2 class="section-title">Recent files</h2>
-    <div class="card empty-state">
+    <div class="card card--transparent empty-state">
       <p>No recent files yet. Open a file to get started.</p>
     </div>
   </section>
 
   <section class="home__action">
-    <label class="button">
-      <span class="button__icon">+</span>
-      <span>Open a file</span>
-      <input type="file" class="file-input" accept=".md,.markdown,.txt,.mdx">
-    </label>
+    <div class="drop-zone"
+         data-controller="drop-zone"
+         data-action="dragenter->drop-zone#dragEnter dragover->drop-zone#dragOver dragleave->drop-zone#dragLeave drop->drop-zone#drop click->drop-zone#open">
+      <div class="drop-zone__text">
+        Drop a file here or click to browse
+      </div>
+      <div class="drop-zone__subtext">
+        Supports .md, .markdown, .txt, .mdx
+      </div>
+      <input type="file"
+             class="file-input"
+             data-drop-zone-target="input"
+             accept=".md,.markdown,.txt,.mdx">
+    </div>
+
   </section>
 </div>

@@ -1,15 +1,11 @@
 <div class="home">
   <header class="home__header">
-    <h1 class="home__title">DocNotate</h1>
+    <h1 class="home__title">
+      <%= image_tag "docnotate-icon.svg", alt: "DocNotate", class: "home__logo", width: 32, height: 32 %>
+      DocNotate
+    </h1>
     <p class="home__subtitle">Read and annotate your documents with ease</p>
   </header>
-
-  <section class="home__recent">
-    <h2 class="section-title">Recent files</h2>
-    <div class="card card--transparent empty-state">
-      <p>No recent files yet. Open a file to get started.</p>
-    </div>
-  </section>
 
   <section class="home__action">
     <div class="drop-zone"
@@ -27,5 +23,12 @@
              accept=".md,.markdown,.txt,.mdx">
     </div>
 
+  </section>
+
+  <section class="home__recent">
+    <h2 class="section-title">Recent files</h2>
+    <div class="card card--transparent empty-state">
+      <p>No recent files yet. Open a file to get started.</p>
+    </div>
   </section>
 </div>

@@ -1,10 +1,10 @@
 /*
- * This is a manifest file that'll be compiled into application.css.
+ * CSS manifest — imports all stylesheet files.
  *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
+ * With Propshaft, assets are served efficiently without preprocessing steps.
+ * Keep this file simple and only use @import to pull in other stylesheets.
  */
+
+@import url("foundation.css");
+@import url("components.css");
+@import url("pages/home.css");

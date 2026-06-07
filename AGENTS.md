@@ -14,7 +14,11 @@
 - Controllers should be thin, not perform any complex business logic, complex business logic should be in the model layer and controller just call them
 
 ### CSS
-- Use pure CSS, with BEM naming convention, 2 kinds of css file
+- Use pure CSS, with BEM naming convention, 3 kinds of css file
+  1. **Foundation** — base resets, typography, body/layout defaults (e.g. `foundation.css`)
+  2. **Components** — reusable UI pieces like buttons, cards, empty states (e.g. `components.css`)
+  3. **Pages** — styles scoped to a specific page/screen (e.g. `pages/home.css`)
+- `application.css` is the manifest: it only `@import`s the other files, no direct styles
 
 ### Rails hotwire view
 - Don't make 1 large ERB file which is hard to read, if there is any duplicate, re-usuable code then split it to a partial to simplify and make the view file shorter and easier to read

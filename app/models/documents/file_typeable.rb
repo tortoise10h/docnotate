@@ -9,10 +9,20 @@ module Documents
     end
 
     def file_type_from_path
-      ext = File.extname(file_path)
-      case ext
-      when ".md"
-        "markdown"
+      self.class.file_type_from_path(file_path)
+    end
+
+    class_methods do
+      def file_type_from_path(file_path)
+        ext = File.extname(file_path).downcase
+        case ext
+        when ".md", ".markdown", ".mdx"
+          "markdown"
+        when ".txt"
+          "text"
+        else
+          "markdown"
+        end
       end
     end
   end

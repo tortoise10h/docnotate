@@ -3,6 +3,18 @@ class Document < ApplicationRecord
 
   has_many :document_nodes, dependent: :destroy
 
+  def next_version
+    return "v1" if version.blank?
+
+    match = version.match(/v(\d+)/)
+    if match
+      number = match[1].to_i
+      "v#{number + 1}"
+    else
+      "v1"
+    end
+  end
+
   def parse_ast_and_save!
     document_nodes = parse_ast
     DocumentNode.insert_all!(document_nodes)

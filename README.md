@@ -1,5 +1,10 @@
 # README
 
-This is a DocNotate project, it's a web-based Rails application, its purpose is with the current AI era, we use AI agents to build feature day-by-day, and for building efficiently we usually plan with the agent before building, and when planning, agents usually produce a markdown file for the full plan and most of the time we need to read the plan to validate what agent planned and sometimes we don't don't agree at some points in the plan and we need to feedback to the agent to fix it. The original workflow usually is we copy the part we don't agree and paste to the agent console to tell it to fix, but when reading the plan if we stop by to do that and back again it could cause the context switching but if we don't do that at that moment we may forget it.
+# Project
+DocNotate is a web-based Rails application designed to solve a major pain point in the age of AI-driven development.
 
-So this project's purpose is we can open any markdown files (or more file formats in the future) read it (readonly) and if we disagree or want to clarify something more, just highlight the part and add the inline comments directly here and continue to read till the end of the plan, after that we can just press the copy button and it'll copy all of our comments so far along with the selected text and we can easily paste to any agent console and tell it to fix or answer at once.
+When you're using AI agents to build features day by day, efficiency is everything. Usually, you plan the workflow with the agent beforehand, and the agent generates a markdown file outlining the full plan. To ensure everything is on track, you have to review and validate that plan. But what happens when you disagree with a specific part? 
+
+Normally, you'd have to stop reading, copy the problematic section, paste it into the AI console, and tell the agent to fix it. This constant back-and-forth causes massive context switching. But if you wait until the end, you'll probably forget half of your feedback.
+
+That’s where DocNotate comes in. It lets you open any markdown file (with more formats coming soon) in a clean, read-only view. As you read, if you spot something you want to change or clarify, just highlight the text, add an inline comment, and keep reading. Once you're done, hit the copy button to grab all your comments and their corresponding code snippets at once. Then, just paste the whole thing into your AI console to get everything fixed in one single prompt.

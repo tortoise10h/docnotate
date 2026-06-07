@@ -11,15 +11,15 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.1].define(version: 2026_06_07_060526) do
-  create_table "document_nodes", force: :cascade do |t|
+  create_table "document_nodes", id: :string, force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
-    t.integer "document_id", null: false
+    t.string "document_id", null: false
     t.integer "heading_level"
     t.json "meta"
     t.string "node_id"
     t.string "node_type", null: false
-    t.integer "parent_id"
+    t.string "parent_id"
     t.integer "position", null: false
     t.datetime "updated_at", null: false
     t.index ["document_id"], name: "index_document_nodes_on_document_id"

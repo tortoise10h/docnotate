@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_07_045845) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_07_060526) do
   create_table "document_nodes", force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
@@ -30,6 +30,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_07_045845) do
     t.text "content", null: false
     t.datetime "created_at", null: false
     t.string "file_path", null: false
+    t.string "file_type", default: "markdown", null: false
     t.datetime "updated_at", null: false
     t.string "version", null: false
     t.index ["file_path"], name: "index_documents_on_file_path", unique: true

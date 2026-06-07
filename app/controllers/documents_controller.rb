@@ -18,6 +18,7 @@ class DocumentsController < ApplicationController
 
   def show
     @document = Document.find(params[:id])
+    @document.touch_last_opened!
     @root_nodes = @document.root_node_tree
   end
 

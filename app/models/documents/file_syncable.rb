@@ -21,6 +21,7 @@ module Documents
           file_type: file_type,
           size: file_stats.size,
           last_modified_at: file_stats.mtime,
+          last_opened_at: Time.current,
           version:
         )
 

@@ -27,4 +27,8 @@ class Document < ApplicationRecord
   def root_node_tree
     DocumentNode.tree_for(id)
   end
+
+  def touch_last_opened!
+    update_column(:last_opened_at, Time.current)
+  end
 end

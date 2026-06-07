@@ -1,0 +1,224 @@
+/* Document page styles - Basecamp paper effect */
+
+.document {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px 24px 48px;
+}
+
+.document__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.document__home-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.document__home-button:hover {
+  background-color: #e5e7eb;
+  color: #1d1d1f;
+}
+
+.document__home-button svg {
+  flex-shrink: 0;
+}
+
+.document__title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1d1d1f;
+  margin: 0;
+  flex: 1;
+}
+
+.document__version {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.document__paper {
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 48px 64px;
+  min-height: 600px;
+}
+
+.document__content {
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* Document node styles */
+.document-node {
+  margin: 0;
+  padding: 0;
+}
+
+.document-node--paragraph {
+  margin-bottom: 16px;
+}
+
+.document-node--heading {
+  margin-top: 32px;
+  margin-bottom: 16px;
+  font-weight: 700;
+  color: #1d1d1f;
+  letter-spacing: -0.02em;
+}
+
+.document-node--heading-1 {
+  font-size: 1.875rem;
+}
+
+.document-node--heading-2 {
+  font-size: 1.5rem;
+}
+
+.document-node--heading-3 {
+  font-size: 1.25rem;
+}
+
+.document-node--heading-4 {
+  font-size: 1.125rem;
+}
+
+.document-node--heading-5 {
+  font-size: 1rem;
+}
+
+.document-node--heading-6 {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.document-node--strong {
+  font-weight: 700;
+}
+
+.document-node--emph {
+  font-style: italic;
+}
+
+.document-node--code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.875em;
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #374151;
+}
+
+.document-node--code-block {
+  background: #1f2937;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.document-node--code-block code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+  color: #e5e7eb;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  display: block;
+  white-space: pre;
+}
+
+.document-node--list {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+.document-node--list ul,
+.document-node--list ol {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.document-node--item {
+  margin-bottom: 4px;
+}
+
+.document-node--link {
+  color: #2563eb;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.document-node--link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.document-node--blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 16px;
+  margin-bottom: 16px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.document-node--blockquote p {
+  margin-bottom: 8px;
+}
+
+.document-node--blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.document-node--thematic-break {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 24px 0;
+}
+
+.document-node--image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.document-node--softbreak,
+.document-node--linebreak {
+  display: block;
+}
+
+.document-node--softbreak + .document-node--softbreak,
+.document-node--linebreak + .document-node--linebreak {
+  margin-top: 8px;
+}
+
+/* Block-level node IDs */
+[id^="block-"] {
+  scroll-margin-top: 24px;
+}
+
+[id^="block-"]:target {
+  background: #eff6ff;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-left: -8px;
+  margin-right: -8px;
+}

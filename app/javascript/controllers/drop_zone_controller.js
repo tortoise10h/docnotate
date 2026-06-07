@@ -53,4 +53,8 @@ export default class extends Controller {
   open = () => {
     this.inputTarget.click()
   }
+
+  submit = () => {
+    this.element.closest("form").requestSubmit()
+  }
 }

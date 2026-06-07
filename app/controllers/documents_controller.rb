@@ -1,37 +1,35 @@
 class DocumentsController < ApplicationController
-  def create
-    file_path = params[:file_path]
+  def open
+    file_path = resolve_file_path
 
-    if file_path.blank?
-      redirect_to root_path, alert: "Please provide a file path."
+    if file_path.nil?
+      redirect_to root_path, alert: "No file provided"
       return
     end
 
-    unless File.exist?(file_path)
-      redirect_to root_path, alert: "File not found: #{file_path}"
-      return
-    end
+    document = Document.open(file_path)
 
-    content = File.read(file_path)
-    file_type = Document.file_type_from_path(file_path)
-
-    document = Document.find_or_initialize_by(file_path: file_path)
-    document.assign_attributes(
-      content: content,
-      file_type: file_type,
-      version: document.next_version
-    )
-
-    if document.save
-      document.parse_ast_and_save!
+    if document&.persisted?
       redirect_to document_path(document)
     else
-      redirect_to root_path, alert: "Failed to open file: #{document.errors.full_messages.to_sentence}"
+      redirect_to root_path, alert: "Failed to open file"
     end
   end
 
   def show
     @document = Document.find(params[:id])
     @root_nodes = @document.root_node_tree
+  end
+
+  private
+
+  def resolve_file_path
+    # Paste file_path directly to the input form
+    if params[:file_path].present?
+      params[:file_path]
+    # Choose file from file picker, web file picker hide the real path from us so this path here is just a temp path
+    elsif params[:file].present?
+      params[:file].path
+    end
   end
 end

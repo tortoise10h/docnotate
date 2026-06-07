@@ -1,5 +1,9 @@
 class Document < ApplicationRecord
-  include Documents::FileTypeable, Documents::AstParseable
+  include Documents::FileTypeable, Documents::AstParseable, Documents::FileSyncable
+
+  validates :file_path, presence: true
+  validates :file_type, presence: true
+  validates :content, presence: true
 
   has_many :document_nodes, dependent: :destroy
 

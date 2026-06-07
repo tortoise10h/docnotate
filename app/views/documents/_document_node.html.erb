@@ -1,0 +1,75 @@
+<% case node.node_type %>
+<% when "document" %>
+  <% node.children.each do |child| %>
+    <%= render "document_node", node: child %>
+  <% end %>
+<% when "paragraph" %>
+  <p id="<%= node.node_id %>" class="document-node document-node--paragraph">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </p>
+<% when "heading" %>
+  <h<%= node.heading_level %> id="<%= node.node_id %>" class="document-node document-node--heading document-node--heading-<%= node.heading_level %>">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </h<%= node.heading_level %>>
+<% when "text" %>
+  <%= node.content %>
+<% when "strong" %>
+  <strong class="document-node document-node--strong">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </strong>
+<% when "emph" %>
+  <em class="document-node document-node--emph">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </em>
+<% when "code" %>
+  <code class="document-node document-node--code"><%= node.content %></code>
+<% when "code_block" %>
+  <pre id="<%= node.node_id %>" class="document-node document-node--code-block">
+    <code class="language-<%= node.meta&.dig("language") %>"><%= node.content %></code>
+  </pre>
+<% when "list" %>
+  <% list_tag = node.meta&.dig("list_type") == "ordered" ? "ol" : "ul" %>
+  <<%= list_tag %> id="<%= node.node_id %>" class="document-node document-node--list">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </<%= list_tag %>>
+<% when "item" %>
+  <li class="document-node document-node--item">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </li>
+<% when "link" %>
+  <a href="<%= node.meta&.dig("url") %>" title="<%= node.meta&.dig("title") %>" class="document-node document-node--link">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </a>
+<% when "image" %>
+  <img src="<%= node.meta&.dig("url") %>" alt="<%= node.content %>" title="<%= node.meta&.dig("title") %>" id="<%= node.node_id %>" class="document-node document-node--image">
+<% when "blockquote" %>
+  <blockquote id="<%= node.node_id %>" class="document-node document-node--blockquote">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </blockquote>
+<% when "thematic_break" %>
+  <hr id="<%= node.node_id %>" class="document-node document-node--thematic-break">
+<% when "softbreak" %>
+  <br class="document-node document-node--softbreak">
+<% when "linebreak" %>
+  <br class="document-node document-node--linebreak">
+<% else %>
+  <% node.children.each do |child| %>
+    <%= render "document_node", node: child %>
+  <% end %>
+<% end %>

@@ -10,7 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_07_144554) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_09_000000) do
+  create_table "comments", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "document_id", null: false
+    t.string "end_block_id"
+    t.integer "end_offset"
+    t.text "postfix_text"
+    t.text "prefix_text"
+    t.text "selected_text"
+    t.string "start_block_id"
+    t.integer "start_offset"
+    t.datetime "updated_at", null: false
+    t.index ["document_id"], name: "index_comments_on_document_id"
+  end
+
   create_table "document_nodes", id: :string, force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
@@ -39,6 +53,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_07_144554) do
     t.index ["file_path"], name: "index_documents_on_file_path", unique: true
   end
 
+  add_foreign_key "comments", "documents"
   add_foreign_key "document_nodes", "document_nodes", column: "parent_id"
   add_foreign_key "document_nodes", "documents"
 end

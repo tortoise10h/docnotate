@@ -6,6 +6,7 @@ class Document < ApplicationRecord
   validates :content, presence: true
 
   has_many :document_nodes, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
   def next_version
     return "v1" if version.blank?

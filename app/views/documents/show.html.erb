@@ -8,8 +8,20 @@
     <span class="document__version"><%= @document.version %></span>
   </header>
 
-  <div class="document__paper">
-    <div class="document__content">
+  <div class="document__paper" data-controller="text-selection">
+    <%= form_with url: document_comments_path(@document), class: "document__selection-form", data: { text_selection_target: "form" } do |f| %>
+      <%= f.hidden_field :start_block_id, data: { text_selection_target: "startBlockId" } %>
+      <%= f.hidden_field :end_block_id, data: { text_selection_target: "endBlockId" } %>
+      <%= f.hidden_field :selected_text, data: { text_selection_target: "selectedText" } %>
+      <%= f.hidden_field :prefix_text, data: { text_selection_target: "prefixText" } %>
+      <%= f.hidden_field :postfix_text, data: { text_selection_target: "postfixText" } %>
+      <button class="document__selection-button" data-text-selection-target="button" type="submit">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add Note
+      </button>
+    <% end %>
+
+    <div class="document__content" data-text-selection-target="content">
       <% @root_nodes.each do |root_node| %>
         <%= render "document_node", node: root_node %>
       <% end %>

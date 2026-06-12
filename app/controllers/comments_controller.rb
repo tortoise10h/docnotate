@@ -14,6 +14,7 @@ class CommentsController < ApplicationController
 
   def comment_params
     params.permit(
+      :content,
       :start_block_id,
       :end_block_id,
       :start_offset,

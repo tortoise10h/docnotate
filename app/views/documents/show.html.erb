@@ -15,10 +15,20 @@
       <%= f.hidden_field :selected_text, data: { text_selection_target: "selectedText" } %>
       <%= f.hidden_field :prefix_text, data: { text_selection_target: "prefixText" } %>
       <%= f.hidden_field :postfix_text, data: { text_selection_target: "postfixText" } %>
-      <button class="document__selection-button" data-text-selection-target="button" type="submit">
+      <button class="document__selection-button" data-text-selection-target="button" data-action="click->text-selection#showCommentInput" type="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
         Add Note
       </button>
+      <div class="document__comment-card" data-text-selection-target="commentInput">
+        <%= f.text_field :content, placeholder: "Add your comment here...", data: { text_selection_target: "commentText" } %>
+        <div class="document__comment-actions">
+          <button type="button" class="document__comment-cancel" data-action="click->text-selection#cancel">Cancel</button>
+          <%= f.button type: "submit", class: "document__comment-submit" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Comment</span>
+          <% end %>
+        </div>
+      </div>
     <% end %>
 
     <div class="document__content" data-text-selection-target="content">

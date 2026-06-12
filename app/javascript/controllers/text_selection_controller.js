@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["button", "content", "form", "startBlockId", "endBlockId", "selectedText", "prefixText", "postfixText"]
+    static targets = ["button", "content", "form", "startBlockId", "endBlockId", "selectedText", "prefixText", "postfixText", "commentInput", "commentText"]
 
     connect() {
 	this.contentTarget.addEventListener("mouseup", this.evaluateSelection.bind(this))
@@ -71,6 +71,9 @@ export default class extends Controller {
 	this.buttonTarget.style.left = `${left}px`
 	this.buttonTarget.style.top = `${top}px`
 	this.buttonTarget.style.display = "inline-flex"
+	this.commentInputTarget.style.display = "none"
+	this.commentInputTarget.style.left = `${left}px`
+	this.commentInputTarget.style.top = `${top}px`
 
 	// Populate hidden form fields for normal submission
 	this.startBlockIdTarget.value = blockIds.length > 0 ? blockIds[0] : ""
@@ -83,8 +86,34 @@ export default class extends Controller {
 	this.postfixTextTarget.value = this.extractPostfix(range)
     }
 
+    showCommentInput(event) {
+	event.preventDefault()
+	event.stopPropagation()
+
+	// Save current selection before showing input
+	const selection = window.getSelection()
+	const savedRange = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null
+
+	this.buttonTarget.style.display = "none"
+	this.commentInputTarget.style.display = "flex"
+	this.commentTextTarget.focus()
+
+	// Restore selection after focusing input
+	if (savedRange) {
+	    selection.removeAllRanges()
+	    selection.addRange(savedRange)
+	}
+    }
+
+    cancel() {
+	this.hideButton()
+	window.getSelection().removeAllRanges()
+    }
+
     hideButton() {
 	this.buttonTarget.style.display = "none"
+	this.commentInputTarget.style.display = "none"
+	this.commentTextTarget.value = ""
 	this.startBlockIdTarget.value = ""
 	this.endBlockIdTarget.value = ""
 	this.selectedTextTarget.value = ""
@@ -111,8 +140,9 @@ export default class extends Controller {
     }
 
     handleOutsideClick(event) {
-	// Don't hide if the user is clicking the comment button itself
+	// Don't hide if the user is clicking the comment button or input area
 	if (this.buttonTarget.contains(event.target)) return
+	if (this.commentInputTarget.contains(event.target)) return
 
 	this.hideButton()
 

@@ -47,22 +47,36 @@
   min-width: 320px;
 }
 
-.document__comment-card input[type="text"] {
+.document__comment-textarea {
   width: 100%;
+  min-height: 72px;
   padding: 10px 14px;
-  border: 1px solid #d1d5db;
+  border: 1px solid #e5e7eb;
   border-radius: 10px;
+  font-family: inherit;
   font-size: 0.875rem;
   line-height: 1.5;
   color: #1d1d1f;
-  background: #ffffff;
+  background: #fafafa;
   box-sizing: border-box;
+  resize: none;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
-.document__comment-card input[type="text"]:focus {
+.document__comment-textarea::placeholder {
+  color: #9ca3af;
+}
+
+.document__comment-textarea:focus {
   outline: none;
   border-color: #2563eb;
+  background: #ffffff;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.document__comment-textarea:placeholder-shown {
+  height: auto !important;
 }
 
 .document__comment-actions {

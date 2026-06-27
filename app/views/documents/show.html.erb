@@ -20,7 +20,7 @@
         Add Note
       </button>
       <div class="document__comment-card" data-text-selection-target="commentInput">
-        <%= f.text_field :content, placeholder: "Add your comment here...", data: { text_selection_target: "commentText" } %>
+        <%= f.text_area :content, placeholder: "Add your comment here...", class: "document__comment-textarea", data: { text_selection_target: "commentText", controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize" } %>
         <div class="document__comment-actions">
           <button type="button" class="document__comment-cancel" data-action="click->text-selection#cancel">Cancel</button>
           <%= f.button type: "submit", class: "document__comment-submit" do %>

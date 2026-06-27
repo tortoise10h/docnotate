@@ -21,6 +21,18 @@
   flex-shrink: 0;
 }
 
+.document__selection-highlight {
+  background: #fef08a;
+  border-radius: 2px;
+  color: inherit;
+  padding: 0;
+}
+
+.document-node--code .document__selection-highlight,
+.document-node--code-block code .document__selection-highlight {
+  color: #1d1d1f;
+}
+
 .document__comment-card {
   display: none;
   position: absolute;

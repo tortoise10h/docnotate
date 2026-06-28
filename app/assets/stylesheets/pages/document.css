@@ -160,6 +160,50 @@
   white-space: pre-wrap;
 }
 
+.document__comment-nav {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 30;
+}
+
+.document__comment-nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: #4b5563;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.document__comment-nav-button:hover {
+  color: #1d1d1f;
+  background: #f3f4f6;
+}
+
+.document__comment-nav-count {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  padding: 2px 0;
+}
+
 .document {
   max-width: 900px;
   margin: 0 auto;

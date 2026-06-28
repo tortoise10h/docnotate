@@ -50,6 +50,20 @@
       <div class="document__comment-popover-body" data-comment-highlight-target="popoverBody"></div>
     </div>
 
+    <div class="document__comment-nav" data-comment-highlight-target="nav">
+      <button type="button" class="document__comment-nav-button" data-action="click->comment-highlight#previousComment" aria-label="Previous comment">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+      <span class="document__comment-nav-count" aria-live="polite">
+        <span data-comment-highlight-target="navCurrent">0</span>
+        <span>/</span>
+        <span data-comment-highlight-target="navTotal">0</span>
+      </span>
+      <button type="button" class="document__comment-nav-button" data-action="click->comment-highlight#nextComment" aria-label="Next comment">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+
     <script type="application/json" data-comment-highlight-target="source">
       <%= @comment_payload.to_json.html_safe %>
     </script>

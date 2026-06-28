@@ -2,12 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 import { BLOCK_SELECTOR } from "utils/dom_selectors"
 
 export default class extends Controller {
-    static targets = ["source", "popover", "popoverBody", "popoverDate"]
+    static targets = ["source", "popover", "popoverBody", "popoverDate", "nav", "navCurrent", "navTotal"]
 
     connect() {
 	this.comments = []
 	this.commentsById = new Map()
 	this.allMarks = []
+	this.navigableComments = []
+	this.currentCommentIndex = -1
 
 	this.boundHandleMarkClick = this.handleMarkClick.bind(this)
 	this.contentEl = this.element.querySelector(".document__content")
@@ -31,7 +33,10 @@ export default class extends Controller {
 	this.comments = payload
 	this.commentsById.clear()
 	this.comments.forEach(comment => this.commentsById.set(comment.id, comment))
+	this.allMarks = []
 	this.applyAllComments()
+	this.buildNavigableComments()
+	this.updateNav()
     }
 
     applyAllComments() {
@@ -127,11 +132,60 @@ export default class extends Controller {
 	const mark = event.target.closest(".document__comment-highlight")
 	if (!mark) return
 
-	const commentId = mark.dataset.commentId
-	const comment = this.commentsById.get(Number(commentId))
+	const commentId = Number(mark.dataset.commentId)
+	const comment = this.commentsById.get(commentId)
 	if (!comment) return
 
 	this.showPopover(mark, comment)
+
+	const navIndex = this.navigableComments.findIndex(item => item.comment.id === commentId)
+	if (navIndex !== -1) {
+	    this.currentCommentIndex = navIndex
+	    this.updateNav()
+	}
+    }
+
+    buildNavigableComments() {
+	this.navigableComments = this.comments
+	    .map(comment => {
+		const firstMark = this.allMarks.find(mark => Number(mark.dataset.commentId) === comment.id)
+		return { comment, firstMark }
+	    })
+	    .filter(item => item.firstMark)
+
+	this.navigableComments.sort((a, b) => {
+	    if (a.firstMark === b.firstMark) return 0
+	    const position = a.firstMark.compareDocumentPosition(b.firstMark)
+	    return position & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
+	})
+
+	this.currentCommentIndex = -1
+    }
+
+    updateNav() {
+	const total = this.navigableComments.length
+	this.navTotalTarget.textContent = total
+	this.navCurrentTarget.textContent = total > 0 ? this.currentCommentIndex + 1 : 0
+	this.navTarget.style.display = total > 0 ? "flex" : "none"
+    }
+
+    previousComment() {
+	this.goToComment(this.currentCommentIndex - 1)
+    }
+
+    nextComment() {
+	this.goToComment(this.currentCommentIndex + 1)
+    }
+
+    goToComment(index) {
+	if (this.navigableComments.length === 0) return
+
+	this.currentCommentIndex = (index + this.navigableComments.length) % this.navigableComments.length
+	const { comment, firstMark } = this.navigableComments[this.currentCommentIndex]
+
+	firstMark.scrollIntoView({ behavior: "smooth", block: "center" })
+	this.showPopover(firstMark, comment)
+	this.updateNav()
     }
 
     showPopover(mark, comment) {

@@ -68,22 +68,6 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-.home__submit {
-  padding: 12px 24px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ffffff;
-  background: #3b82f6;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.home__submit:hover {
-  background: #2563eb;
-}
-
 .home__hint {
   font-size: 0.8125rem;
   color: #9ca3af;

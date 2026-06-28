@@ -23,7 +23,7 @@
         <%= f.text_area :content, placeholder: "Add your comment here...", class: "document__comment-textarea", data: { text_selection_target: "commentText", controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize" } %>
         <div class="document__comment-actions">
           <button type="button" class="document__comment-cancel" data-action="click->text-selection#cancel">Cancel</button>
-          <%= f.button type: "submit", class: "document__comment-submit" do %>
+          <%= f.button type: "submit", class: "button" do %>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
             <span>Comment</span>
           <% end %>

@@ -7,7 +7,7 @@ module Documents
     def highlight_comments
       comments
         .order(:created_at)
-        .map { |c| c.slice(:id, :content, :start_block_id, :end_block_id,
+        .map { |c| c.slice(:id, :content, :selected_text, :start_block_id, :end_block_id,
                            :start_offset, :end_offset, :created_at) }
     end
   end

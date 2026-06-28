@@ -47,6 +47,32 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "replaces stale document nodes when the file is updated" do
+    file = Tempfile.new(["sample", ".md"])
+    file.write("# Hello")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    first_version = document.version
+    first_node_count = DocumentNode.where(document_id: document.id).count
+
+    sleep 1
+    File.write(file.path, "# World")
+    get open_documents_path, params: { file_path: file.path }
+    document.reload
+
+    assert_not_equal first_version, document.version
+    assert_equal first_node_count, DocumentNode.where(document_id: document.id).count,
+                 "re-parsing should replace stale nodes, not stack new ones on top"
+    assert_equal "# World", document.content
+    text_nodes = document.document_nodes.where(node_type: "text").pluck(:content)
+    assert_includes text_nodes, "World"
+    assert_not_includes text_nodes, "Hello", "stale node from previous version should be removed"
+  ensure
+    file.unlink
+  end
+
   test "redirects home when file path is blank" do
     get open_documents_path
 

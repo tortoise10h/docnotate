@@ -21,8 +21,12 @@ class Document < ApplicationRecord
   end
 
   def parse_ast_and_save!
-    document_nodes = parse_ast
-    DocumentNode.insert_all!(document_nodes)
+    nodes = parse_ast
+
+    transaction do
+      document_nodes.delete_all
+      DocumentNode.insert_all!(nodes)
+    end
   end
 
   def root_node_tree

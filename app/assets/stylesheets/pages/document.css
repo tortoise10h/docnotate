@@ -108,32 +108,24 @@
 }
 
 .document__scroll-top-button {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 28px;
+  height: 28px;
   padding: 0;
+  margin-right: 2px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: 6px;
   color: #1d1d1f;
   cursor: pointer;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  z-index: 50;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
 }
 
 .document__scroll-top-button:hover {
   border-color: #d1d5db;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  transform: translateY(0);
 }
 
 .document__scroll-top-button svg {
@@ -142,9 +134,7 @@
 }
 
 .document__scroll-top-button--visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
+  display: flex;
 }
 
 .document__header {

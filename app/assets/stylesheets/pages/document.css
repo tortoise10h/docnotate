@@ -182,14 +182,54 @@
   flex-shrink: 0;
 }
 
+.document__title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
 .document__title {
   position: relative;
   font-size: 1rem;
   font-weight: 500;
   color: #1d1d1f;
   margin: 0;
-  flex: 1;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.document__copy-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.document__copy-button:hover {
+  color: #1d1d1f;
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.document__copy-button svg {
+  flex-shrink: 0;
+}
+
+.document__copy-icon--hidden {
+  display: none;
 }
 
 .document__title::after {

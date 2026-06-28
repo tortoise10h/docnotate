@@ -17,7 +17,7 @@
     </button>
   </header>
 
-  <div class="document__paper" data-controller="text-selection">
+  <div class="document__paper" data-controller="text-selection comment-highlight">
     <%= form_with url: document_comments_path(@document), class: "document__selection-form", data: { text_selection_target: "form" } do |f| %>
       <%= f.hidden_field :start_block_id, data: { text_selection_target: "startBlockId" } %>
       <%= f.hidden_field :end_block_id, data: { text_selection_target: "endBlockId" } %>
@@ -41,6 +41,18 @@
         </div>
       </div>
     <% end %>
+
+    <div class="document__comment-popover" data-comment-highlight-target="popover">
+      <div class="document__comment-popover-header">
+        <span class="document__comment-popover-date" data-comment-highlight-target="popoverDate"></span>
+        <button type="button" class="document__comment-popover-close" data-action="click->comment-highlight#hidePopover" aria-label="Close">&times;</button>
+      </div>
+      <div class="document__comment-popover-body" data-comment-highlight-target="popoverBody"></div>
+    </div>
+
+    <script type="application/json" data-comment-highlight-target="source">
+      <%= @comment_payload.to_json.html_safe %>
+    </script>
 
     <div class="document__content" data-text-selection-target="content">
       <% @root_nodes.each do |root_node| %>

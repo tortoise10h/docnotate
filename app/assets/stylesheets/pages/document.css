@@ -28,8 +28,24 @@
   padding: 0;
 }
 
+.document__comment-highlight {
+  background: #5fd47e;
+  border-bottom: 2px solid #2e8b4a;
+  border-radius: 2px;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.document__comment-highlight:hover {
+  background: #4dbb6a;
+}
+
 .document-node--code .document__selection-highlight,
-.document-node--code-block code .document__selection-highlight {
+.document-node--code-block code .document__selection-highlight,
+.document-node--code .document__comment-highlight,
+.document-node--code-block code .document__comment-highlight {
   color: #1d1d1f;
 }
 
@@ -99,6 +115,49 @@
 
 .document__comment-cancel:hover {
   color: #1d4ed8;
+}
+
+.document__comment-popover {
+  display: none;
+  position: absolute;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 1px rgba(0, 0, 0, 0.1);
+  z-index: 20;
+  min-width: 280px;
+  max-width: 360px;
+}
+
+.document__comment-popover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.document__comment-popover-close {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  line-height: 1;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.document__comment-popover-close:hover {
+  color: #1d1d1f;
+}
+
+.document__comment-popover-body {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #1d1d1f;
+  white-space: pre-wrap;
 }
 
 .document {

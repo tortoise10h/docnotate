@@ -40,5 +40,6 @@ class DocumentsController < ApplicationController
   def prepare_document
     @document.touch_last_opened!
     @root_nodes = @document.root_node_tree
+    @comment_payload = @document.highlight_comments
   end
 end

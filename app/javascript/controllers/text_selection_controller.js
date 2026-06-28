@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { BLOCK_SELECTOR } from "utils/dom_selectors"
 
 export default class extends Controller {
     static targets = ["button", "content", "form", "startBlockId", "endBlockId", "startOffset", "endOffset", "selectedText", "prefixText", "postfixText", "commentInput", "commentText"]
@@ -63,16 +64,30 @@ export default class extends Controller {
     }
 
     collectBlockIds(range) {
-	const blockIds = []
-	const blocks = this.contentTarget.querySelectorAll("[id]")
+	const allBlocks = Array.from(this.contentTarget.querySelectorAll(BLOCK_SELECTOR))
+	const selectedBlocks = allBlocks.filter(block => this.blockContainsSelectedText(range, block))
 
-	blocks.forEach(block => {
-	    if (this.rangeIntersectsNode(range, block)) {
-		blockIds.push(block.id)
-	    }
-	})
+	// Keep only leaf blocks: exclude ancestors of other selected blocks so a
+	// nested paragraph inside a list is used instead of the enclosing list.
+	return selectedBlocks
+	    .filter(block => !selectedBlocks.some(other => block !== other && block.contains(other)))
+	    .map(block => block.id)
+    }
 
-	return blockIds
+    blockContainsSelectedText(range, block) {
+	const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null, false)
+	let textNode
+	while ((textNode = walker.nextNode()) !== null) {
+	    if (!this.rangeIntersectsNode(range, textNode)) continue
+
+	    const nodeLength = textNode.textContent.length
+	    const start = textNode === range.startContainer ? range.startOffset : 0
+	    const end = textNode === range.endContainer ? range.endOffset : nodeLength
+
+	    if (start < end) return true
+	}
+
+	return false
     }
 
     computeBlockOffsets(range, selectedBlockIds) {
@@ -144,31 +159,30 @@ export default class extends Controller {
     }
 
     highlightRange(range) {
+	const marks = []
 	const walker = document.createTreeWalker(
 	    this.contentTarget,
 	    NodeFilter.SHOW_TEXT,
-	    null,
+	    {
+		acceptNode: (node) => {
+		    if (node.parentNode.closest("mark")) return NodeFilter.FILTER_REJECT
+		    return NodeFilter.FILTER_ACCEPT
+		}
+	    },
 	    false
 	)
 
-	const highlights = []
 	let textNode
 	while ((textNode = walker.nextNode()) !== null) {
 	    if (!this.rangeIntersectsNode(range, textNode)) continue
 
-	    const isStartNode = textNode === range.startContainer
-	    const isEndNode = textNode === range.endContainer
-	    const textLength = textNode.textContent.length
-
-	    const startOffset = isStartNode ? range.startOffset : 0
-	    const endOffset = isEndNode ? range.endOffset : textLength
+	    const nodeStart = 0
+	    const nodeEnd = textNode.textContent.length
+	    const startOffset = textNode === range.startContainer ? range.startOffset : nodeStart
+	    const endOffset = textNode === range.endContainer ? range.endOffset : nodeEnd
 
 	    if (startOffset >= endOffset) continue
 
-	    highlights.push({ textNode, startOffset, endOffset })
-	}
-
-	highlights.forEach(({ textNode, startOffset, endOffset }) => {
 	    const parent = textNode.parentNode
 	    textNode.splitText(endOffset)
 	    const highlightNode = textNode.splitText(startOffset)
@@ -177,9 +191,10 @@ export default class extends Controller {
 	    mark.className = "document__selection-highlight"
 	    mark.textContent = highlightNode.textContent
 	    parent.replaceChild(mark, highlightNode)
-	    this.activeMarks.push(mark)
-	})
+	    marks.push(mark)
+	}
 
+	this.activeMarks = marks
 	return this.activeMarks
     }
 

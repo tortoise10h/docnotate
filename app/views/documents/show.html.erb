@@ -17,7 +17,7 @@
     </button>
   </header>
 
-  <div class="document__paper" data-controller="text-selection comment-highlight">
+  <div class="document__paper" data-controller="text-selection comment-highlight comment-copy">
     <%= form_with url: document_comments_path(@document), class: "document__selection-form", data: { text_selection_target: "form" } do |f| %>
       <%= f.hidden_field :start_block_id, data: { text_selection_target: "startBlockId" } %>
       <%= f.hidden_field :end_block_id, data: { text_selection_target: "endBlockId" } %>
@@ -62,9 +62,19 @@
       <button type="button" class="document__comment-nav-button" data-action="click->comment-highlight#nextComment" aria-label="Next comment">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
       </button>
+      <% if @document.comments.exists? %>
+        <div class="document__comment-nav-divider" role="separator" aria-hidden="true"></div>
+        <button type="button" class="document__comment-copy"
+                data-comment-copy-target="button"
+                data-action="click->comment-copy#copyComments"
+                data-tooltip="Copy comments"
+                aria-label="Copy comments">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></svg>
+        </button>
+      <% end %>
     </div>
 
-    <script type="application/json" data-comment-highlight-target="source">
+    <script type="application/json" data-comment-highlight-target="source" data-comment-copy-target="source">
       <%= @comment_payload.to_json.html_safe %>
     </script>
 

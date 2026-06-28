@@ -32,6 +32,10 @@
 - Don't make 1 large ERB file which is hard to read, if there is any duplicate, re-usuable code then split it to a partial to simplify and make the view file shorter and easier to read
 - If it's a separate component in the view, should also split it into partial for simplify the main view file
 
+## Code style
+### Comment
+- Only add necessary comments to code, comment should only be added to explain "why" we do that not "what"
+
 ## Testing
 - The project uses Minitest as the testing framework
 - Write tests only for necessary cases; avoid adding verbose or excessive tests

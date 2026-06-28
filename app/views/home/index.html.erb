@@ -8,21 +8,14 @@
   </header>
 
   <section class="home__action">
-    <%= form_with url: open_documents_path, method: :post, multipart: true, class: "home__form", data: { controller: "drop-zone" } do |form| %>
-      <div class="drop-zone"
-           data-action="dragenter->drop-zone#dragEnter dragover->drop-zone#dragOver dragleave->drop-zone#dragLeave drop->drop-zone#drop click->drop-zone#open">
-        <div class="drop-zone__text">
-          Drop a file here or click to browse
-        </div>
-        <div class="drop-zone__subtext">
-          Supports .md, .markdown, .txt, .mdx
-        </div>
-        <%= form.file_field :file,
-                           class: "file-input",
-                           data: { drop_zone_target: "input", action: "change->drop-zone#submit" },
-                           accept: ".md,.markdown,.txt,.mdx" %>
-      </div>
+    <%= form_with url: open_documents_path, method: :get, class: "home__form" do |form| %>
+      <%= form.text_field :file_path,
+                          placeholder: "Enter local file path",
+                          class: "home__input",
+                          autocomplete: "off" %>
+      <%= form.submit "Open", class: "home__submit" %>
     <% end %>
+    <p class="home__hint">Supports .md, .markdown, .txt, .mdx</p>
   </section>
 
   <section class="home__recent">
@@ -31,7 +24,7 @@
       <ul class="recent-files">
         <% @recent_documents.each do |document| %>
           <li class="recent-files__item">
-            <%= link_to document_path(document), class: "recent-files__link" do %>
+            <%= link_to open_documents_path(file_path: document.file_path), class: "recent-files__link" do %>
               <span class="recent-files__name"><%= File.basename(document.file_path) %></span>
               <span class="recent-files__time"><%= time_ago_in_words(document.last_opened_at) %> ago</span>
             <% end %>

@@ -1,8 +1,0 @@
-/* Hidden file input component */
-.file-input {
-  position: absolute;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  overflow: hidden;
-}

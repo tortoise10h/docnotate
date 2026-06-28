@@ -12,8 +12,6 @@
 @import url("components/card.css");
 @import url("components/empty-state.css");
 @import url("components/section-title.css");
-@import url("components/file-input.css");
-@import url("components/drop-zone.css");
 
 /* Pages */
 @import url("pages/home.css");

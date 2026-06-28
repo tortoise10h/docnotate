@@ -4,9 +4,9 @@ class CommentsController < ApplicationController
     comment = document.comments.build(comment_params)
 
     if comment.save
-      redirect_to document_path(document), notice: "Comment added."
+      redirect_to open_documents_path(file_path: document.file_path), notice: "Comment added."
     else
-      redirect_to document_path(document), alert: comment.errors.full_messages.to_sentence
+      redirect_to open_documents_path(file_path: document.file_path), alert: comment.errors.full_messages.to_sentence
     end
   end
 

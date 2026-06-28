@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
   resources :documents, only: [:show] do
     collection do
-      post :open
+      get :open
     end
     resources :comments, only: [:create]
   end

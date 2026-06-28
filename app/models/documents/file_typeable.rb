@@ -13,16 +13,22 @@ module Documents
     end
 
     class_methods do
+      MARKDOWN_EXTENSIONS = %w[.md .markdown .mdx].freeze
+
       def file_type_from_path(file_path)
         ext = File.extname(file_path).downcase
         case ext
-        when ".md", ".markdown", ".mdx"
+        when *MARKDOWN_EXTENSIONS
           "markdown"
         when ".txt"
           "text"
         else
           "markdown"
         end
+      end
+
+      def markdown_file?(file_path)
+        MARKDOWN_EXTENSIONS.include?(File.extname(file_path).downcase)
       end
     end
   end

@@ -60,4 +60,19 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     assert_equal "File not found", flash[:alert]
   end
+
+  test "renders unsupported file error for non-markdown files" do
+    file = Tempfile.new(["sample", ".txt"])
+    file.write("Hello")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+
+    assert_response :unsupported_media_type
+    assert_select ".error__title", "Unsupported file type"
+    assert_select ".error__message", /#{File.basename(file.path)}/
+    assert_select "a[href=?]", root_path, text: /Return to Home/
+  ensure
+    file.unlink
+  end
 end

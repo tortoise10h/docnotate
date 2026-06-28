@@ -14,5 +14,6 @@
 @import url("components/section-title.css");
 
 /* Pages */
+@import url("pages/error.css");
 @import url("pages/home.css");
 @import url("pages/document.css");

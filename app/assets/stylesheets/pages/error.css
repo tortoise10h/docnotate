@@ -1,0 +1,37 @@
+/* Error page styles */
+
+.error {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.error__header {
+  margin-bottom: 24px;
+}
+
+.error__logo {
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.error__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.error__message {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 8px;
+}
+
+.error__hint {
+  font-size: 0.9375rem;
+  color: #9ca3af;
+  margin-bottom: 24px;
+}

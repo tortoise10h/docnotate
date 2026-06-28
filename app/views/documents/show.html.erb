@@ -21,6 +21,8 @@
     <%= form_with url: document_comments_path(@document), class: "document__selection-form", data: { text_selection_target: "form" } do |f| %>
       <%= f.hidden_field :start_block_id, data: { text_selection_target: "startBlockId" } %>
       <%= f.hidden_field :end_block_id, data: { text_selection_target: "endBlockId" } %>
+      <%= f.hidden_field :start_offset, data: { text_selection_target: "startOffset" } %>
+      <%= f.hidden_field :end_offset, data: { text_selection_target: "endOffset" } %>
       <%= f.hidden_field :selected_text, data: { text_selection_target: "selectedText" } %>
       <%= f.hidden_field :prefix_text, data: { text_selection_target: "prefixText" } %>
       <%= f.hidden_field :postfix_text, data: { text_selection_target: "postfixText" } %>

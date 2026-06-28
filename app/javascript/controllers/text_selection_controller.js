@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["button", "content", "form", "startBlockId", "endBlockId", "selectedText", "prefixText", "postfixText", "commentInput", "commentText"]
+    static targets = ["button", "content", "form", "startBlockId", "endBlockId", "startOffset", "endOffset", "selectedText", "prefixText", "postfixText", "commentInput", "commentText"]
 
     connect() {
 	this.activeMarks = []
@@ -43,6 +43,8 @@ export default class extends Controller {
 	const prefixText = this.extractPrefix(range)
 	const postfixText = this.extractPostfix(range)
 
+	const { startOffset, endOffset } = this.computeBlockOffsets(range, blockIds)
+
 	// One active highlight at a time: clear any prior mark before wrapping the new selection
 	this.clearActiveHighlight()
 
@@ -57,7 +59,7 @@ export default class extends Controller {
 	const leftOffset = lastRect.right - containerRect.left
 	const topOffset = lastRect.bottom - containerRect.top
 
-	this.showButton(leftOffset, topOffset, blockIds, selectedText, prefixText, postfixText)
+	this.showButton(leftOffset, topOffset, blockIds, selectedText, prefixText, postfixText, startOffset, endOffset)
     }
 
     collectBlockIds(range) {
@@ -73,6 +75,30 @@ export default class extends Controller {
 	return blockIds
     }
 
+    computeBlockOffsets(range, selectedBlockIds) {
+	const startBlockEl = document.getElementById(selectedBlockIds[0])
+	const endBlockEl = document.getElementById(selectedBlockIds[selectedBlockIds.length - 1])
+
+	let startTextNode = range.startContainer
+	let startLocalOffset = range.startOffset
+	if (startTextNode.nodeType !== Node.TEXT_NODE) {
+	    startTextNode = this.resolveTextNode(startTextNode, startLocalOffset, true)
+	    startLocalOffset = 0
+	}
+
+	let endTextNode = range.endContainer
+	let endLocalOffset = range.endOffset
+	if (endTextNode.nodeType !== Node.TEXT_NODE) {
+	    endTextNode = this.resolveTextNode(endTextNode, endLocalOffset, false)
+	    endLocalOffset = endTextNode ? endTextNode.textContent.length : 0
+	}
+
+	return {
+	    startOffset: this.offsetWithinBlock(startTextNode, startLocalOffset, startBlockEl),
+	    endOffset: this.offsetWithinBlock(endTextNode, endLocalOffset, endBlockEl)
+	}
+    }
+
     rangeIntersectsNode(range, node) {
 	if (range.intersectsNode) {
 	    return range.intersectsNode(node)
@@ -83,6 +109,38 @@ export default class extends Controller {
 	nodeRange.selectNode(node)
 	return range.compareBoundaryPoints(Range.START_TO_END, nodeRange) <= 0 &&
 	    range.compareBoundaryPoints(Range.END_TO_START, nodeRange) >= 0
+    }
+
+    resolveTextNode(container, offset, isStart) {
+	if (container.nodeType === Node.TEXT_NODE) return container
+
+	const child = isStart ? container.childNodes[offset] : container.childNodes[offset - 1]
+	if (!child) return null
+
+	const walker = document.createTreeWalker(child, NodeFilter.SHOW_TEXT, null, false)
+	if (isStart) {
+	    return walker.nextNode()
+	} else {
+	    let last = null
+	    let node
+	    while ((node = walker.nextNode()) !== null) {
+		last = node
+	    }
+	    return last
+	}
+    }
+
+    offsetWithinBlock(textNode, localOffset, blockEl) {
+	if (!blockEl.contains(textNode)) return localOffset
+
+	const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, null, false)
+	let offset = 0
+	let node
+	while ((node = walker.nextNode()) !== null) {
+	    if (node === textNode) return offset + localOffset
+	    offset += node.textContent.length
+	}
+	return localOffset
     }
 
     highlightRange(range) {
@@ -133,7 +191,7 @@ export default class extends Controller {
 	this.contentTarget.normalize()
     }
 
-    showButton(left, top, blockIds, text, prefixText, postfixText) {
+    showButton(left, top, blockIds, text, prefixText, postfixText, startOffset, endOffset) {
 	this.buttonTarget.style.left = `${left}px`
 	this.buttonTarget.style.top = `${top}px`
 	this.buttonTarget.style.display = "inline-flex"
@@ -144,6 +202,8 @@ export default class extends Controller {
 	// Populate hidden form fields for normal submission
 	this.startBlockIdTarget.value = blockIds.length > 0 ? blockIds[0] : ""
 	this.endBlockIdTarget.value = blockIds.length > 0 ? blockIds[blockIds.length - 1] : ""
+	this.startOffsetTarget.value = startOffset
+	this.endOffsetTarget.value = endOffset
 	this.selectedTextTarget.value = text
 	this.prefixTextTarget.value = prefixText
 	this.postfixTextTarget.value = postfixText
@@ -170,6 +230,8 @@ export default class extends Controller {
 	this.commentTextTarget.value = ""
 	this.startBlockIdTarget.value = ""
 	this.endBlockIdTarget.value = ""
+	this.startOffsetTarget.value = ""
+	this.endOffsetTarget.value = ""
 	this.selectedTextTarget.value = ""
 	this.prefixTextTarget.value = ""
 	this.postfixTextTarget.value = ""

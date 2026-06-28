@@ -28,7 +28,7 @@
         <% @recent_documents.each do |document| %>
           <li class="recent-files__item">
             <%= link_to open_documents_path(file_path: document.file_path), class: "recent-files__link" do %>
-              <span class="recent-files__name"><%= File.basename(document.file_path) %></span>
+              <span class="recent-files__name" data-tooltip="<%= document.file_path %>"><%= File.basename(document.file_path) %></span>
               <span class="recent-files__time"><%= time_ago_in_words(document.last_opened_at) %> ago</span>
             <% end %>
           </li>

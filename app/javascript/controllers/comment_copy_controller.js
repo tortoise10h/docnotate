@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["source", "button"]
+    static targets = ["source", "button", "divider"]
 
     connect() {
         this.copyTimeout = null
@@ -32,8 +32,9 @@ export default class extends Controller {
                 return position & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
             })
 
-        this.buttonTarget.style.display =
-            this.orderedComments.length > 0 ? "inline-flex" : "none"
+        const visible = this.orderedComments.length > 0
+        this.buttonTarget.style.display = visible ? "inline-flex" : "none"
+        this.dividerTarget.style.display = visible ? "block" : "none"
     }
 
     async copyComments() {

@@ -23,6 +23,8 @@ export default class extends Controller {
     }
 
     loadComments() {
+	this.clearAllMarks()
+
 	let payload = []
 	try {
 	    payload = JSON.parse(this.sourceTarget.textContent)
@@ -37,6 +39,14 @@ export default class extends Controller {
 	this.applyAllComments()
 	this.buildNavigableComments()
 	this.updateNav()
+    }
+
+    clearAllMarks() {
+	this.allMarks.forEach(mark =>
+	    mark.replaceWith(document.createTextNode(mark.textContent))
+	)
+	this.allMarks = []
+	this.contentEl.normalize()
     }
 
     applyAllComments() {
@@ -202,5 +212,9 @@ export default class extends Controller {
 
     hidePopover() {
 	this.popoverTarget.style.display = "none"
+    }
+
+    reloadFromSource() {
+	this.loadComments()
     }
 }

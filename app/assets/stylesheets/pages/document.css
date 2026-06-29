@@ -95,6 +95,16 @@
   height: auto !important;
 }
 
+.document__comment-create-error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #dc2626;
+}
+
+.document__comment-create-error:empty {
+  display: none;
+}
+
 .document__comment-actions {
   display: flex;
   justify-content: flex-end;

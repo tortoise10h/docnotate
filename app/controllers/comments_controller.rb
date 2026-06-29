@@ -4,9 +4,14 @@ class CommentsController < ApplicationController
     comment = document.comments.build(comment_params)
 
     if comment.save
-      redirect_to open_documents_path(file_path: document.file_path), notice: "Comment added."
+      @comment_payload = document.highlight_comments
+      respond_to { |format| format.turbo_stream }
     else
-      redirect_to open_documents_path(file_path: document.file_path), alert: comment.errors.full_messages.to_sentence
+      @create_error = comment.errors.full_messages.to_sentence
+      @comment_payload = document.highlight_comments
+      respond_to do |format|
+        format.turbo_stream { render :create, status: :unprocessable_entity }
+      end
     end
   end
 

@@ -19,7 +19,7 @@
   - Example file: `app/models/concerns/ast_parseable.rb` containing `module AstParseable; end; end`
 
 ### Controllers
-- Controllers should be thin, not perform any complex business logic, complex business logic should be in the model layer and controller just call them
+- When writing Rails controller, the code style should follow the 37signals controler code style
 
 ### CSS
 - Use pure CSS, with BEM naming convention, 3 kinds of css file

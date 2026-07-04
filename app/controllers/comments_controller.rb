@@ -1,21 +1,28 @@
 class CommentsController < ApplicationController
-  def create
-    document = Document.find(params[:document_id])
-    comment = document.comments.build(comment_params)
+  before_action :set_document
 
-    if comment.save
-      @comment_payload = document.highlight_comments
-      respond_to { |format| format.turbo_stream }
+  def create
+    @comment = @document.comments.build(comment_params)
+
+    if @comment.save
+      set_comment_payload
+      render :create
     else
-      @create_error = comment.errors.full_messages.to_sentence
-      @comment_payload = document.highlight_comments
-      respond_to do |format|
-        format.turbo_stream { render :create, status: :unprocessable_entity }
-      end
+      @create_error = @comment.errors.full_messages.to_sentence
+      set_comment_payload
+      render :create, status: :unprocessable_entity
     end
   end
 
   private
+
+  def set_document
+    @document = Document.find(params[:document_id])
+  end
+
+  def set_comment_payload
+    @comment_payload = @document.highlight_comments
+  end
 
   def comment_params
     params.permit(

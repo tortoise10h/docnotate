@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_04_101828) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_04_134947) do
   create_table "comments", force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
@@ -58,13 +58,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_04_101828) do
   create_table "documents", force: :cascade do |t|
     t.text "content", null: false
     t.datetime "created_at", null: false
+    t.integer "current_version_id"
     t.string "file_path", null: false
     t.string "file_type", default: "markdown", null: false
-    t.datetime "last_modified_at"
     t.datetime "last_opened_at"
-    t.integer "size"
     t.datetime "updated_at", null: false
-    t.string "version", null: false
+    t.index ["current_version_id"], name: "index_documents_on_current_version_id"
     t.index ["file_path"], name: "index_documents_on_file_path", unique: true
   end
 
@@ -73,4 +72,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_04_101828) do
   add_foreign_key "document_nodes", "document_nodes", column: "parent_id"
   add_foreign_key "document_nodes", "document_versions"
   add_foreign_key "document_versions", "documents"
+  add_foreign_key "documents", "document_versions", column: "current_version_id"
 end

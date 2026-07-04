@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { BLOCK_SELECTOR } from "utils/dom_selectors"
 
 export default class extends Controller {
-    static targets = ["source", "popover", "popoverBody", "popoverDate", "nav", "navCurrent", "navTotal"]
+    static targets = ["source", "popover", "popoverBody", "popoverDate", "deleteForm", "nav", "navCurrent", "navTotal"]
 
     connect() {
 	this.comments = []
@@ -10,6 +10,7 @@ export default class extends Controller {
 	this.allMarks = []
 	this.navigableComments = []
 	this.currentCommentIndex = -1
+	this.documentId = this.element.dataset.documentId
 
 	this.boundHandleMarkClick = this.handleMarkClick.bind(this)
 	this.contentEl = this.element.querySelector(".document__content")
@@ -204,6 +205,7 @@ export default class extends Controller {
 
 	this.popoverBodyTarget.textContent = comment.content
 	this.popoverDateTarget.textContent = new Date(comment.created_at).toLocaleString()
+	this.deleteFormTarget.action = `/documents/${this.documentId}/comments/${comment.id}`
 
 	this.popoverTarget.style.display = "flex"
 	this.popoverTarget.style.left = `${markRect.left - containerRect.left}px`

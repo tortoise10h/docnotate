@@ -19,8 +19,10 @@
 
   <div class="document__paper" id="document_paper"
        data-controller="text-selection comment-highlight comment-copy"
+       data-document-id="<%= @document.id %>"
        data-action="comment-highlight:reload->comment-highlight#reloadFromSource
                    comment-highlight:reload->comment-copy#loadComments
+                   comment-highlight:hide-popover->comment-highlight#hidePopover
                    comment-create:reset->text-selection#hideButton">
     <%= form_with url: document_comments_path(@document), class: "document__selection-form", data: { text_selection_target: "form" } do |f| %>
       <%= f.hidden_field :start_block_id, data: { text_selection_target: "startBlockId" } %>
@@ -50,8 +52,16 @@
     <div class="document__comment-popover" data-comment-highlight-target="popover">
       <div class="document__comment-popover-header">
         <span class="document__comment-popover-date" data-comment-highlight-target="popoverDate"></span>
-        <button type="button" class="document__comment-popover-close" data-action="click->comment-highlight#hidePopover" aria-label="Close">&times;</button>
+        <div class="document__comment-popover-actions">
+          <%= form_with url: document_comment_path(@document, 0), method: :delete, class: "document__comment-delete-form", data: { comment_highlight_target: "deleteForm" } do |f| %>
+            <%= f.button type: :submit, class: "document__comment-delete", aria: { label: "Delete comment" } do %>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            <% end %>
+          <% end %>
+          <button type="button" class="document__comment-popover-close" data-action="click->comment-highlight#hidePopover" aria-label="Close">&times;</button>
+        </div>
       </div>
+      <p class="document__comment-destroy-error" id="comment_destroy_error"></p>
       <div class="document__comment-popover-body" data-comment-highlight-target="popoverBody"></div>
     </div>
 

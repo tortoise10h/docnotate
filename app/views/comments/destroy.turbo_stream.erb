@@ -1,0 +1,14 @@
+<%= turbo_stream.replace "comment_payload_source" do %>
+  <script type="application/json" id="comment_payload_source"
+          data-comment-highlight-target="source"
+          data-comment-copy-target="source">
+    <%= @comment_payload.to_json.html_safe %>
+  </script>
+<% end %>
+
+<% if @destroy_error.present? %>
+  <%= turbo_stream.update "comment_destroy_error", @destroy_error %>
+<% end %>
+
+<%= turbo_stream.action :hide_popover, "document_paper" %>
+<%= turbo_stream.action :reload_comments, "document_paper" %>

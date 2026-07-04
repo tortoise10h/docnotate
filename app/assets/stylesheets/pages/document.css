@@ -149,6 +149,36 @@
   color: #6b7280;
 }
 
+.document__comment-popover-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.document__comment-delete-form {
+  display: inline-flex;
+}
+
+.document__comment-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.document__comment-delete:hover {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
 .document__comment-popover-close {
   background: none;
   border: none;
@@ -161,6 +191,16 @@
 
 .document__comment-popover-close:hover {
   color: #1d1d1f;
+}
+
+.document__comment-destroy-error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #dc2626;
+}
+
+.document__comment-destroy-error:empty {
+  display: none;
 }
 
 .document__comment-popover-body {

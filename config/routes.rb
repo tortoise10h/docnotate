@@ -16,6 +16,6 @@ Rails.application.routes.draw do
     collection do
       get :open
     end
-    resources :comments, only: [:create]
+    resources :comments, only: [:create, :destroy]
   end
 end

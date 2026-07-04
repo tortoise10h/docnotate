@@ -46,4 +46,29 @@ class CommentsTest < ActionDispatch::IntegrationTest
   ensure
     file.unlink
   end
+
+  test "destroys a comment via turbo stream" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    comment = document.comments.create!(
+      content: "To be deleted",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+
+    assert_difference("Comment.count", -1) do
+      delete document_comment_path(document, comment), as: :turbo_stream
+    end
+
+    assert_response :ok
+    assert_match %r{text/vnd.turbo-stream.html}, response.content_type
+    refute_match "To be deleted", response.body
+  ensure
+    file.unlink
+  end
 end

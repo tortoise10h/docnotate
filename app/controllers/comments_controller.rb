@@ -14,6 +14,19 @@ class CommentsController < ApplicationController
     end
   end
 
+  def destroy
+    @comment = @document.comments.find(params[:id])
+
+    if @comment.destroy
+      set_comment_payload
+      render :destroy
+    else
+      @destroy_error = @comment.errors.full_messages.to_sentence
+      set_comment_payload
+      render :destroy, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_document

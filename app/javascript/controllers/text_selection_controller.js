@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { BLOCK_SELECTOR } from "utils/dom_selectors"
 
 export default class extends Controller {
-    static targets = ["button", "content", "form", "startBlockId", "endBlockId", "startOffset", "endOffset", "selectedText", "prefixText", "postfixText", "commentInput", "commentText"]
+    static targets = ["button", "content", "form", "startBlockId", "endBlockId", "startOffset", "endOffset", "selectedText", "prefixText", "postfixText", "commentInput", "commentText", "copyButton"]
 
     connect() {
 	this.activeMarks = []
@@ -214,6 +214,9 @@ export default class extends Controller {
 	this.commentInputTarget.style.left = `${left}px`
 	this.commentInputTarget.style.top = `${top}px`
 
+	// Pass the selected text to the dedicated copy controller
+	this.copyButtonTarget.dataset.selectionCopyTextValue = text
+
 	// Populate hidden form fields for normal submission
 	this.startBlockIdTarget.value = blockIds.length > 0 ? blockIds[0] : ""
 	this.endBlockIdTarget.value = blockIds.length > 0 ? blockIds[blockIds.length - 1] : ""
@@ -250,6 +253,7 @@ export default class extends Controller {
 	this.selectedTextTarget.value = ""
 	this.prefixTextTarget.value = ""
 	this.postfixTextTarget.value = ""
+	this.copyButtonTarget.dataset.selectionCopyTextValue = ""
     }
 
     extractPrefix(range) {

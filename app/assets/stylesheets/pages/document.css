@@ -1,24 +1,69 @@
 /* Document page styles - Basecamp paper effect */
 
-.document__selection-button {
+.document__selection-toolbar {
   display: none;
   position: absolute;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 4px;
+  padding: 4px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #1d1d1f;
-  cursor: pointer;
+  border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   z-index: 10;
 }
 
+.document__selection-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.document__selection-button:hover {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
 .document__selection-button svg {
   flex-shrink: 0;
+}
+
+.document__selection-copy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #4b5563;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.document__selection-copy-button:hover {
+  color: #1d1d1f;
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+.document__selection-copy-icon {
+  flex-shrink: 0;
+}
+
+.document__selection-copy-icon--hidden {
+  display: none;
 }
 
 .document__selection-highlight {

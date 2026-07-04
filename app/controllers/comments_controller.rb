@@ -27,6 +27,19 @@ class CommentsController < ApplicationController
     end
   end
 
+  def update
+    @comment = @document.comments.find(params[:id])
+
+    if @comment.update(comment_params)
+      set_comment_payload
+      render :update
+    else
+      @edit_error = @comment.errors.full_messages.to_sentence
+      set_comment_payload
+      render :update, status: :unprocessable_entity
+    end
+  end
+
   private
 
   def set_document

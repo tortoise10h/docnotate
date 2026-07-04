@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { BLOCK_SELECTOR } from "utils/dom_selectors"
 
 export default class extends Controller {
-    static targets = ["source", "popover", "popoverBody", "popoverDate", "deleteForm", "nav", "navCurrent", "navTotal"]
+    static targets = ["source", "nav", "navCurrent", "navTotal"]
 
     connect() {
 	this.comments = []
@@ -10,7 +10,6 @@ export default class extends Controller {
 	this.allMarks = []
 	this.navigableComments = []
 	this.currentCommentIndex = -1
-	this.documentId = this.element.dataset.documentId
 
 	this.boundHandleMarkClick = this.handleMarkClick.bind(this)
 	this.contentEl = this.element.querySelector(".document__content")
@@ -147,7 +146,7 @@ export default class extends Controller {
 	const comment = this.commentsById.get(commentId)
 	if (!comment) return
 
-	this.showPopover(mark, comment)
+	this.showComment(comment, mark)
 
 	const navIndex = this.navigableComments.findIndex(item => item.comment.id === commentId)
 	if (navIndex !== -1) {
@@ -195,25 +194,15 @@ export default class extends Controller {
 	const { comment, firstMark } = this.navigableComments[this.currentCommentIndex]
 
 	firstMark.scrollIntoView({ behavior: "smooth", block: "center" })
-	this.showPopover(firstMark, comment)
+	this.showComment(comment, firstMark)
 	this.updateNav()
     }
 
-    showPopover(mark, comment) {
-	const markRect = mark.getBoundingClientRect()
-	const containerRect = this.element.getBoundingClientRect()
-
-	this.popoverBodyTarget.textContent = comment.content
-	this.popoverDateTarget.textContent = new Date(comment.created_at).toLocaleString()
-	this.deleteFormTarget.action = `/documents/${this.documentId}/comments/${comment.id}`
-
-	this.popoverTarget.style.display = "flex"
-	this.popoverTarget.style.left = `${markRect.left - containerRect.left}px`
-	this.popoverTarget.style.top = `${markRect.bottom - containerRect.top + 4}px`
-    }
-
-    hidePopover() {
-	this.popoverTarget.style.display = "none"
+    showComment(comment, mark) {
+	this.element.dispatchEvent(new CustomEvent("comment-highlight:show", {
+	    detail: { comment, mark },
+	    bubbles: true
+	}))
     }
 
     reloadFromSource() {

@@ -14,6 +14,6 @@ Turbo.StreamActions.reset_create_form = function() {
 
 Turbo.StreamActions.hide_popover = function() {
   this.targetElements.forEach(el =>
-    el.dispatchEvent(new CustomEvent("comment-highlight:hide-popover", { bubbles: true }))
+    el.dispatchEvent(new CustomEvent("comment-popover:hide", { bubbles: true }))
   )
 }

@@ -193,6 +193,36 @@
   color: #1d1d1f;
 }
 
+.document__comment-popover-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.document__comment-popover-edit:hover {
+  color: #1d1d1f;
+  background: #e5e7eb;
+}
+
+.document__comment-edit-error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #dc2626;
+}
+
+.document__comment-edit-error:empty {
+  display: none;
+}
+
 .document__comment-destroy-error {
   margin: 0;
   font-size: 0.75rem;

@@ -71,4 +71,82 @@ class CommentsTest < ActionDispatch::IntegrationTest
   ensure
     file.unlink
   end
+
+  test "updates a comment via turbo stream" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    comment = document.comments.create!(
+      content: "Original",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+
+    patch document_comment_path(document, comment),
+          params: { content: "Updated body" }, as: :turbo_stream
+
+    assert_response :ok
+    assert_match %r{text/vnd.turbo-stream.html}, response.content_type
+    assert_equal "Updated body", comment.reload.content
+  ensure
+    file.unlink
+  end
+
+  test "update with blank content renders 422 turbo stream" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    comment = document.comments.create!(
+      content: "Original",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+
+    patch document_comment_path(document, comment),
+          params: { content: "" }, as: :turbo_stream
+
+    assert_response :unprocessable_entity
+    assert_match %r{text/vnd.turbo-stream.html}, response.content_type
+    assert_equal "Original", comment.reload.content
+  ensure
+    file.unlink
+  end
+
+  test "update with foreign comment id raises not found" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    other_file = Tempfile.new([ "other", ".md" ])
+    other_file.write("# Other")
+    other_file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+
+    get open_documents_path, params: { file_path: other_file.path }
+    other_document = Document.find_by(file_path: File.realpath(other_file.path))
+    other_comment = other_document.comments.create!(
+      content: "Other comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Other", prefix_text: "# ", postfix_text: ""
+    )
+
+    patch document_comment_path(document, other_comment),
+          params: { content: "x" }, as: :turbo_stream
+
+    assert_response :not_found
+  ensure
+    file.unlink
+    other_file.unlink
+  end
 end

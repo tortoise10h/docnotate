@@ -55,7 +55,7 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     get open_documents_path, params: { file_path: file.path }
     document = Document.find_by(file_path: File.realpath(file.path))
     first_version = document.version
-    first_node_count = DocumentNode.where(document_id: document.id).count
+    first_node_count = document.document_nodes.count
 
     sleep 1
     File.write(file.path, "# World")
@@ -63,7 +63,7 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     document.reload
 
     assert_not_equal first_version, document.version
-    assert_equal first_node_count, DocumentNode.where(document_id: document.id).count,
+    assert_equal first_node_count, document.document_nodes.count,
                  "re-parsing should replace stale nodes, not stack new ones on top"
     assert_equal "# World", document.content
     text_nodes = document.document_nodes.where(node_type: "text").pluck(:content)

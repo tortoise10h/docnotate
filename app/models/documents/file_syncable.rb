@@ -19,7 +19,6 @@ module Documents
         need_parse = document.new_record? ||
                      (document.last_modified_at.present? && document.last_modified_at < file_mtime) ||
                      (document.size.present? && document.size != file_stats.size)
-        version = need_parse ? document.next_version : (document.version || "v1")
 
         document.assign_attributes(
           content: content,
@@ -27,7 +26,7 @@ module Documents
           size: file_stats.size,
           last_modified_at: file_mtime,
           last_opened_at: Time.current,
-          version:
+          version: document.version || "v1"
         )
 
         if document.save

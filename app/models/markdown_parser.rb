@@ -4,12 +4,13 @@ class MarkdownParser
     block_quote thematic_break
   ].freeze
 
-  def initialize(document:)
-    @document = document
+  def initialize(document_version_id:, content:)
+    @document_version_id = document_version_id
+    @content = content
   end
 
   def parse
-    ast = Commonmarker.parse(@document.content)
+    ast = Commonmarker.parse(@content)
     nodes = []
 
     build_nodes(node: ast, parent_id: nil, position: 0, nodes:)
@@ -37,7 +38,7 @@ class MarkdownParser
 
   def node_attributes(node:, parent_id:, position:)
     {
-      document_id: @document.id,
+      document_version_id: @document_version_id,
       parent_id:,
       position:,
       node_type: node.type.to_s,

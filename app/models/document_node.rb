@@ -1,5 +1,5 @@
 class DocumentNode < ApplicationRecord
-  belongs_to :document
+  belongs_to :document_version
   belongs_to :parent, class_name: "DocumentNode", optional: true
   has_many :children, -> { ordered }, class_name: "DocumentNode", foreign_key: "parent_id", dependent: :destroy
 
@@ -7,8 +7,8 @@ class DocumentNode < ApplicationRecord
 
   attr_accessor :children_array
 
-  def self.tree_for(document_id)
-    nodes = where(document_id: document_id).ordered.to_a
+  def self.tree_for(document_version_id)
+    nodes = where(document_version_id: document_version_id).ordered.to_a
     build_tree(nodes)
   end
 

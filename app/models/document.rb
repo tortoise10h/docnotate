@@ -6,33 +6,10 @@ class Document < ApplicationRecord
   validates :file_type, presence: true
   validates :content, presence: true
 
-  has_many :document_nodes, dependent: :destroy
+  has_many :document_versions, dependent: :destroy
+  has_one :current_version, -> { order(created_at: :desc) }, class_name: "DocumentVersion"
+  has_many :document_nodes, through: :current_version
   has_many :comments, dependent: :destroy
-
-  def next_version
-    return "v1" if version.blank?
-
-    match = version.match(/v(\d+)/)
-    if match
-      number = match[1].to_i
-      "v#{number + 1}"
-    else
-      "v1"
-    end
-  end
-
-  def parse_ast_and_save!
-    nodes = parse_ast
-
-    transaction do
-      document_nodes.delete_all
-      DocumentNode.insert_all!(nodes)
-    end
-  end
-
-  def root_node_tree
-    DocumentNode.tree_for(id)
-  end
 
   def touch_last_opened!
     update_column(:last_opened_at, Time.current)

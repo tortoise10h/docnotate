@@ -10,13 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_09_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_04_101828) do
   create_table "comments", force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
     t.integer "document_id", null: false
+    t.integer "document_version_id", null: false
     t.string "end_block_id"
     t.integer "end_offset"
+    t.boolean "is_resolved", default: false, null: false
     t.text "postfix_text"
     t.text "prefix_text"
     t.text "selected_text"
@@ -24,12 +26,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_000001) do
     t.integer "start_offset"
     t.datetime "updated_at", null: false
     t.index ["document_id"], name: "index_comments_on_document_id"
+    t.index ["document_version_id"], name: "index_comments_on_document_version_id"
   end
 
   create_table "document_nodes", id: :string, force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
-    t.string "document_id", null: false
+    t.integer "document_version_id", null: false
     t.integer "heading_level"
     t.json "meta"
     t.string "node_id"
@@ -37,8 +40,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_000001) do
     t.string "parent_id"
     t.integer "position", null: false
     t.datetime "updated_at", null: false
-    t.index ["document_id"], name: "index_document_nodes_on_document_id"
+    t.index ["document_version_id"], name: "index_document_nodes_on_document_version_id"
     t.index ["parent_id"], name: "index_document_nodes_on_parent_id"
+  end
+
+  create_table "document_versions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "document_id", null: false
+    t.datetime "last_modified_at"
+    t.integer "size"
+    t.datetime "updated_at", null: false
+    t.string "version", null: false
+    t.index ["document_id", "version"], name: "index_document_versions_on_document_id_and_version", unique: true
+    t.index ["document_id"], name: "index_document_versions_on_document_id"
   end
 
   create_table "documents", force: :cascade do |t|
@@ -54,7 +68,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_09_000001) do
     t.index ["file_path"], name: "index_documents_on_file_path", unique: true
   end
 
+  add_foreign_key "comments", "document_versions"
   add_foreign_key "comments", "documents"
   add_foreign_key "document_nodes", "document_nodes", column: "parent_id"
-  add_foreign_key "document_nodes", "documents"
+  add_foreign_key "document_nodes", "document_versions"
+  add_foreign_key "document_versions", "documents"
 end

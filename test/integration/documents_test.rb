@@ -37,12 +37,12 @@ class DocumentsTest < ActionDispatch::IntegrationTest
 
     get open_documents_path, params: { file_path: file.path }
     document = Document.find_by(file_path: File.realpath(file.path))
-    first_version = document.version
+    first_version = document.current_version.version
 
     get open_documents_path, params: { file_path: file.path }
     document.reload
 
-    assert_equal first_version, document.version
+    assert_equal first_version, document.current_version.version
   ensure
     file.unlink
   end
@@ -54,7 +54,7 @@ class DocumentsTest < ActionDispatch::IntegrationTest
 
     get open_documents_path, params: { file_path: file.path }
     document = Document.find_by(file_path: File.realpath(file.path))
-    first_version = document.version
+    first_version = document.current_version.version
     first_node_count = document.document_nodes.count
 
     sleep 1
@@ -62,7 +62,7 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     get open_documents_path, params: { file_path: file.path }
     document.reload
 
-    assert_not_equal first_version, document.version
+    assert_not_equal first_version, document.current_version.version
     assert_equal first_node_count, document.document_nodes.count,
                  "re-parsing should replace stale nodes, not stack new ones on top"
     assert_equal "# World", document.content

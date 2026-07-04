@@ -5,22 +5,16 @@ class CommentTest < ActiveSupport::TestCase
     document = Document.create!(
       file_path: "/tmp/doc.md",
       content: "# Hello",
-      file_type: "markdown",
-      version: "v1",
-      size: 100,
-      last_modified_at: Time.current
+      file_type: "markdown"
     )
-    document.parse_ast_and_save!
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
 
     other_document = Document.create!(
       file_path: "/tmp/other.md",
       content: "# Other",
-      file_type: "markdown",
-      version: "v1",
-      size: 100,
-      last_modified_at: Time.current
+      file_type: "markdown"
     )
-    other_document.parse_ast_and_save!
+    other_document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
 
     comment = document.comments.new(content: "Comment")
     comment.document_version = other_document.current_version
@@ -33,12 +27,9 @@ class CommentTest < ActiveSupport::TestCase
     document = Document.create!(
       file_path: "/tmp/doc.md",
       content: "# Hello",
-      file_type: "markdown",
-      version: "v1",
-      size: 100,
-      last_modified_at: Time.current
+      file_type: "markdown"
     )
-    document.parse_ast_and_save!
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
 
     comment = document.comments.create!(content: "Comment")
 

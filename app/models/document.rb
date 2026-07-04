@@ -6,8 +6,8 @@ class Document < ApplicationRecord
   validates :file_type, presence: true
   validates :content, presence: true
 
+  belongs_to :current_version, class_name: "DocumentVersion", optional: true
   has_many :document_versions, dependent: :destroy
-  has_one :current_version, -> { order(created_at: :desc) }, class_name: "DocumentVersion"
   has_many :document_nodes, through: :current_version
   has_many :comments, dependent: :destroy
 

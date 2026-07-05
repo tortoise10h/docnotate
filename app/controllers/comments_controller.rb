@@ -1,4 +1,6 @@
 class CommentsController < ApplicationController
+  include CommentPayloadable
+
   before_action :set_document
 
   def create
@@ -44,10 +46,6 @@ class CommentsController < ApplicationController
 
   def set_document
     @document = Document.find(params[:document_id])
-  end
-
-  def set_comment_payload
-    @comment_payload = @document.highlight_comments
   end
 
   def comment_params

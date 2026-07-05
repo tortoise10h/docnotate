@@ -16,6 +16,8 @@ Rails.application.routes.draw do
     collection do
       get :open
     end
-    resources :comments, only: [:create, :destroy, :update]
+    resources :comments, only: [:create, :destroy, :update] do
+      resource :resolver, only: [:update], controller: "resolver", module: :comments
+    end
   end
 end

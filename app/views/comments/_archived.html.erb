@@ -1,0 +1,45 @@
+<section id="previous-comments" class="document__archived">
+  <h2 class="document__archived-title">Previous comments (<%= archived_comments.count %>)</h2>
+
+  <% if archived_comments.any? %>
+    <div class="document__archived-list">
+      <% archived_comments.each do |comment| %>
+        <div class="document__archived-comment <%= "document__archived-comment--resolved" if comment.is_resolved %>">
+          <div class="document__archived-comment-timeline">
+            <span class="document__archived-comment-dot"></span>
+          </div>
+
+          <div class="document__archived-comment-content">
+            <div class="document__archived-comment-header">
+              <div class="document__archived-comment-meta">
+                <span><%= comment.created_at.to_fs(:short) %> · <%= comment.document_version.version %></span>
+
+                <% if comment.is_resolved %>
+                  <span class="document__archived-comment-badge">Resolved</span>
+                <% end %>
+              </div>
+
+              <%= button_to document_comment_resolver_path(document, comment),
+                            method: :patch,
+                            class: "document__archived-comment-resolve",
+                            aria: { label: comment.is_resolved ? "Undo resolve" : "Resolve" },
+                            form: { data: { turbo_stream: true } } do %>
+                <% if comment.is_resolved %>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+                <% else %>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+                <% end %>
+              <% end %>
+            </div>
+
+            <blockquote class="document__archived-comment-quote">
+              &ldquo;<%= comment.selected_text %>&rdquo;
+            </blockquote>
+
+            <p class="document__archived-comment-body"><%= comment.content %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</section>

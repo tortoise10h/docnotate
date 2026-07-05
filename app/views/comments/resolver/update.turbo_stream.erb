@@ -1,0 +1,9 @@
+<%= turbo_stream.replace "comment_payload_source" do %>
+  <%= render "comments/payload_source", comment_payload: @comment_payload %>
+<% end %>
+
+<%= turbo_stream.replace "previous-comments" do %>
+  <%= render "comments/archived", document: @document, archived_comments: @archived_comments %>
+<% end %>
+
+<%= turbo_stream.action :reload_comments, "document_paper" %>

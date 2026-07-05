@@ -40,6 +40,8 @@ class DocumentsController < ApplicationController
   def prepare_document
     @document.touch_last_opened!
     @root_nodes = @document.root_node_tree
-    @comment_payload = @document.highlight_comments
+    @comment_payload = @document.comment_payload
+    @archived_comments = @document.archived_comments
+    @unresolved_archived_count = @archived_comments.where(is_resolved: false).count
   end
 end

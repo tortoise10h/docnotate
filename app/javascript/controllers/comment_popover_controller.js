@@ -89,7 +89,8 @@ export default class extends Controller {
 
     parseComments() {
 	try {
-	    return JSON.parse(this.sourceTarget.textContent)
+	    const parsed = JSON.parse(this.sourceTarget.textContent)
+	    return Array.isArray(parsed) ? parsed : (parsed.current || [])
 	} catch {
 	    return []
 	}

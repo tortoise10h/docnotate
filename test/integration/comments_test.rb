@@ -149,4 +149,90 @@ class CommentsTest < ActionDispatch::IntegrationTest
     file.unlink
     other_file.unlink
   end
+
+  test "toggle_resolved flips the resolved flag for archived comments" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    archived_comment = document.comments.create!(
+      content: "Archived comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+
+    document.update!(content: "# Updated world")
+    document.parse_ast_and_save!(
+      metadata: Documents::AstParseable::ParseMetadata.new(size: 200, last_modified_at: Time.current)
+    )
+
+    assert_not archived_comment.reload.is_resolved
+
+    patch document_comment_resolver_path(document, archived_comment), as: :turbo_stream
+
+    assert_response :ok
+    assert archived_comment.reload.is_resolved
+    assert_match %r{text/vnd.turbo-stream.html}, response.content_type
+    assert_match "document__archived-comment--resolved", response.body
+    assert_match "Resolved", response.body
+  ensure
+    file.unlink
+  end
+
+  test "toggle_resolved rejects current-version comments" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    current_comment = document.comments.create!(
+      content: "Current comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+
+    patch document_comment_resolver_path(document, current_comment), as: :turbo_stream
+
+    assert_response :unprocessable_entity
+    assert_not current_comment.reload.is_resolved
+  ensure
+    file.unlink
+  end
+
+  test "comment payload includes current and archived keys" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    document.comments.create!(
+      content: "Archived comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+    document.update!(content: "# Updated world")
+    document.parse_ast_and_save!(
+      metadata: Documents::AstParseable::ParseMetadata.new(size: 200, last_modified_at: Time.current)
+    )
+
+    get open_documents_path, params: { file_path: file.path }
+
+    assert_response :ok
+    payload = Nokogiri::HTML4(response.body).at("#comment_payload_source")&.text
+    assert payload.present?
+    parsed = JSON.parse(payload)
+    assert parsed.key?("current")
+    assert parsed.key?("archived")
+    assert_equal 1, parsed["archived"].length
+    assert_equal "Archived comment", parsed["archived"].first["content"]
+  ensure
+    file.unlink
+  end
 end

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { BLOCK_SELECTOR } from "utils/dom_selectors"
 
 export default class extends Controller {
-    static targets = ["source", "nav", "navCurrent", "navTotal"]
+    static targets = ["source", "nav", "navCurrent", "navTotal", "inboxBadge"]
 
     connect() {
 	this.comments = []
@@ -25,14 +25,17 @@ export default class extends Controller {
     loadComments() {
 	this.clearAllMarks()
 
-	let payload = []
+	let payload = { current: [], archived: [] }
 	try {
-	    payload = JSON.parse(this.sourceTarget.textContent)
+	    const parsed = JSON.parse(this.sourceTarget.textContent)
+	    payload = Array.isArray(parsed) ? { current: parsed, archived: [] } : parsed
 	} catch {
-	    payload = []
+	    payload = { current: [], archived: [] }
 	}
 
-	this.comments = payload
+	this.comments = payload.current || []
+	this.archivedComments = payload.archived || []
+	this.unresolvedArchivedCount = this.archivedComments.filter(comment => !comment.is_resolved).length
 	this.commentsById.clear()
 	this.comments.forEach(comment => this.commentsById.set(comment.id, comment))
 	this.allMarks = []
@@ -176,7 +179,12 @@ export default class extends Controller {
 	const total = this.navigableComments.length
 	this.navTotalTarget.textContent = total
 	this.navCurrentTarget.textContent = total > 0 ? this.currentCommentIndex + 1 : 0
-	this.navTarget.style.display = total > 0 ? "flex" : "none"
+	this.navTarget.style.display = (total > 0 || this.archivedComments.length > 0) ? "flex" : "none"
+
+	if (this.hasInboxBadgeTarget) {
+	    this.inboxBadgeTarget.textContent = this.unresolvedArchivedCount
+	    this.inboxBadgeTarget.hidden = this.unresolvedArchivedCount === 0
+	}
     }
 
     previousComment() {
@@ -196,6 +204,11 @@ export default class extends Controller {
 	firstMark.scrollIntoView({ behavior: "smooth", block: "center" })
 	this.showComment(comment, firstMark)
 	this.updateNav()
+    }
+
+    scrollToArchived() {
+	const section = document.getElementById("previous-comments")
+	if (section) section.scrollIntoView({ behavior: "smooth" })
     }
 
     showComment(comment, mark) {

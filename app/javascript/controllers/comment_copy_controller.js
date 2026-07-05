@@ -13,16 +13,17 @@ export default class extends Controller {
     }
 
     loadComments() {
-        let payload = []
+        let payload = { current: [], archived: [] }
         try {
-            payload = JSON.parse(this.sourceTarget.textContent)
+            const parsed = JSON.parse(this.sourceTarget.textContent)
+            payload = Array.isArray(parsed) ? { current: parsed, archived: [] } : parsed
         } catch {
-            payload = []
+            payload = { current: [], archived: [] }
         }
 
         // Keep only comments whose start block still exists in the DOM,
         // sorted by document position (top-to-bottom reading order).
-        this.orderedComments = payload
+        this.orderedComments = (payload.current || [])
             .filter(comment => document.getElementById(comment.start_block_id))
             .sort((a, b) => {
                 const elA = document.getElementById(a.start_block_id)

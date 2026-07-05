@@ -3,7 +3,7 @@
 <% end %>
 
 <%= turbo_stream.replace "previous-comments" do %>
-  <%= render "comments/archived", document: @document, archived_comments: @archived_comments %>
+  <%= render "comments/archived", document: @document, archived_comments_by_version: @archived_comments_by_version %>
 <% end %>
 
 <% if @create_error.present? %>

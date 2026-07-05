@@ -40,4 +40,34 @@ class DocumentTest < ActiveSupport::TestCase
     assert_includes document.archived_comments, archived_comment
     assert_not_includes document.archived_comments, current_comment
   end
+
+  test "archived_comments_by_version groups archived comments by version in descending version order" do
+    document = Document.create!(
+      file_path: "/tmp/doc.md",
+      content: "# Hello",
+      file_type: "markdown"
+    )
+
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
+    first_version = document.current_version
+    first_version.comments.create!(content: "First version comment A")
+    first_version.comments.create!(content: "First version comment B")
+
+    document.update!(content: "# World")
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 200, last_modified_at: Time.current + 1.second))
+    second_version = document.reload.current_version
+    second_version.comments.create!(content: "Second version comment")
+
+    document.update!(content: "# Updated")
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 300, last_modified_at: Time.current + 2.seconds))
+
+    grouped = document.archived_comments_by_version
+    versions = grouped.keys
+
+    assert_equal 2, versions.size
+    assert_equal second_version, versions.first
+    assert_equal first_version, versions.last
+    assert_equal [ "Second version comment" ], grouped[second_version].map(&:content)
+    assert_equal [ "First version comment A", "First version comment B" ], grouped[first_version].map(&:content)
+  end
 end

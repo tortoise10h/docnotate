@@ -19,6 +19,11 @@ module Documents
         .order("comments.created_at ASC")
     end
 
+    # Group archived comments by their document version, preserving version order
+    def archived_comments_by_version
+      archived_comments.group_by(&:document_version)
+    end
+
     # Serialized payload for archived comments used by the "Previous comments"
     # section and the comment source JSON.
     def archived_comments_payload

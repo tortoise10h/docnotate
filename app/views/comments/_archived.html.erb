@@ -1,9 +1,14 @@
 <section id="previous-comments" class="document__archived">
-  <h2 class="document__archived-title">Previous comments (<%= archived_comments.count %>)</h2>
+  <h2 class="document__archived-title">Previous comments (<%= archived_comments_by_version.values.sum(&:size) %>)</h2>
 
-  <% if archived_comments.any? %>
+  <% archived_comments_by_version.each do |version, comments| %>
+    <div class="document__archived-version">
+      <h3 class="document__archived-version-name"><%= version.version %></h3>
+      <span class="document__archived-version-line" aria-hidden="true"></span>
+    </div>
+
     <div class="document__archived-list">
-      <% archived_comments.each do |comment| %>
+      <% comments.each do |comment| %>
         <div class="document__archived-comment <%= "document__archived-comment--resolved" if comment.is_resolved %>">
           <div class="document__archived-comment-timeline">
             <span class="document__archived-comment-dot"></span>
@@ -12,7 +17,7 @@
           <div class="document__archived-comment-content">
             <div class="document__archived-comment-header">
               <div class="document__archived-comment-meta">
-                <span><%= comment.created_at.to_fs(:short) %> · <%= comment.document_version.version %></span>
+                <span><%= comment.created_at.to_fs(:short) %></span>
 
                 <% if comment.is_resolved %>
                   <span class="document__archived-comment-badge">Resolved</span>

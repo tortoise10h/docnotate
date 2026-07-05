@@ -21,10 +21,10 @@ export default class extends Controller {
             payload = { current: [], archived: [] }
         }
 
-        // Keep only comments whose start block still exists in the DOM,
-        // sorted by document position (top-to-bottom reading order).
+        // Keep only current inline comments whose start block still exists in the DOM.
+        // Archived/previous comments don't have a start_block_id, so they're ignored.
         this.orderedComments = (payload.current || [])
-            .filter(comment => document.getElementById(comment.start_block_id))
+            .filter(comment => comment.start_block_id && document.getElementById(comment.start_block_id))
             .sort((a, b) => {
                 const elA = document.getElementById(a.start_block_id)
                 const elB = document.getElementById(b.start_block_id)

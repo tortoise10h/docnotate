@@ -1,11 +1,22 @@
 ---
-name: plannotate
-description: Plan a feature/task and open the resulting plan file in DocNotate for inline review. Use whenever the user invokes /plannotate, asks to "plan and annotate", "plan and review in DocNotate", or wants to plan a task and have the plan opened in the DocNotate web UI for commenting. Triggers on /plannotate or any request that combines planning a feature/implementation with opening the plan in DocNotate for review.
+name: docnotate-plan
+description: Plan a feature/task and open the resulting plan file in DocNotate for inline review. Use whenever the user invokes /docnotate:plan, asks to "plan and annotate", "plan and review in DocNotate", or wants to plan a task and have the plan opened in the DocNotate web UI for commenting. Triggers on /docnotate:plan or any request that combines planning a feature/implementation with opening the plan in DocNotate for review.
 ---
 
-# Plannotate
+# docnotate:plan
 
 Plan the user's task as you normally would, then write the plan to a markdown file under the project's `plans/` directory, and open that file in the local DocNotate web app so the user can annotate inline comments before handing feedback back to you.
+
+## What this skill does NOT do
+
+This skill is **planning only**. While running it:
+
+- **Do not modify the codebase.** No edits, no writes, no file moves outside `plans/`.
+- **Do not run side-effecting commands.** No migrations, no installs, no builds, no commits, no pushes, no deploys.
+- **Do not start implementing the plan in the same turn.** The whole point of this skill is to let the user review and refine the plan in DocNotate before any code changes happen.
+- **Do not open non-DocNotate URLs** in the course of this skill.
+
+Stop once the plan is written and opened in DocNotate. Wait for the user to paste their comments back before touching anything else.
 
 ## Why this exists
 
@@ -20,7 +31,7 @@ Do the planning the way you normally would for the task the user gave you:
 - Break the work into clear, ordered steps.
 - Call out assumptions, risks, and open questions.
 
-Keep the plan practical and specific to *this* codebase — no generic filler.
+Keep the plan practical and specific to *this codebase* — no generic filler.
 
 ### 2. Clarify ambiguities
 
@@ -32,7 +43,7 @@ Once the user answers, proceed to write the plan informed by their response. If 
 
 ### 3. Write the plan to `plans/<plan_file>.md`
 
-- The `plans/` directory is relative to the **project root** (the current working directory of the session). If it does not exist, create it.
+- The `plans/` directory is relative to the **project root** (the current working directory of the session). If it does not exist, create it (this directory itself is fine to create — it is not a codebase change).
 - Pick a short, kebab-case filename derived from the task (e.g. `plans/add-jwt-auth.md`, `plans/refactor-connection-pool.md`). If the user named the file, use their name exactly.
 - Write the plan as markdown. A reasonable structure:
 
@@ -56,24 +67,36 @@ Once the user answers, proceed to write the plan informed by their response. If 
 
   Adapt the structure to the task — don't force it if something simpler fits.
 
-### 4. Open the plan in DocNotate
+### 4. Resolve the DocNotate base URL
 
-Once the file is written, open it in the local DocNotate instance by running the `open` command (macOS) with the **absolute** path to the file you just created:
+DocNotate's base URL is configurable via the `DOCNOTATE_ROOT_URL` environment variable. Resolve it with a fallback to the default, and strip any trailing slash so users can set either form interchangeably:
 
 ```bash
-open "http://localhost:3535/documents/open?file_path=<absolute_path_to_plan_file>"
+DOCNOTATE_ROOT_URL="${DOCNOTATE_ROOT_URL:-http://localhost:3535}"
+DOCNOTATE_ROOT_URL="${DOCNOTATE_ROOT_URL%/}"
+```
+
+If `DOCNOTATE_ROOT_URL` is set but empty, treat it as unset (the `:-` fallback handles this).
+
+### 5. Open the plan in DocNotate
+
+Once the file is written, open it in the running DocNotate instance via the `open` command (macOS) with the **absolute** path to the file you just created:
+
+```bash
+open "${DOCNOTATE_ROOT_URL}/documents/open?file_path=<absolute_path_to_plan_file>"
 ```
 
 - Use the absolute path (not `~`, not relative) so the URL is unambiguous.
 - If the `open` command isn't available on this platform (e.g. Linux without `xdg-open`, Windows), use the platform equivalent (`xdg-open`, `start`) and tell the user what you ran.
-- DocNotate must already be running on port 3535. If the command fails or the URL doesn't respond, tell the user to start DocNotate and re-run the open command — don't silently swallow the error.
+- DocNotate must already be running at the resolved `DOCNOTATE_ROOT_URL`. If the command fails or the URL doesn't respond, tell the user to start DocNotate (and check the `DOCNOTATE_ROOT_URL` they set) and re-run the open command — don't silently swallow the error.
 
-### 5. Tell the user what to do next
+### 6. Tell the user what to do next
 
 Briefly tell the user:
 - Where the plan file lives (absolute path).
 - That DocNotate should now be open with the plan loaded.
 - That when they're done commenting, they can use DocNotate's copy button and paste the comments back here as their next message, and you'll revise the plan from there.
+- That the plan is still a proposal — no code changes will be made until they explicitly approve it.
 
 Keep it short — no need to re-summarize the plan itself, it's already in the file they're looking at.
 
@@ -81,4 +104,5 @@ Keep it short — no need to re-summarize the plan itself, it's already in the f
 
 - Don't commit the plan file unless the user asks. The `plans/` directory may be gitignored or kept on purpose; respect whichever.
 - If an existing plan file exists with the same name, overwrite it only if the new task is clearly a revision of the same thing. Otherwise pick a distinct filename to avoid losing prior plans.
-- This skill is paired with DocNotate running locally on port 3535. The plan file is plain markdown — the user can still open and read it even if DocNotate isn't running, they just lose the inline-commenting workflow.
+- This skill is paired with DocNotate running locally. The base URL defaults to `http://localhost:3535` and can be overridden by setting `DOCNOTATE_ROOT_URL` (e.g. `DOCNOTATE_ROOT_URL=http://localhost:4000`). The plan file is plain markdown — the user can still open and read it even if DocNotate isn't running, they just lose the inline-commenting workflow.
+- The plan is a proposal until the user explicitly approves it. After they paste comments back, revise the plan or ask follow-up questions as needed; do not start implementation until they say so.

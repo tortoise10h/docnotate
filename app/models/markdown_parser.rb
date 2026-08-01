@@ -1,7 +1,7 @@
 class MarkdownParser
   BLOCK_LEVEL_TYPES = %i[
     paragraph heading code_block list item
-    block_quote thematic_break
+    block_quote thematic_break table table_row table_cell
   ].freeze
 
   def initialize(document_version_id:, content:)
@@ -13,16 +13,16 @@ class MarkdownParser
     ast = Commonmarker.parse(@content)
     nodes = []
 
-    build_nodes(node: ast, parent_id: nil, position: 0, nodes:)
+    build_nodes(node: ast, parent_id: nil, parent_node: nil, position: 0, nodes:)
 
     nodes
   end
 
   private
 
-  def build_nodes(node:, parent_id:, position:, nodes:)
+  def build_nodes(node:, parent_id:, parent_node:, position:, nodes:)
     db_id = SecureRandom.uuid_v7
-    attrs = node_attributes(node:, parent_id:, position:)
+    attrs = node_attributes(node:, parent_id:, parent_node:, position:)
     attrs[:id] = db_id
 
     nodes << attrs
@@ -30,13 +30,13 @@ class MarkdownParser
     child = node.first_child
     child_position = 0
     while child
-      build_nodes(node: child, parent_id: db_id, position: child_position, nodes: nodes)
+      build_nodes(node: child, parent_id: db_id, parent_node: node, position: child_position, nodes: nodes)
       child = child.next_sibling
       child_position += 1
     end
   end
 
-  def node_attributes(node:, parent_id:, position:)
+  def node_attributes(node:, parent_id:, parent_node:, position:)
     {
       document_version_id: @document_version_id,
       parent_id:,
@@ -44,7 +44,7 @@ class MarkdownParser
       node_type: node.type.to_s,
       content: node_content(node),
       heading_level: node_heading_level(node),
-      meta: node_metadata(node),
+      meta: node_metadata(node, parent_node:, position:),
       node_id: block_level?(node) ? unique_block_id : nil,
       created_at: Time.current,
       updated_at: Time.current
@@ -67,7 +67,7 @@ class MarkdownParser
     node.header_level
   end
 
-  def node_metadata(node)
+  def node_metadata(node, parent_node:, position:)
     case node.type
     when :code_block
       { "language" => node.fence_info.to_s }
@@ -83,9 +83,26 @@ class MarkdownParser
         "url" => node.url.to_s,
         "title" => node.title.to_s
       }
+    when :table_row
+      { "row_index" => position }
+    when :table_cell
+      {
+        "is_header" => parent_node&.type == :table_row && node_position(parent_node).zero?,
+        "cell_index" => position
+      }
     else
       nil
     end
+  end
+
+  def node_position(node)
+    position = 0
+    sibling = node.previous_sibling
+    while sibling
+      position += 1
+      sibling = sibling.previous_sibling
+    end
+    position
   end
 
   def unique_block_id

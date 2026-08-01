@@ -678,6 +678,33 @@
   margin: 24px 0;
 }
 
+.document-node--table {
+  display: block;
+  width: 100%;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.document-node--table-row {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.document-node--table-cell {
+  min-width: 8rem;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  text-align: left;
+  vertical-align: top;
+}
+
+.document-node--table-cell-th {
+  background: #f3f4f6;
+  color: #1d1d1f;
+  font-weight: 600;
+}
+
 .document-node--image {
   max-width: 100%;
   height: auto;

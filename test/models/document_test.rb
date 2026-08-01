@@ -70,4 +70,25 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal [ "Second version comment" ], grouped[second_version].map(&:content)
     assert_equal [ "First version comment A", "First version comment B" ], grouped[first_version].map(&:content)
   end
+
+  test "parses markdown tables into selectable document nodes" do
+    document = Document.create!(
+      file_path: "/tmp/table.md",
+      content: "| Name | Status |\n| --- | --- |\n| Alice | Active |",
+      file_type: "markdown"
+    )
+
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
+
+    table = document.document_nodes.find_by(node_type: "table")
+    header_row = table.children.ordered.first
+    header_cells = header_row.children.ordered
+
+    assert table
+    assert_equal 1, document.document_nodes.where(node_type: "table").count
+    assert_equal 2, document.document_nodes.where(node_type: "table_row").count
+    assert_equal 4, document.document_nodes.where(node_type: "table_cell").count
+    assert_equal [ true, true ], header_cells.map { |cell| cell.meta["is_header"] }
+    assert header_cells.all? { |cell| cell.node_id.start_with?("block-") }
+  end
 end

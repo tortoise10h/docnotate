@@ -16,6 +16,23 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "renders markdown tables" do
+    file = Tempfile.new(["table", ".md"])
+    file.write("| Name | Status |\n| --- | --- |\n| Alice | Active |")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+
+    assert_response :success
+    assert_select "table.document-node--table"
+    assert_select "table > thead > tr.document-node--table-row"
+    assert_select "table > tbody > tr.document-node--table-row"
+    assert_select "thead th.document-node--table-cell-th", text: "Name"
+    assert_select "tbody td.document-node--table-cell", text: "Active"
+  ensure
+    file.unlink
+  end
+
   test "resolves a relative file path to an absolute path" do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do

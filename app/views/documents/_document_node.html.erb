@@ -64,6 +64,32 @@
   </blockquote>
 <% when "thematic_break" %>
   <hr id="<%= node.node_id %>" class="document-node document-node--thematic-break">
+<% when "table" %>
+  <table id="<%= node.node_id %>" class="document-node document-node--table">
+    <% header_row = node.children.first %>
+    <% body_rows = node.children.drop(1) %>
+    <thead>
+      <%= render "document_node", node: header_row if header_row %>
+    </thead>
+    <tbody>
+      <% body_rows.each do |row| %>
+        <%= render "document_node", node: row %>
+      <% end %>
+    </tbody>
+  </table>
+<% when "table_row" %>
+  <tr id="<%= node.node_id %>" class="document-node document-node--table-row">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </tr>
+<% when "table_cell" %>
+  <% cell_tag = node.meta&.dig("is_header") ? "th" : "td" %>
+  <<%= cell_tag %> id="<%= node.node_id %>" class="document-node document-node--table-cell<%= " document-node--table-cell-th" if cell_tag == "th" %>">
+    <% node.children.each do |child| %>
+      <%= render "document_node", node: child %>
+    <% end %>
+  </<%= cell_tag %>>
 <% when "softbreak" %>
   <br class="document-node document-node--softbreak">
 <% when "linebreak" %>

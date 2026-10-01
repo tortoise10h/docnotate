@@ -91,4 +91,31 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal [ true, true ], header_cells.map { |cell| cell.meta["is_header"] }
     assert header_cells.all? { |cell| cell.node_id.start_with?("block-") }
   end
+
+  test "table_of_contents extracts h1 through h3 headings in document order" do
+    document = Document.create!(
+      file_path: "/tmp/headings.md",
+      content: "# Heading **with** `code`\n\n## Nested [link](https://example.com)\n\n### Third level\n\n#### Too deep\n\n# Last heading",
+      file_type: "markdown"
+    )
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
+
+    entries = document.table_of_contents
+    expected_headings = document.document_nodes.where(node_type: "heading").where("heading_level <= 3").ordered
+
+    assert_equal expected_headings.map(&:node_id), entries.map(&:id)
+    assert_equal [ 1, 2, 3, 1 ], entries.map(&:level)
+    assert_equal [ "Heading with code", "Nested link", "Third level", "Last heading" ], entries.map(&:text)
+  end
+
+  test "table_of_contents returns an empty array when there are no h1 through h3 headings" do
+    document = Document.create!(
+      file_path: "/tmp/no-headings.md",
+      content: "A paragraph without headings.\n\n#### Only a deeper heading",
+      file_type: "markdown"
+    )
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
+
+    assert_empty document.table_of_contents
+  end
 end

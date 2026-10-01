@@ -1,0 +1,26 @@
+<% return if entries.empty? %>
+
+<details class="document__toc"
+         data-controller="table-of-contents"
+         data-action="toggle->table-of-contents#updateToggle">
+  <summary class="document__toc-toggle" data-table-of-contents-target="toggle">
+    <span>Contents</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+  </summary>
+  <nav class="document__toc-panel" aria-label="Table of contents">
+    <ul class="document__toc-list">
+      <% entries.each do |entry| %>
+        <li>
+          <%= link_to entry.text, "##{entry.id}",
+                      class: "document__toc-item document__toc-item--level-#{entry.level}",
+                      data: {
+                        action: "click->table-of-contents#select",
+                        table_of_contents_target: "link",
+                        table_of_contents_heading_id: entry.id,
+                        level: entry.level
+                      } %>
+        </li>
+      <% end %>
+    </ul>
+  </nav>
+</details>

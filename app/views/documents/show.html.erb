@@ -17,6 +17,8 @@
     </button>
   </header>
 
+  <%= render "table_of_contents", entries: @document.table_of_contents(@root_nodes) %>
+
   <div class="document__paper" id="document_paper"
        data-controller="text-selection comment-highlight comment-copy comment-popover"
        data-document-id="<%= @document.id %>"

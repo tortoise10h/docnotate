@@ -1,11 +1,5 @@
 <div class="home">
-  <header class="home__header">
-    <h1 class="home__title">
-      <%= image_tag "docnotate-logo.png", alt: "DocNotate", class: "home__logo" %>
-      DocNotate
-    </h1>
-    <p class="home__subtitle">Read and annotate your documents with ease</p>
-  </header>
+  <%= render "application/brand" %>
 
   <section class="home__action">
     <%= form_with url: open_documents_path, method: :get, class: "home__form" do |form| %>
@@ -25,13 +19,18 @@
   </section>
 
   <section class="home__recent">
-    <h2 class="section-title">Recent files</h2>
+    <div class="home__recent-header">
+      <h2 class="section-title">Recent files</h2>
+      <%= link_to documents_path, class: "home__all-files", aria: { label: "View all files" }, data: { tooltip: "View all files" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      <% end %>
+    </div>
     <% if @recent_documents.any? %>
       <ul class="recent-files">
         <% @recent_documents.each do |document| %>
           <li class="recent-files__item">
             <%= link_to open_documents_path(file_path: document.file_path), class: "recent-files__link" do %>
-              <span class="recent-files__name" data-tooltip="<%= document.file_path %>"><%= File.basename(document.file_path) %></span>
+              <span class="recent-files__name" data-tooltip="<%= document.file_path %>"><%= document.display_name %></span>
               <span class="recent-files__time"><%= time_ago_in_words(document.last_opened_at) %> ago</span>
             <% end %>
           </li>

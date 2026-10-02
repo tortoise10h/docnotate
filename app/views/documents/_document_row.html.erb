@@ -1,0 +1,48 @@
+<li id="<%= dom_id(document) %>" class="documents__row" data-controller="rename-row">
+  <div class="documents__row-display" data-rename-row-target="display">
+    <%= link_to open_documents_path(file_path: document.file_path), class: "documents__file-link" do %>
+      <span class="documents__name" data-tooltip="<%= document.file_path %>">
+        <span class="documents__name-text"><%= document.display_name %></span>
+      </span>
+      <span class="documents__last-opened">
+        <% if document.last_opened_at.present? %>
+          <%= time_ago_in_words(document.last_opened_at) %> ago
+        <% else %>
+          Never opened
+        <% end %>
+      </span>
+    <% end %>
+
+    <div class="documents__actions">
+      <button type="button"
+              class="documents__icon-button"
+              title="Rename"
+              aria-label="Rename <%= document.display_name %>"
+              data-action="click->rename-row#edit">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+      </button>
+      <%= button_to document_path(document),
+                    method: :delete,
+                    class: "documents__icon-button documents__icon-button--danger",
+                    title: "Remove from history",
+                    aria: { label: "Remove #{document.display_name} from history" },
+                    form: { data: { turbo_stream: true } },
+                    data: { turbo_confirm: "Remove this file from history?" } do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+      <% end %>
+    </div>
+  </div>
+
+  <%= form_with model: document,
+                class: "documents__rename-form",
+                html: { hidden: true },
+                data: { rename_row_target: "form", turbo_stream: true } do |form| %>
+    <%= form.text_field :name,
+                        value: document.display_name,
+                        class: "documents__name-input",
+                        aria: { label: "File name" },
+                        data: { rename_row_target: "input" } %>
+    <%= form.submit "Save", class: "documents__save-button" %>
+    <button type="button" class="documents__cancel-button" data-action="click->rename-row#cancel">Cancel</button>
+  <% end %>
+</li>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_04_134947) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_27_134731) do
   create_table "comments", force: :cascade do |t|
     t.text "content"
     t.datetime "created_at", null: false
@@ -62,6 +62,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_04_134947) do
     t.string "file_path", null: false
     t.string "file_type", default: "markdown", null: false
     t.datetime "last_opened_at"
+    t.string "name"
     t.datetime "updated_at", null: false
     t.index ["current_version_id"], name: "index_documents_on_current_version_id"
     t.index ["file_path"], name: "index_documents_on_file_path", unique: true

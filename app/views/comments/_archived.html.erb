@@ -5,6 +5,21 @@
     <div class="document__archived-version">
       <h3 class="document__archived-version-name"><%= version.version %></h3>
       <span class="document__archived-version-line" aria-hidden="true"></span>
+
+      <% all_resolved = comments.all?(&:is_resolved) %>
+      <%= form_with url: document_version_resolver_path(document), method: :patch, data: { turbo_stream: true } do |f| %>
+        <%= f.hidden_field :document_version_id, value: version.id %>
+        <%= f.hidden_field :resolved, value: all_resolved ? "0" : "1" %>
+        <button type="submit"
+                class="document__archived-version-checkall <%= "document__archived-version-checkall--resolved" if all_resolved %>"
+                aria-label="<%= all_resolved ? "Undo resolve all" : "Resolve all" %>">
+          <% if all_resolved %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+          <% else %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>
+          <% end %>
+        </button>
+      <% end %>
     </div>
 
     <div class="document__archived-list">

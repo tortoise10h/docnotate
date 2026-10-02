@@ -204,6 +204,102 @@ class CommentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "version resolver marks all comments of a version resolved when checked" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    document.comments.create!(
+      content: "First comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+    document.comments.create!(
+      content: "Second comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+
+    document.update!(content: "# Updated world")
+    document.parse_ast_and_save!(
+      metadata: Documents::AstParseable::ParseMetadata.new(size: 200, last_modified_at: Time.current)
+    )
+
+    archived_version = document.document_versions.order(:created_at).first
+    archived_comments = -> { document.archived_comments.where(document_version: archived_version) }
+    assert_equal 2, archived_comments.call.count
+    assert archived_comments.call.none?(&:is_resolved)
+
+    patch document_version_resolver_path(document),
+          params: { document_version_id: archived_version.id, resolved: "1" }, as: :turbo_stream
+
+    assert_response :ok
+    assert_match %r{text/vnd.turbo-stream.html}, response.content_type
+    assert archived_comments.call.all?(&:is_resolved)
+    assert_match "document__archived-comment--resolved", response.body
+  ensure
+    file.unlink
+  end
+
+  test "version resolver unresolves all comments of a version when unchecked" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    document.comments.create!(
+      content: "First comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+
+    document.update!(content: "# Updated world")
+    document.parse_ast_and_save!(
+      metadata: Documents::AstParseable::ParseMetadata.new(size: 200, last_modified_at: Time.current)
+    )
+
+    archived_version = document.document_versions.order(:created_at).first
+    archived_version.resolve_all_comments!(true)
+    assert document.archived_comments.where(document_version: archived_version).all?(&:is_resolved)
+
+    patch document_version_resolver_path(document),
+          params: { document_version_id: archived_version.id, resolved: "0" }, as: :turbo_stream
+
+    assert_response :ok
+    assert document.archived_comments.where(document_version: archived_version).all? { |comment| !comment.is_resolved }
+  ensure
+    file.unlink
+  end
+
+  test "version resolver rejects the current version" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    current_comment = document.comments.create!(
+      content: "Current comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+
+    patch document_version_resolver_path(document),
+          params: { document_version_id: document.current_version_id, resolved: "1" }, as: :turbo_stream
+
+    assert_response :unprocessable_entity
+    assert_not current_comment.reload.is_resolved
+  ensure
+    file.unlink
+  end
+
   test "comment payload includes current and archived keys" do
     file = Tempfile.new([ "sample", ".md" ])
     file.write("# Hello world")

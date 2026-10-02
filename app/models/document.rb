@@ -12,7 +12,17 @@ class Document < ApplicationRecord
   has_many :document_nodes, through: :current_version
   has_many :comments, dependent: :destroy
 
+  before_destroy :clear_current_version_reference, prepend: true
+
+  def display_name = name.presence || File.basename(file_path)
+
   def touch_last_opened!
     update_column(:last_opened_at, Time.current)
+  end
+
+  private
+
+  def clear_current_version_reference
+    update_column(:current_version_id, nil) if current_version_id.present?
   end
 end

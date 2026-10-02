@@ -927,6 +927,31 @@
   background: #e5e7eb;
 }
 
+.document__archived-version-checkall {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  color: #9ca3af;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.document__archived-version-checkall:hover {
+  color: #1d1d1f;
+  background: #f3f4f6;
+}
+
+.document__archived-version-checkall--resolved {
+  color: #16a34a;
+}
+
 .document__archived-list {
   display: flex;
   flex-direction: column;

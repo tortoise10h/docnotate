@@ -1,0 +1,16 @@
+<div class="documents">
+  <%= render "application/brand" %>
+
+  <h2 class="section-title">All files <span id="documents_count" class="documents__count">(<%= pluralize(@pagy.count, "file") %>)</span></h2>
+
+  <% if @documents.any? %>
+    <ul class="documents__list">
+      <%= render partial: "document_row", collection: @documents, as: :document %>
+    </ul>
+    <%== pagy_nav(@pagy) %>
+  <% else %>
+    <div class="card card--transparent empty-state">
+      <p>No files in your history yet. Open a file to get started.</p>
+    </div>
+  <% end %>
+</div>

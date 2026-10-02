@@ -1,0 +1,2 @@
+<%= turbo_stream.remove @document %>
+<%= turbo_stream.update "documents_count", "(#{pluralize(@documents_count, 'file')})" %>

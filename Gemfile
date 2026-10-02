@@ -68,4 +68,4 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "commonmarker", "~> 2.8"
+gem "commonmarker", "~> 2.10"

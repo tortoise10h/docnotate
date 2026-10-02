@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-    static targets = ["link", "toggle"]
+    static targets = ["link", "toggle", "panel"]
 
     connect() {
         this.headings = this.linkTargets.flatMap(link => {
@@ -17,17 +17,33 @@ export default class extends Controller {
         )
         this.headings.forEach(({ heading }) => this.observer.observe(heading))
         this.updateActiveLink()
-    }
 
-    updateToggle() {
-        this.toggleTarget.querySelector("span").textContent = this.element.open ? "On this page" : "Contents"
-        if (this.element.open && this.activeLink) {
-            this.activeLink.scrollIntoView({ block: "nearest" })
+        this.onKeydown = (event) => {
+            if (event.key === "Escape") this.close()
         }
+        document.addEventListener("keydown", this.onKeydown)
     }
 
     disconnect() {
         this.observer?.disconnect()
+        document.removeEventListener("keydown", this.onKeydown)
+    }
+
+    open() {
+        this.panelTarget.hidden = false
+        this.toggleTarget.hidden = true
+        this.toggleTarget.setAttribute("aria-expanded", "true")
+
+        if (this.activeLink) this.activeLink.scrollIntoView({ block: "nearest" })
+    }
+
+    close() {
+        if (this.panelTarget.hidden) return
+
+        this.panelTarget.hidden = true
+        this.toggleTarget.hidden = false
+        this.toggleTarget.setAttribute("aria-expanded", "false")
+        this.toggleTarget.focus()
     }
 
     select(event) {
@@ -59,7 +75,7 @@ export default class extends Controller {
 
             if (isActive) {
                 link.setAttribute("aria-current", "location")
-                if (this.element.open) link.scrollIntoView({ block: "nearest" })
+                if (!this.panelTarget.hidden) link.scrollIntoView({ block: "nearest" })
             } else {
                 link.removeAttribute("aria-current")
             }

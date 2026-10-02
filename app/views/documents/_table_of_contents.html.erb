@@ -1,26 +1,38 @@
 <% return if entries.empty? %>
 
-<details class="document__toc"
-         data-controller="table-of-contents"
-         data-action="toggle->table-of-contents#updateToggle">
-  <summary class="document__toc-toggle" data-table-of-contents-target="toggle">
-    <span>Contents</span>
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
-  </summary>
-  <nav class="document__toc-panel" aria-label="Table of contents">
-    <ul class="document__toc-list">
-      <% entries.each do |entry| %>
-        <li>
-          <%= link_to entry.text, "##{entry.id}",
-                      class: "document__toc-item document__toc-item--level-#{entry.level}",
-                      data: {
-                        action: "click->table-of-contents#select",
-                        table_of_contents_target: "link",
-                        table_of_contents_heading_id: entry.id,
-                        level: entry.level
-                      } %>
-        </li>
-      <% end %>
-    </ul>
-  </nav>
-</details>
+<div class="document__toc" data-controller="table-of-contents">
+  <button class="document__toc-toggle"
+          data-table-of-contents-target="toggle"
+          data-tooltip="Contents"
+          data-action="click->table-of-contents#open"
+          type="button"
+          aria-label="Table of contents"
+          aria-controls="document_toc_panel"
+          aria-expanded="false">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+  </button>
+  <div class="document__toc-panel" id="document_toc_panel" data-table-of-contents-target="panel" hidden>
+    <div class="document__toc-header">
+      <span class="document__toc-heading">On this page</span>
+      <button class="document__toc-close" data-action="click->table-of-contents#close" type="button" aria-label="Close table of contents">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <nav aria-label="Table of contents">
+      <ul class="document__toc-list">
+        <% entries.each do |entry| %>
+          <li>
+            <%= link_to entry.text, "##{entry.id}",
+                        class: "document__toc-item document__toc-item--level-#{entry.level}",
+                        data: {
+                          action: "click->table-of-contents#select",
+                          table_of_contents_target: "link",
+                          table_of_contents_heading_id: entry.id,
+                          level: entry.level
+                        } %>
+          </li>
+        <% end %>
+      </ul>
+    </nav>
+  </div>
+</div>

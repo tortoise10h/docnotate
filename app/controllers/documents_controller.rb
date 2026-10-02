@@ -1,4 +1,10 @@
 class DocumentsController < ApplicationController
+  before_action :set_document, only: %i[update destroy]
+
+  def index
+    @pagy, @documents = pagy(Document.order(last_opened_at: :desc))
+  end
+
   def open
     file_path = resolve_file_path
 
@@ -31,7 +37,43 @@ class DocumentsController < ApplicationController
     redirect_to open_documents_path(file_path: @document.file_path)
   end
 
+  def update
+    if @document.update(document_params)
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to documents_path, notice: "File renamed" }
+      end
+    else
+      respond_to do |format|
+        format.turbo_stream { render :update, status: :unprocessable_entity }
+        format.html { redirect_to documents_path, alert: "Unable to rename file" }
+      end
+    end
+  end
+
+  def destroy
+    @document.destroy!
+    @documents_count = Document.count
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to documents_path, notice: "Removed from history" }
+    end
+  rescue ActiveRecord::RecordNotDestroyed
+    respond_to do |format|
+      format.turbo_stream { head :unprocessable_entity }
+      format.html { redirect_to documents_path, alert: "Unable to remove file from history" }
+    end
+  end
+
   private
+
+  def set_document
+    @document = Document.find(params[:id])
+  end
+
+  def document_params
+    params.require(:document).permit(:name)
+  end
 
   def resolve_file_path
     params[:file_path]

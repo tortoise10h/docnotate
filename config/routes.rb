@@ -12,12 +12,13 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
-  resources :documents, only: [:show] do
+  resources :documents, only: [:index, :show, :update, :destroy] do
     collection do
       get :open
     end
     resources :comments, only: [:create, :destroy, :update] do
       resource :resolver, only: [:update], controller: "resolver", module: :comments
     end
+    resource :version_resolver, only: [:update], controller: "version_resolver", module: :comments
   end
 end

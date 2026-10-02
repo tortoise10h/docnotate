@@ -81,6 +81,7 @@ class DocumentsController < ApplicationController
 
   def prepare_document
     @document.touch_last_opened!
+    @recent_documents = Document.recently_opened.limit(5)
     @root_nodes = @document.root_node_tree
     @comment_payload = @document.comment_payload
     @archived_comments_by_version = @document.archived_comments_by_version

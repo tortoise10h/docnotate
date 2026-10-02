@@ -118,4 +118,13 @@ class DocumentTest < ActiveSupport::TestCase
 
     assert_empty document.table_of_contents
   end
+
+  test "recently_opened orders opened documents by last_opened_at and excludes never-opened documents" do
+    oldest = Document.create!(file_path: "/tmp/old.md", content: "old", file_type: "markdown", last_opened_at: 1.hour.ago)
+    newest = Document.create!(file_path: "/tmp/new.md", content: "new", file_type: "markdown", last_opened_at: Time.current)
+    never_opened = Document.create!(file_path: "/tmp/never.md", content: "never", file_type: "markdown")
+
+    assert_equal [ newest, oldest ], Document.recently_opened.to_a
+    assert_not_includes Document.recently_opened, never_opened
+  end
 end

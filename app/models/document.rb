@@ -12,6 +12,8 @@ class Document < ApplicationRecord
   has_many :document_nodes, through: :current_version
   has_many :comments, dependent: :destroy
 
+  scope :recently_opened, -> { where.not(last_opened_at: nil).order(last_opened_at: :desc) }
+
   before_destroy :clear_current_version_reference, prepend: true
 
   def display_name = name.presence || File.basename(file_path)

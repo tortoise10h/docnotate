@@ -1,0 +1,31 @@
+<div class="document__editor"
+     data-controller="editor-open"
+     data-editor-open-url="<%= open_in_editor_document_path(document) %>"
+     data-editor-open-configured="<%= editor_preference.present? %>">
+  <button class="document__editor-button"
+          data-editor-open-target="button"
+          data-action="click->editor-open#open"
+          type="button"
+          aria-label="Open in editor"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          data-tooltip="Open in editor">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+  </button>
+
+  <div class="document__editor-panel" data-editor-open-target="panel" hidden>
+    <div class="document__editor-panel-header">
+      <span class="document__editor-panel-heading">Open in editor</span>
+    </div>
+    <%= form_with url: open_in_editor_document_path(document), method: :post, class: "document__editor-form", data: { editor_open_target: "form", action: "submit->editor-open#choose" } do |form| %>
+      <%= form.label :editor_name, "Application name", class: "document__editor-label" %>
+      <%= form.text_field :editor_name, placeholder: "e.g. Visual Studio Code", class: "document__editor-input", autocomplete: "off", data: { editor_open_target: "input" } %>
+      <p class="document__editor-hint">Use the app name shown in your Applications folder. This choice will be remembered.</p>
+      <p class="document__editor-error" data-editor-open-target="error" hidden></p>
+      <div class="document__editor-actions">
+        <button type="submit" name="editor_name" value="" class="button button--secondary">Use default app</button>
+        <button type="submit" class="button">Open</button>
+      </div>
+    <% end %>
+  </div>
+</div>

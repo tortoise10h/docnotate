@@ -841,6 +841,152 @@
   color: #9ca3af;
 }
 
+.document__editor {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.document__editor-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.document__editor-button:hover {
+  color: #1d1d1f;
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.document__editor-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.document__editor-button svg {
+  flex-shrink: 0;
+}
+
+.document__editor-button::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  padding: 4px 8px;
+  background: #1f2937;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  pointer-events: none;
+  z-index: 60;
+}
+
+.document__editor-button:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.document__editor-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 300px;
+  max-width: calc(100vw - 32px);
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 50;
+}
+
+.document__editor-panel[hidden] {
+  display: none;
+}
+
+.document__editor-panel-header {
+  margin-bottom: 8px;
+}
+
+.document__editor-panel-heading {
+  color: #7c8981;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.document__editor-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.document__editor-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.document__editor-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: #1d1d1f;
+  background: #ffffff;
+}
+
+.document__editor-input:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 1px;
+}
+
+.document__editor-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.document__editor-error {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #dc2626;
+}
+
+.document__editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.document__editor-actions .button {
+  padding: 6px 12px;
+  font-size: 0.8125rem;
+  border-radius: 8px;
+}
+
 .document__title::after {
   content: attr(data-tooltip);
   position: absolute;

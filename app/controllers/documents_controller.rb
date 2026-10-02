@@ -37,6 +37,28 @@ class DocumentsController < ApplicationController
     redirect_to open_documents_path(file_path: @document.file_path)
   end
 
+  def open_in_editor
+    @document = Document.find(params[:id])
+
+    if params.key?(:editor_name)
+      editor_name = params[:editor_name].presence
+      AppSetting.set("editor_application", editor_name || EditorOpener::DEFAULT)
+    end
+
+    preference = AppSetting.get("editor_application")
+
+    if preference.blank?
+      render json: { error: "No editor configured" }, status: :unprocessable_entity
+      return
+    end
+
+    if EditorOpener.new(application: preference).open(@document.file_path)
+      render json: { ok: true }
+    else
+      render json: { error: "Unable to open #{@document.display_name} in #{preference == EditorOpener::DEFAULT ? 'the default application' : preference}. Is the application installed?" }, status: :unprocessable_entity
+    end
+  end
+
   def update
     if @document.update(document_params)
       respond_to do |format|
@@ -82,6 +104,7 @@ class DocumentsController < ApplicationController
   def prepare_document
     @document.touch_last_opened!
     @recent_documents = Document.recently_opened.limit(5)
+    @editor_preference = AppSetting.get("editor_application")
     @root_nodes = @document.root_node_tree
     @comment_payload = @document.comment_payload
     @archived_comments_by_version = @document.archived_comments_by_version

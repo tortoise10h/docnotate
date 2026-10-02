@@ -12,9 +12,14 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
+  post "settings/editor", to: "settings#update_editor", as: :settings_editor
+
   resources :documents, only: [:index, :show, :update, :destroy] do
     collection do
       get :open
+    end
+    member do
+      post :open_in_editor
     end
     resources :comments, only: [:create, :destroy, :update] do
       resource :resolver, only: [:update], controller: "resolver", module: :comments

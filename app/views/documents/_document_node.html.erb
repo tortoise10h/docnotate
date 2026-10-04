@@ -30,10 +30,10 @@
     <% end %>
   </em>
 <% when "code" %>
-  <code class="document-node document-node--code"><%= node.content %></code>
+  <code class="document-node document-node--code" data-gramm="false"><%= node.content %></code>
 <% when "code_block" %>
-  <pre id="<%= node.node_id %>" class="document-node document-node--code-block">
-    <code class="language-<%= node.meta&.dig("language") %>"><%= node.content %></code>
+  <pre id="<%= node.node_id %>" class="document-node document-node--code-block" data-gramm="false">
+    <code class="language-<%= node.meta&.dig("language") %>" data-gramm="false"><%= node.content %></code>
   </pre>
 <% when "list" %>
   <% list_tag = node.meta&.dig("list_type") == "ordered" ? "ol" : "ul" %>

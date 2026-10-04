@@ -25,7 +25,8 @@
       <%= f.text_area :content, class: "document__comment-textarea",
             data: { comment_popover_target: "popoverEditText",
                     controller: "auto-resize-textarea",
-                    action: "input->auto-resize-textarea#resize" } %>
+                    action: "input->auto-resize-textarea#resize",
+                    gramm: "false" } %>
       <p class="document__comment-edit-error" id="comment_edit_error" data-comment-popover-target="editError"></p>
       <div class="document__comment-actions">
         <button type="button" class="document__comment-cancel" data-action="click->comment-popover#cancelEdit">Cancel</button>

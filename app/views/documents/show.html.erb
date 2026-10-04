@@ -86,7 +86,7 @@
         </button>
       </div>
       <div class="document__comment-card" data-text-selection-target="commentInput">
-        <%= f.text_area :content, placeholder: "Add your comment here...", class: "document__comment-textarea", data: { text_selection_target: "commentText", controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize" } %>
+        <%= f.text_area :content, placeholder: "Add your comment here...", class: "document__comment-textarea", data: { text_selection_target: "commentText", controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize", gramm: "false" } %>
         <p class="document__comment-create-error" id="comment_create_error"></p>
         <div class="document__comment-actions">
           <button type="button" class="document__comment-cancel" data-action="click->text-selection#cancel">Cancel</button>
@@ -133,7 +133,7 @@
 
     <%= render "comments/payload_source", comment_payload: @comment_payload %>
 
-    <div class="document__content" data-text-selection-target="content" data-comment-popover-target="content">
+    <div class="document__content" data-text-selection-target="content" data-comment-popover-target="content" data-gramm="false">
       <% @root_nodes.each do |root_node| %>
         <%= render "document_node", node: root_node %>
       <% end %>

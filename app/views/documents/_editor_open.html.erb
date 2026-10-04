@@ -2,7 +2,7 @@
      data-controller="editor-open"
      data-editor-open-url="<%= open_in_editor_document_path(document) %>"
      data-editor-open-configured="<%= editor_preference.present? %>">
-  <button class="document__editor-button"
+  <button class="icon-button icon-button--tooltip-end"
           data-editor-open-target="button"
           data-action="click->editor-open#open"
           type="button"

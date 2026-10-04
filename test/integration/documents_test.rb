@@ -97,7 +97,7 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     assert document.present?
     assert_response :success
     assert_select ".document__title", File.basename(file.path)
-    assert_select ".document__editor-button"
+    assert_select ".document__editor [data-editor-open-target='button']"
     assert_select "[data-editor-open-configured='false']"
   ensure
     file.unlink

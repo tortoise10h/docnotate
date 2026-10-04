@@ -571,32 +571,16 @@
 
 .document__scroll-top-button {
   display: none;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  margin-right: 2px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  color: #1d1d1f;
-  cursor: pointer;
-  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-  flex-shrink: 0;
+  color: #2563eb;
 }
 
-.document__scroll-top-button:hover {
-  border-color: #d1d5db;
-}
-
-.document__scroll-top-button svg {
-  flex-shrink: 0;
+/* Keep the accent blue even on hover (shared .icon-button:hover would darken it) */
+.icon-button.document__scroll-top-button:hover {
   color: #2563eb;
 }
 
 .document__scroll-top-button--visible {
-  display: flex;
+  display: inline-flex;
 }
 
 .document__header {
@@ -606,9 +590,24 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 16px;
-  padding: 4px 0;
+  margin-bottom: 12px;
+  padding: 4px 0 2px;
   background: #F5FAF6;
+}
+
+/* Explicit header slots so adding buttons never reshuffles the whole bar: */
+.document__leading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.document__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .document__home-button {
@@ -655,87 +654,9 @@
   white-space: nowrap;
 }
 
-.document__copy-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  color: #6b7280;
-  cursor: pointer;
-  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-  flex-shrink: 0;
-}
-
-.document__copy-button:hover {
-  color: #1d1d1f;
-  background: #e5e7eb;
-  border-color: #d1d5db;
-}
-
-.document__copy-button svg {
-  flex-shrink: 0;
-}
-
+/* Copy button uses the shared .icon-button component; only the icon-swap state lives here */
 .document__copy-icon--hidden {
   display: none;
-}
-
-.document__switcher-toggle {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  color: #6b7280;
-  cursor: pointer;
-  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-  flex-shrink: 0;
-}
-
-.document__switcher-toggle:hover {
-  color: #1d1d1f;
-  background: #e5e7eb;
-  border-color: #d1d5db;
-}
-
-.document__switcher-toggle:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
-}
-
-.document__switcher-toggle::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 50%;
-  top: calc(100% + 6px);
-  transform: translateX(-50%);
-  padding: 4px 8px;
-  background: #1f2937;
-  color: #ffffff;
-  font-size: 0.75rem;
-  font-weight: 500;
-  border-radius: 6px;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s ease, visibility 0.15s ease;
-  pointer-events: none;
-  z-index: 60;
-}
-
-.document__switcher-toggle:hover::after {
-  opacity: 1;
-  visibility: visible;
 }
 
 .document__switcher-panel {
@@ -845,62 +766,6 @@
   position: relative;
   display: inline-flex;
   flex-shrink: 0;
-}
-
-.document__editor-button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  color: #6b7280;
-  cursor: pointer;
-  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-  flex-shrink: 0;
-}
-
-.document__editor-button:hover {
-  color: #1d1d1f;
-  background: #e5e7eb;
-  border-color: #d1d5db;
-}
-
-.document__editor-button:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
-}
-
-.document__editor-button svg {
-  flex-shrink: 0;
-}
-
-.document__editor-button::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
-  padding: 4px 8px;
-  background: #1f2937;
-  color: #ffffff;
-  font-size: 0.75rem;
-  font-weight: 500;
-  border-radius: 6px;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s ease, visibility 0.15s ease;
-  pointer-events: none;
-  z-index: 60;
-}
-
-.document__editor-button:hover::after {
-  opacity: 1;
-  visibility: visible;
 }
 
 .document__editor-panel {
@@ -1020,6 +885,7 @@
   background: #f3f4f6;
   padding: 2px 8px;
   border-radius: 4px;
+  flex-shrink: 0;
 }
 
 .document__paper {

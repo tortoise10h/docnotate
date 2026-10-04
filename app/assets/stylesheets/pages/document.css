@@ -375,9 +375,14 @@
   left: max(24px, calc(50% - 450px - 268px));
   width: 244px;
   max-height: calc(100vh - 112px);
-  padding: 12px 0;
+  padding: 12px;
   overflow-y: auto;
   z-index: 30;
+  background: rgba(245, 250, 246, 0.95);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
   scrollbar-color: #cbd5cf transparent;
   scrollbar-width: thin;
 }
@@ -478,9 +483,24 @@
   font-weight: 500;
 }
 
-@media (min-width: 1400px) {
+/* Toggle needs ~100px of left gutter (36px button + 28px gap + page margin),
+   which is available from ~1100px viewport width. Between 1100-1500px the
+   244px panel overlaps the paper edge, so it floats as a page-tinted card
+   (same family as the page bg, not bright white) with border + shadow for
+   separation. From 1500px the full gutter fits, so it goes borderless. */
+@media (min-width: 1100px) {
   .document__toc {
     display: block;
+  }
+}
+
+@media (min-width: 1500px) {
+  .document__toc-panel {
+    padding: 12px 0;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
   }
 }
 

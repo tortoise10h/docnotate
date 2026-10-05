@@ -371,7 +371,7 @@
 
 .document__toc-panel {
   position: fixed;
-  top: 88px;
+  top: 50%;
   left: max(24px, calc(50% - 450px - 268px));
   width: 244px;
   max-height: calc(100vh - 112px);
@@ -382,6 +382,7 @@
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-50%);
   scrollbar-color: #cbd5cf transparent;
   scrollbar-width: thin;
 }
@@ -483,26 +484,12 @@
 }
 
 /* Toggle needs ~100px of left gutter (36px button + 28px gap + page margin),
-   which is available from ~1100px viewport width. Between 1100-1500px the
-   244px panel overlaps the paper edge, so it gets a hairline border +
-   shadow for separation — but keeps the exact page bg, so no new color is
-   introduced. From 1500px the full gutter fits, so it goes borderless. */
+   which is available from ~1100px viewport width. The panel keeps the same
+   card style at every width: page bg with a hairline border + shadow so it
+   stays readable where it overlaps the paper edge on narrower screens. */
 @media (min-width: 1100px) {
   .document__toc {
     display: block;
-  }
-}
-
-@media (min-width: 1500px) {
-  .document__toc-panel {
-    padding: 12px 0;
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-  }
-
-  .document__toc-header {
-    background: #f5faf6;
   }
 }
 

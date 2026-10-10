@@ -66,3 +66,5 @@ group :test do
 end
 
 gem "commonmarker", "~> 2.8"
+# Parse HTML documents with the HTML5 parser for the HTML viewer
+gem "nokogiri"

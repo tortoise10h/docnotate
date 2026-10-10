@@ -1,0 +1,25 @@
+<div class="document__paper" id="document_paper"
+     data-controller="text-selection comment-highlight comment-copy comment-popover"
+     data-document-id="<%= @document.id %>"
+     data-action="comment-highlight:reload->comment-highlight#reloadFromSource
+                 comment-highlight:reload->comment-copy#loadComments
+                 comment-highlight:reload->comment-popover#reload
+                 comment-highlight:show->comment-popover#show
+                 comment-popover:hide->comment-popover#hide
+                 comment-create:reset->text-selection#hideButton">
+  <%= render "documents/selection_form", document: @document %>
+
+  <%= render "comments/popover", document: @document %>
+
+  <%= render "documents/comment_nav", archived_comments_by_version: @archived_comments_by_version, unresolved_archived_count: @unresolved_archived_count, show_inbox: @archived_comments_by_version.any? %>
+
+  <%= render "comments/payload_source", comment_payload: @comment_payload %>
+
+  <div class="document__content" data-text-selection-target="content" data-comment-popover-target="content">
+    <% @root_nodes.each do |root_node| %>
+      <%= render "document_node", node: root_node %>
+    <% end %>
+  </div>
+
+  <%= render "comments/archived", document: @document, archived_comments_by_version: @archived_comments_by_version %>
+</div>

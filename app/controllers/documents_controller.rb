@@ -13,7 +13,7 @@ class DocumentsController < ApplicationController
       return
     end
 
-    unless Document.markdown_file?(file_path)
+    unless Document.supported_file?(file_path)
       @file_path = file_path
       render :unsupported_file, status: :unsupported_media_type
       return

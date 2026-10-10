@@ -1,0 +1,31 @@
+<div class="document__comment-nav" data-comment-highlight-target="nav">
+  <button type="button" class="document__comment-nav-button" data-action="click->comment-highlight#previousComment" aria-label="Previous comment">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+  </button>
+  <span class="document__comment-nav-count" aria-live="polite">
+    <span data-comment-highlight-target="navCurrent">0</span>
+    <span>/</span>
+    <span data-comment-highlight-target="navTotal">0</span>
+  </span>
+  <button type="button" class="document__comment-nav-button" data-action="click->comment-highlight#nextComment" aria-label="Next comment">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+  </button>
+  <div class="document__comment-nav-divider" data-comment-copy-target="divider" role="separator" aria-hidden="true"></div>
+  <button type="button" class="document__comment-copy"
+          data-comment-copy-target="button"
+          data-action="click->comment-copy#copyComments"
+          data-tooltip="Copy comments"
+          aria-label="Copy comments">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></svg>
+  </button>
+  <% if show_inbox %>
+    <button type="button" class="document__comment-inbox-button"
+            data-action="click->comment-highlight#scrollToArchived"
+            data-tooltip="Previous comments"
+            aria-label="Previous comments">
+      <svg class="document__comment-inbox-icon document__comment-inbox-icon--inbox" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
+      <svg class="document__comment-inbox-icon document__comment-inbox-icon--file" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+      <span class="document__comment-inbox-badge" data-comment-highlight-target="inboxBadge" <%= "hidden" if unresolved_archived_count.zero? %>><%= unresolved_archived_count %></span>
+    </button>
+  <% end %>
+</div>

@@ -1,6 +1,8 @@
 <% return if entries.empty? %>
 
-<div class="document__toc" data-controller="table-of-contents">
+<div class="document__toc" data-controller="table-of-contents"
+     data-table-of-contents-html-value="<%= html %>"
+     <% if html %>data-action="iframe-bridge:headings@window->table-of-contents#updateFromFrame"<% end %>>
   <button class="document__toc-toggle"
           data-table-of-contents-target="toggle"
           data-tooltip="Contents"

@@ -2,8 +2,19 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static targets = ["link", "toggle", "panel"]
+    static values = { html: Boolean }
 
     connect() {
+        this.onKeydown = (event) => {
+            if (event.key === "Escape") this.close()
+        }
+
+        // HTML files keep their headings inside the frame; positions arrive via updateFromFrame
+        if (this.htmlValue) {
+            document.addEventListener("keydown", this.onKeydown)
+            return
+        }
+
         this.headings = this.linkTargets.flatMap(link => {
             const heading = document.getElementById(link.dataset.tableOfContentsHeadingId)
             return heading ? [{ link, heading }] : []
@@ -17,10 +28,6 @@ export default class extends Controller {
         )
         this.headings.forEach(({ heading }) => this.observer.observe(heading))
         this.updateActiveLink()
-
-        this.onKeydown = (event) => {
-            if (event.key === "Escape") this.close()
-        }
         document.addEventListener("keydown", this.onKeydown)
     }
 
@@ -49,10 +56,31 @@ export default class extends Controller {
     select(event) {
         event.preventDefault()
 
+        if (this.htmlValue) {
+            this.dispatch("navigate", { detail: { blockId: event.currentTarget.dataset.tableOfContentsHeadingId } })
+            return
+        }
+
         const item = this.headings.find(({ link }) => link === event.currentTarget)
         if (!item) return
 
         item.heading.scrollIntoView({ behavior: "smooth", block: "start" })
+    }
+
+    updateFromFrame(event) {
+        const { entries, threshold } = event.detail
+        const linked = entries.flatMap(entry => {
+            const link = this.linkTargets.find(target => target.dataset.tableOfContentsHeadingId === entry.blockId)
+            return link ? [{ link, top: entry.top }] : []
+        })
+        if (linked.length === 0) return
+
+        let activeItem = linked[0]
+        linked.forEach(item => {
+            if (item.top <= threshold) activeItem = item
+        })
+
+        this.setActiveLink(activeItem.link)
     }
 
     updateActiveLink() {

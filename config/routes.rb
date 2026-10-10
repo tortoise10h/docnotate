@@ -21,6 +21,8 @@ Rails.application.routes.draw do
     member do
       post :open_in_editor
     end
+    get "content", to: "document_contents#show", as: :content, format: false
+    get "content/*path", to: "document_contents#asset", as: :content_asset, format: false
     resources :comments, only: [:create, :destroy, :update] do
       resource :resolver, only: [:update], controller: "resolver", module: :comments
     end

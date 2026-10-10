@@ -578,6 +578,29 @@
   padding: 24px 24px 48px;
 }
 
+/* HTML files get a wider canvas so their own layouts (dashboards, charts) fit */
+.document--wide {
+  display: flex;
+  flex-direction: column;
+  max-width: 90vw;
+  height: 100dvh;
+  padding-bottom: 0;
+}
+
+/* Uploaded HTML brings its own look, so the app chrome sits on plain white */
+.html-document-page {
+  background-color: #ffffff;
+}
+
+.html-document-page .document__header {
+  background: #ffffff;
+}
+
+/* The frame fills the width, so the table-of-contents button moves into the page margin */
+.html-document-page .document__toc-toggle {
+  left: 16px;
+}
+
 .document__scroll-top-button {
   display: none;
   color: #2563eb;
@@ -909,6 +932,49 @@
 .document__content {
   line-height: 1.6;
   color: #374151;
+}
+
+/* The iframe scrolls internally; the page itself never scrolls for HTML files */
+.document__paper--html {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0;
+  min-height: 0;
+}
+
+/* Clips only the frame, so the selection toolbar can overhang the viewer */
+.html-viewer {
+  flex: 1;
+  min-height: 480px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+/* Shown in place of the file when the nav's inbox button is pressed */
+.html-archived-panel {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 40px 40px;
+}
+
+.html-archived-panel .document__archived {
+  margin-top: 0;
+  padding-top: 32px;
+}
+
+.html-archived-panel[hidden],
+.html-viewer[hidden] {
+  display: none;
+}
+
+.html-viewer__frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #ffffff;
 }
 
 /* Document node styles */
@@ -1319,6 +1385,24 @@
 .document__comment-inbox-button:hover {
   color: #1d1d1f;
   background: #f3f4f6;
+}
+
+.document__comment-inbox-button[aria-pressed="true"] {
+  color: #1d1d1f;
+  background: #e5e7eb;
+}
+
+/* While the archived list is open, the same button shows a document icon to switch back */
+.document__comment-inbox-icon--file {
+  display: none;
+}
+
+.document__comment-inbox-button[aria-pressed="true"] .document__comment-inbox-icon--inbox {
+  display: none;
+}
+
+.document__comment-inbox-button[aria-pressed="true"] .document__comment-inbox-icon--file {
+  display: inline;
 }
 
 .document__comment-inbox-button::after {

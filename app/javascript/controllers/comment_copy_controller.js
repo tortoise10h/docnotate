@@ -2,9 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static targets = ["source", "button", "divider"]
+    static values = { remote: Boolean }
 
     connect() {
         this.copyTimeout = null
+        this.anchoredIds = []
         this.loadComments()
     }
 
@@ -21,9 +23,24 @@ export default class extends Controller {
             payload = { current: [], archived: [] }
         }
 
-        // Keep only current inline comments whose start block still exists in the DOM.
-        // Archived/previous comments don't have a start_block_id, so they're ignored.
-        this.orderedComments = (payload.current || [])
+        this.orderedComments = this.remoteValue
+            ? this.orderRemoteComments(payload.current || [])
+            : this.orderDomComments(payload.current || [])
+
+        const visible = this.orderedComments.length > 0
+        this.buttonTarget.style.display = visible ? "inline-flex" : "none"
+        this.dividerTarget.style.display = visible ? "block" : "none"
+    }
+
+    receiveAnchors(event) {
+        this.anchoredIds = event.detail.anchoredIds
+        this.loadComments()
+    }
+
+    // Keep only current inline comments whose start block still exists in the DOM.
+    // Archived/previous comments don't have a start_block_id, so they're ignored.
+    orderDomComments(comments) {
+        return comments
             .filter(comment => comment.start_block_id && document.getElementById(comment.start_block_id))
             .sort((a, b) => {
                 const elA = document.getElementById(a.start_block_id)
@@ -32,10 +49,15 @@ export default class extends Controller {
                 const position = elA.compareDocumentPosition(elB)
                 return position & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
             })
+    }
 
-        const visible = this.orderedComments.length > 0
-        this.buttonTarget.style.display = visible ? "inline-flex" : "none"
-        this.dividerTarget.style.display = visible ? "block" : "none"
+    // The frame owns the blocks, so it reports which comments are anchored, in document order
+    orderRemoteComments(comments) {
+        const rank = new Map(this.anchoredIds.map((id, index) => [id, index]))
+
+        return comments
+            .filter(comment => rank.has(comment.id))
+            .sort((a, b) => rank.get(a.id) - rank.get(b.id))
     }
 
     async copyComments() {

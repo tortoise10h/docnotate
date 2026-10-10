@@ -17,8 +17,9 @@ module Documents
 
         previous_version&.document_nodes&.delete_all
 
-        nodes = MarkdownParser.new(document_version_id: new_version.id, content: content).parse
-        DocumentNode.insert_all!(nodes)
+        parser = document_parser_for(new_version.id)
+        DocumentNode.insert_all!(parser.parse)
+        new_version.update!(content: HtmlContent.create!(annotated_html: parser.annotated_html)) if html?
 
         update_column(:current_version_id, new_version.id)
       end
@@ -30,6 +31,11 @@ module Documents
       return [] unless current_version
 
       DocumentNode.tree_for(current_version.id)
+    end
+
+    def document_parser_for(document_version_id)
+      parser_class = html? ? HtmlParser : MarkdownParser
+      parser_class.new(document_version_id:, content:)
     end
 
     def next_version

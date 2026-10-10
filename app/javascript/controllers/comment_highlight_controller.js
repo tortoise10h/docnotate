@@ -3,6 +3,7 @@ import { BLOCK_SELECTOR } from "utils/dom_selectors"
 
 export default class extends Controller {
     static targets = ["source", "nav", "navCurrent", "navTotal", "inboxBadge"]
+    static values = { remote: Boolean }
 
     connect() {
 	this.comments = []
@@ -11,19 +12,22 @@ export default class extends Controller {
 	this.navigableComments = []
 	this.currentCommentIndex = -1
 
-	this.boundHandleMarkClick = this.handleMarkClick.bind(this)
+	this.markedIds = []
 	this.contentEl = this.element.querySelector(".document__content")
-	this.contentEl.addEventListener("click", this.boundHandleMarkClick)
+	if (this.contentEl) {
+		this.boundHandleMarkClick = this.handleMarkClick.bind(this)
+		this.contentEl.addEventListener("click", this.boundHandleMarkClick)
+	}
 
 	this.loadComments()
     }
 
     disconnect() {
-	this.contentEl.removeEventListener("click", this.boundHandleMarkClick)
+	this.contentEl?.removeEventListener("click", this.boundHandleMarkClick)
     }
 
     loadComments() {
-	this.clearAllMarks()
+	if (!this.remoteValue) this.clearAllMarks()
 
 	let payload = { current: [], archived: [] }
 	try {
@@ -38,6 +42,12 @@ export default class extends Controller {
 	this.unresolvedArchivedCount = this.archivedComments.filter(comment => !comment.is_resolved).length
 	this.commentsById.clear()
 	this.comments.forEach(comment => this.commentsById.set(comment.id, comment))
+	if (this.remoteValue) {
+		this.buildRemoteNavigable()
+		this.updateNav()
+		return
+	}
+
 	this.allMarks = []
 	this.applyAllComments()
 	this.buildNavigableComments()
@@ -145,11 +155,18 @@ export default class extends Controller {
 	const mark = event.target.closest(".document__comment-highlight")
 	if (!mark) return
 
-	const commentId = Number(mark.dataset.commentId)
+	this.openComment(Number(mark.dataset.commentId), mark.getBoundingClientRect())
+    }
+
+    openFromFrame(event) {
+	this.openComment(event.detail.commentId, event.detail.rect)
+    }
+
+    openComment(commentId, rect) {
 	const comment = this.commentsById.get(commentId)
 	if (!comment) return
 
-	this.showComment(comment, mark)
+	this.showComment(comment, rect)
 
 	const navIndex = this.navigableComments.findIndex(item => item.comment.id === commentId)
 	if (navIndex !== -1) {
@@ -172,6 +189,19 @@ export default class extends Controller {
 	    return position & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1
 	})
 
+	this.currentCommentIndex = -1
+    }
+
+    receiveMarks(event) {
+	this.markedIds = event.detail.markedIds
+	this.buildRemoteNavigable()
+	this.updateNav()
+    }
+
+    buildRemoteNavigable() {
+	this.navigableComments = this.markedIds
+	    .map(commentId => ({ comment: this.commentsById.get(commentId) }))
+	    .filter(item => item.comment)
 	this.currentCommentIndex = -1
     }
 
@@ -201,19 +231,34 @@ export default class extends Controller {
 	this.currentCommentIndex = (index + this.navigableComments.length) % this.navigableComments.length
 	const { comment, firstMark } = this.navigableComments[this.currentCommentIndex]
 
-	firstMark.scrollIntoView({ behavior: "smooth", block: "center" })
-	this.showComment(comment, firstMark)
+	const rect = this.scrollToComment(comment.id, firstMark)
+	this.showComment(comment, rect)
 	this.updateNav()
     }
 
+    scrollToComment(commentId, firstMark) {
+	if (this.remoteValue) {
+		this.dispatch("scrollTo", { detail: { commentId } })
+		return null
+	}
+
+	firstMark.scrollIntoView({ behavior: "smooth", block: "center" })
+	return firstMark.getBoundingClientRect()
+    }
+
     scrollToArchived() {
+	if (this.remoteValue) {
+		this.dispatch("showArchived")
+		return
+	}
+
 	const section = document.getElementById("previous-comments")
 	if (section) section.scrollIntoView({ behavior: "smooth" })
     }
 
-    showComment(comment, mark) {
+    showComment(comment, rect) {
 	this.element.dispatchEvent(new CustomEvent("comment-highlight:show", {
-	    detail: { comment, mark },
+	    detail: { comment, rect },
 	    bubbles: true
 	}))
     }

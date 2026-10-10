@@ -1,4 +1,5 @@
-<div class="document" data-controller="scroll-to-top">
+<% content_for :body_class, "html-document-page" if @document.html? %>
+<div class="<%= class_names("document", "document--wide": @document.html?) %>" data-controller="scroll-to-top">
   <header class="document__header">
     <div class="document__leading">
       <%= link_to root_path, class: "document__home-button" do %>
@@ -50,95 +51,11 @@
     </div>
   </header>
 
-  <%= render "table_of_contents", entries: @document.table_of_contents(@root_nodes) %>
+  <%= render "table_of_contents", entries: @document.table_of_contents(@root_nodes), html: @document.html? %>
 
-  <div class="document__paper" id="document_paper"
-       data-controller="text-selection comment-highlight comment-copy comment-popover"
-       data-document-id="<%= @document.id %>"
-       data-action="comment-highlight:reload->comment-highlight#reloadFromSource
-                   comment-highlight:reload->comment-copy#loadComments
-                   comment-highlight:reload->comment-popover#reload
-                   comment-highlight:show->comment-popover#show
-                   comment-popover:hide->comment-popover#hide
-                   comment-create:reset->text-selection#hideButton">
-    <%= form_with url: document_comments_path(@document), class: "document__selection-form", data: { text_selection_target: "form" } do |f| %>
-      <%= f.hidden_field :start_block_id, data: { text_selection_target: "startBlockId" } %>
-      <%= f.hidden_field :end_block_id, data: { text_selection_target: "endBlockId" } %>
-      <%= f.hidden_field :start_offset, data: { text_selection_target: "startOffset" } %>
-      <%= f.hidden_field :end_offset, data: { text_selection_target: "endOffset" } %>
-      <%= f.hidden_field :selected_text, data: { text_selection_target: "selectedText" } %>
-      <%= f.hidden_field :prefix_text, data: { text_selection_target: "prefixText" } %>
-      <%= f.hidden_field :postfix_text, data: { text_selection_target: "postfixText" } %>
-      <div class="document__selection-toolbar" data-text-selection-target="button">
-        <button class="document__selection-button" data-action="click->text-selection#showCommentInput" type="button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-          Add Note
-        </button>
-        <button class="document__selection-copy-button"
-                data-controller="selection-copy"
-                data-selection-copy-text-value=""
-                data-text-selection-target="copyButton"
-                data-action="click->selection-copy#copy"
-                type="button"
-                aria-label="Copy selected text">
-          <svg class="document__selection-copy-icon" data-selection-copy-target="defaultIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></svg>
-          <svg class="document__selection-copy-icon document__selection-copy-icon--hidden" data-selection-copy-target="successIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </button>
-      </div>
-      <div class="document__comment-card" data-text-selection-target="commentInput">
-        <%= f.text_area :content, placeholder: "Add your comment here...", class: "document__comment-textarea", data: { text_selection_target: "commentText", controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize" } %>
-        <p class="document__comment-create-error" id="comment_create_error"></p>
-        <div class="document__comment-actions">
-          <button type="button" class="document__comment-cancel" data-action="click->text-selection#cancel">Cancel</button>
-          <%= f.button type: "submit", class: "button" do %>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-            <span>Comment</span>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-
-    <%= render "comments/popover", document: @document %>
-
-    <div class="document__comment-nav" data-comment-highlight-target="nav">
-      <button type="button" class="document__comment-nav-button" data-action="click->comment-highlight#previousComment" aria-label="Previous comment">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-      </button>
-      <span class="document__comment-nav-count" aria-live="polite">
-        <span data-comment-highlight-target="navCurrent">0</span>
-        <span>/</span>
-        <span data-comment-highlight-target="navTotal">0</span>
-      </span>
-      <button type="button" class="document__comment-nav-button" data-action="click->comment-highlight#nextComment" aria-label="Next comment">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-      <div class="document__comment-nav-divider" data-comment-copy-target="divider" role="separator" aria-hidden="true"></div>
-      <button type="button" class="document__comment-copy"
-              data-comment-copy-target="button"
-              data-action="click->comment-copy#copyComments"
-              data-tooltip="Copy comments"
-              aria-label="Copy comments">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></svg>
-      </button>
-      <% if @archived_comments_by_version.any? %>
-        <button type="button" class="document__comment-inbox-button"
-                data-action="click->comment-highlight#scrollToArchived"
-                data-tooltip="Previous comments"
-                aria-label="Previous comments">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
-          <span class="document__comment-inbox-badge" data-comment-highlight-target="inboxBadge" <%= "hidden" if @unresolved_archived_count.zero? %>><%= @unresolved_archived_count %></span>
-        </button>
-      <% end %>
-    </div>
-
-    <%= render "comments/payload_source", comment_payload: @comment_payload %>
-
-    <div class="document__content" data-text-selection-target="content" data-comment-popover-target="content">
-      <% @root_nodes.each do |root_node| %>
-        <%= render "document_node", node: root_node %>
-      <% end %>
-    </div>
-
-    <%= render "comments/archived", document: @document, archived_comments_by_version: @archived_comments_by_version %>
-  </div>
+  <% if @document.html? %>
+    <%= render "documents/html_paper" %>
+  <% else %>
+    <%= render "documents/markdown_paper" %>
+  <% end %>
 </div>

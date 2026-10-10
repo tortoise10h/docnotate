@@ -1,0 +1,46 @@
+<div class="document__paper document__paper--html" id="document_paper"
+     data-controller="text-selection iframe-bridge comment-highlight comment-copy comment-popover document-view"
+     data-document-id="<%= @document.id %>"
+     data-comment-highlight-remote-value="true"
+     data-comment-copy-remote-value="true"
+     data-comment-popover-remote-value="true"
+     data-action="comment-create:reset->text-selection#hideButton
+                 comment-highlight:reload->comment-highlight#reloadFromSource
+                 comment-highlight:reload->comment-copy#loadComments
+                 comment-highlight:reload->comment-popover#reload
+                 comment-highlight:reload->iframe-bridge#pushComments
+                 comment-highlight:show->comment-popover#show
+                 comment-highlight:scrollTo->iframe-bridge#scrollToComment
+                 comment-highlight:showArchived->document-view#showArchived
+                 comment-popover:hide->comment-popover#hide
+                 comment-popover:closed->iframe-bridge#unfocusComment
+                 iframe-bridge:selection->text-selection#showFromFrame
+                 iframe-bridge:selectionMoved->text-selection#moveFromFrame
+                 iframe-bridge:pointerdown->text-selection#hideButton
+                 iframe-bridge:marksApplied->comment-highlight#receiveMarks
+                 iframe-bridge:marksApplied->comment-copy#receiveAnchors
+                 iframe-bridge:markClick->comment-highlight#openFromFrame
+                 iframe-bridge:markRect->comment-popover#reposition
+                 table-of-contents:navigate@window->iframe-bridge#scrollToBlock
+                 text-selection:hidden->iframe-bridge#clearSelection">
+  <%= render "documents/selection_form", document: @document %>
+
+  <%= render "comments/popover", document: @document %>
+
+  <%= render "documents/comment_nav", archived_comments_by_version: @archived_comments_by_version, unresolved_archived_count: @unresolved_archived_count, show_inbox: true %>
+
+  <%= render "comments/payload_source", comment_payload: @comment_payload %>
+
+  <div class="html-viewer" data-document-view-target="panel" data-view="document"
+       data-text-selection-target="content" data-comment-popover-target="content">
+    <iframe class="html-viewer__frame"
+            src="<%= document_content_path(@document) %>/"
+            sandbox="allow-scripts"
+            title="<%= @document.display_name %>"
+            data-iframe-bridge-target="frame"></iframe>
+  </div>
+
+  <div class="html-archived-panel" data-document-view-target="panel" data-view="archived" hidden>
+    <%= render "comments/archived", document: @document, archived_comments_by_version: @archived_comments_by_version %>
+  </div>
+</div>

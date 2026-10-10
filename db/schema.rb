@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_02_140209) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_10_085649) do
   create_table "app_settings", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "key"
@@ -53,12 +53,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_140209) do
   end
 
   create_table "document_versions", force: :cascade do |t|
+    t.integer "content_id"
+    t.string "content_type"
     t.datetime "created_at", null: false
     t.integer "document_id", null: false
     t.datetime "last_modified_at"
     t.integer "size"
     t.datetime "updated_at", null: false
     t.string "version", null: false
+    t.index ["content_type", "content_id"], name: "index_document_versions_on_content"
     t.index ["document_id", "version"], name: "index_document_versions_on_document_id_and_version", unique: true
     t.index ["document_id"], name: "index_document_versions_on_document_id"
   end
@@ -74,6 +77,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_02_140209) do
     t.datetime "updated_at", null: false
     t.index ["current_version_id"], name: "index_documents_on_current_version_id"
     t.index ["file_path"], name: "index_documents_on_file_path", unique: true
+  end
+
+  create_table "html_contents", force: :cascade do |t|
+    t.text "annotated_html", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "comments", "document_versions"

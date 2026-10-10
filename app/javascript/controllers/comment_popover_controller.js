@@ -1,26 +1,43 @@
 import { Controller } from "@hotwired/stimulus"
 
+const REMOTE_EDGE_GAP = 24
+
 export default class extends Controller {
     static targets = [
         "source", "content", "popover", "popoverBody", "popoverDate", "deleteForm",
         "popoverEditBody", "popoverEditText", "editForm", "editError"
     ]
+    static values = { remote: Boolean }
 
     connect() {
 	this.currentComment = null
-	this.currentMark = null
 	this.documentId = this.element.dataset.documentId
     }
 
+    // A null rect means the anchor is unknown (remote nav) or off-screen (remote scroll)
     show(event) {
-	const { comment, mark } = event.detail
-	if (!comment || !mark) return
+	const { comment, rect } = event.detail
+	if (!comment) return
 
 	this.currentComment = comment
-	this.currentMark = mark
 	this.render(comment)
-	this.position(mark)
+	if (rect) this.placeAt(rect)
+    }
+
+    placeAt(rect) {
 	this.popoverTarget.style.display = "flex"
+	this.position(rect)
+    }
+
+    reposition(event) {
+	const { commentId, rect } = event.detail
+	if (commentId !== this.currentComment?.id) return
+
+	if (rect) {
+	    this.placeAt(rect)
+	} else {
+	    this.popoverTarget.style.display = "none"
+	}
     }
 
     render(comment) {
@@ -34,12 +51,14 @@ export default class extends Controller {
 	return `/documents/${this.documentId}/comments/${comment.id}`
     }
 
-    position(mark) {
-	const markRect = mark.getBoundingClientRect()
+    position(markRect) {
 	const contentRect = this.contentTarget.getBoundingClientRect()
 	const containerRect = this.element.getBoundingClientRect()
+	const left = this.remoteValue
+	    ? contentRect.right - containerRect.left - this.popoverTarget.offsetWidth - REMOTE_EDGE_GAP
+	    : contentRect.right - containerRect.left + 16
 
-	this.popoverTarget.style.left = `${contentRect.right - containerRect.left + 16}px`
+	this.popoverTarget.style.left = `${left}px`
 	this.popoverTarget.style.top = `${markRect.top - containerRect.top}px`
     }
 
@@ -68,6 +87,8 @@ export default class extends Controller {
     hide() {
 	this.exitEditMode()
 	this.popoverTarget.style.display = "none"
+	this.currentComment = null
+	this.dispatch("closed")
     }
 
     reload() {
@@ -77,14 +98,17 @@ export default class extends Controller {
 	const comments = this.parseComments()
 	const updated = comments.find(comment => comment.id === openCommentId)
 	if (!updated) {
-	    this.currentComment = null
-	    this.currentMark = null
 	    this.hide()
 	    return
 	}
 
+	if (this.remoteValue) {
+	    this.show({ detail: { comment: updated } })
+	    return
+	}
+
 	const newMark = this.findMarkForComment(updated.id)
-	if (newMark) this.show({ detail: { comment: updated, mark: newMark } })
+	if (newMark) this.show({ detail: { comment: updated, rect: newMark.getBoundingClientRect() } })
     }
 
     parseComments() {

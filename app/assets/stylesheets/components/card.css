@@ -1,8 +1,8 @@
 /* Card component */
 .card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  background: var(--pre-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
   padding: 32px;
 }
 

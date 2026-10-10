@@ -17,21 +17,21 @@
 }
 
 .error__title {
+  font-family: var(--title-font);
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #1d1d1f;
+  font-weight: 400;
+  color: var(--title-color);
   margin: 0;
-  letter-spacing: -0.02em;
 }
 
 .error__message {
   font-size: 1rem;
-  color: #4b5563;
+  color: var(--fg);
   margin-bottom: 8px;
 }
 
 .error__hint {
   font-size: 0.9375rem;
-  color: #9ca3af;
+  color: var(--muted);
   margin-bottom: 24px;
 }

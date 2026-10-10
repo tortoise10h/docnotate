@@ -4,13 +4,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--pre-bg);
+  border: 1px solid var(--border-light);
   border-radius: 10px;
   padding: 10px 20px;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--full-contrast);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -18,7 +18,7 @@
 }
 
 .button:hover {
-  border-color: #d1d5db;
+  border-color: var(--border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transform: translateY(-1px);
 }
@@ -30,28 +30,28 @@
 
 .button svg {
   flex-shrink: 0;
-  color: #2563eb;
+  color: var(--accent);
 }
 
 .button__icon {
   font-size: 1.25rem;
   font-weight: 300;
-  color: #2563eb;
+  color: var(--accent);
   line-height: 1;
 }
 
 /* Secondary button */
 .button--secondary {
-  background: #f9fafb;
-  color: #4b5563;
+  background: var(--bg);
+  color: var(--fg);
 }
 
 .button--secondary:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: rgba(25, 29, 38, 0.045);
+  border-color: var(--border);
 }
 
 .button--secondary svg,
 .button--secondary .button__icon {
-  color: #6b7280;
+  color: var(--muted);
 }

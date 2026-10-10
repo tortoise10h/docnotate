@@ -5,11 +5,11 @@
 }
 
 .brand__title {
+  font-family: var(--title-font);
   font-size: 1.75rem;
-  font-weight: 700;
-  color: #1d1d1f;
+  font-weight: 400;
+  color: var(--title-color);
   margin-bottom: 8px;
-  letter-spacing: -0.02em;
 }
 
 .brand__link {
@@ -27,6 +27,6 @@
 
 .brand__subtitle {
   font-size: 0.9375rem;
-  color: #6b7280;
+  color: var(--muted);
   font-weight: 400;
 }

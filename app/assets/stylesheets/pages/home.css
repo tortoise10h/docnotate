@@ -81,7 +81,7 @@
   align-items: stretch;
   width: 100%;
   margin: 0 auto;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(25, 29, 38, 0.14);
   border-radius: 8px;
   overflow: hidden;
   background: var(--pre-bg);
@@ -96,6 +96,7 @@
 .home__input {
   flex: 1;
   padding: 12px 16px;
+  font-family: var(--mono-font);
   font-size: 1rem;
   border: none;
   background: transparent;
@@ -103,17 +104,21 @@
   outline: none;
 }
 
+.home__input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
 .home__button {
   border: none;
   border-radius: 0;
-  border-left: 1px solid var(--border);
-  box-shadow: none;
+  border-left: 1px solid rgba(25, 29, 38, 0.14);
 }
 
 .home__button:hover {
-  background: var(--bg);
-  box-shadow: none;
-  transform: none;
+  background: rgba(9, 78, 206, 0.05);
+  border-color: transparent;
+  border-left-color: rgba(25, 29, 38, 0.14);
 }
 
 .home__hint {
@@ -290,19 +295,6 @@
 
 .home-settings__input {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
-  font-family: inherit;
-  font-size: 0.875rem;
-  line-height: 1.4;
-  color: var(--full-contrast);
-  background: var(--pre-bg);
-}
-
-.home-settings__input:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
 }
 
 .home-settings__hint {

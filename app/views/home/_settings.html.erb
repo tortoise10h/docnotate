@@ -16,7 +16,7 @@
     </div>
     <%= form_with url: settings_editor_path, method: :post, class: "home-settings__form", data: { settings_target: "form", action: "submit->settings#save" } do |form| %>
       <%= form.label :editor_name, "Open in editor app", class: "home-settings__label" %>
-      <%= form.text_field :editor_name, value: (@editor_preference if @editor_preference.present? && @editor_preference != EditorOpener::DEFAULT), placeholder: "e.g. Visual Studio Code", class: "home-settings__input", autocomplete: "off", data: { settings_target: "input" } %>
+      <%= form.text_field :editor_name, value: (@editor_preference if @editor_preference.present? && @editor_preference != EditorOpener::DEFAULT), placeholder: "e.g. Visual Studio Code", class: "home-settings__input input", autocomplete: "off", data: { settings_target: "input" } %>
       <p class="home-settings__hint">App used when opening a file in your local editor. Choose "Use default app" to use your system default.</p>
       <p class="home-settings__error" data-settings-target="error" hidden></p>
       <div class="home-settings__actions">

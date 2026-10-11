@@ -7,13 +7,13 @@
                           placeholder: "Search files",
                           autocomplete: "off",
                           aria: { label: "Search files" },
-                          class: "documents__search",
+                          class: "documents__search input",
                           data: { action: "input->filter#search" } %>
     <%= form.select :file_type,
                     [["All types", ""], ["Markdown", "markdown"], ["HTML", "html"]],
                     { selected: @file_type },
                     { aria: { label: "Filter by file type" },
-                      class: "documents__type-filter",
+                      class: "documents__type-filter input",
                       data: { action: "change->filter#filter" } } %>
     <% if @query.present? || @file_type.present? %>
       <%= link_to "Clear", documents_path, class: "documents__clear" %>

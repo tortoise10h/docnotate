@@ -1,6 +1,6 @@
 <li id="<%= dom_id(document) %>" class="documents__row" data-controller="rename-row">
   <div class="documents__row-display" data-rename-row-target="display">
-    <%= link_to open_documents_path(file_path: document.file_path), class: "documents__file-link" do %>
+    <%= link_to open_documents_path(file_path: document.file_path), class: "documents__file-link", data: { turbo_frame: "_top" } do %>
       <%= render "application/file_badge", document: document %>
       <span class="documents__name" data-tooltip="<%= document.file_path %>">
         <span class="documents__name-text"><%= document.display_name %></span>
@@ -40,7 +40,7 @@
                 data: { rename_row_target: "form", turbo_stream: true } do |form| %>
     <%= form.text_field :name,
                         value: document.display_name,
-                        class: "documents__name-input",
+                        class: "documents__name-input input",
                         aria: { label: "File name" },
                         data: { rename_row_target: "input" } %>
     <%= form.submit "Save", class: "documents__save-button" %>

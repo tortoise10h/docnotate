@@ -32,9 +32,7 @@
 <% when "code" %>
   <code class="document-node document-node--code"><%= node.content %></code>
 <% when "code_block" %>
-  <pre id="<%= node.node_id %>" class="document-node document-node--code-block">
-    <code class="language-<%= node.meta&.dig("language") %>"><%= node.content %></code>
-  </pre>
+  <pre id="<%= node.node_id %>" class="document-node document-node--code-block"><code class="language-<%= node.meta&.dig("language") %>"><%= node.content %></code></pre>
 <% when "list" %>
   <% list_tag = node.meta&.dig("list_type") == "ordered" ? "ol" : "ul" %>
   <<%= list_tag %> id="<%= node.node_id %>" class="document-node document-node--list">

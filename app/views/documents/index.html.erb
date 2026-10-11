@@ -1,16 +1,41 @@
 <div class="documents">
   <%= render "application/brand" %>
 
-  <h2 class="section-title">All files <span id="documents_count" class="documents__count">(<%= pluralize(@pagy.count, "file") %>)</span></h2>
-
-  <% if @documents.any? %>
-    <ul class="documents__list">
-      <%= render partial: "document_row", collection: @documents, as: :document %>
-    </ul>
-    <%== pagy_nav(@pagy) %>
-  <% else %>
-    <div class="card card--transparent empty-state">
-      <p>No files in your history yet. Open a file to get started.</p>
-    </div>
+  <%= form_with url: documents_path, method: :get, class: "documents__toolbar", data: { controller: "filter", turbo_frame: "documents_list", turbo_action: "advance" } do |form| %>
+    <%= form.search_field :query,
+                          value: @query,
+                          placeholder: "Search files",
+                          autocomplete: "off",
+                          aria: { label: "Search files" },
+                          class: "documents__search",
+                          data: { action: "input->filter#search" } %>
+    <%= form.select :file_type,
+                    [["All types", ""], ["Markdown", "markdown"], ["HTML", "html"]],
+                    { selected: @file_type },
+                    { aria: { label: "Filter by file type" },
+                      class: "documents__type-filter",
+                      data: { action: "change->filter#filter" } } %>
+    <% if @query.present? || @file_type.present? %>
+      <%= link_to "Clear", documents_path, class: "documents__clear" %>
+    <% end %>
   <% end %>
+
+  <turbo-frame id="documents_list" class="documents__results">
+    <h2 class="section-title">All files <span id="documents_count" class="documents__count">(<%= pluralize(@pagy.count, "file") %>)</span></h2>
+
+    <% if @documents.any? %>
+      <ul class="documents__list">
+        <%= render partial: "document_row", collection: @documents, as: :document %>
+      </ul>
+      <%== pagy_nav(@pagy) %>
+    <% else %>
+      <div class="card card--transparent empty-state">
+        <% if @query.present? || @file_type.present? %>
+          <p>No files match your search.</p>
+        <% else %>
+          <p>No files in your history yet. Open a file to get started.</p>
+        <% end %>
+      </div>
+    <% end %>
+  </turbo-frame>
 </div>

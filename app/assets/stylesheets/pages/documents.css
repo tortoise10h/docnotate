@@ -13,6 +13,55 @@
   letter-spacing: 0;
 }
 
+.documents__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.documents__search,
+.documents__type-filter {
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 0.8125rem;
+  color: var(--full-contrast);
+  background: var(--pre-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.documents__search {
+  flex: 1;
+  min-width: 0;
+}
+
+.documents__search:focus,
+.documents__type-filter:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.documents__type-filter {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.documents__clear {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.documents__clear:hover {
+  color: var(--full-contrast);
+}
+
+.documents__results {
+  display: block;
+}
+
 .documents__list {
   list-style: none;
   margin: 0;

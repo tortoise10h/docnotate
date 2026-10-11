@@ -2,7 +2,9 @@ class DocumentsController < ApplicationController
   before_action :set_document, only: %i[update destroy]
 
   def index
-    @pagy, @documents = pagy(Document.order(last_opened_at: :desc))
+    @query = params[:query].presence
+    @file_type = params[:file_type].presence_in(%w[markdown html])
+    @pagy, @documents = pagy(Document.matching_title(@query).with_file_type(@file_type).order(last_opened_at: :desc))
   end
 
   def open

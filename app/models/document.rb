@@ -1,7 +1,8 @@
 class Document < ApplicationRecord
   include Documents::FileTypeable, Documents::AstParseable,
           Documents::FileSyncable, Documents::Commentable,
-          Documents::TableOfContents, Documents::Assets
+          Documents::TableOfContents, Documents::Assets,
+          Documents::Filterable
 
   validates :file_path, presence: true
   validates :file_type, presence: true

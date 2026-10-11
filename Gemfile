@@ -17,6 +17,10 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# Official MCP SDK so coding agents can drive DocNotate over Streamable HTTP
+# https://github.com/modelcontextprotocol/ruby-sdk
+gem "mcp", "~> 1.7"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 

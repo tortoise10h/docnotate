@@ -1,3 +1,12 @@
+# MCP over Streamable HTTP. StreamableHTTPTransport is a Rack app, so it can
+# be mounted directly: POST carries JSON-RPC messages, GET opens an SSE
+# stream, DELETE terminates the session (see docs/mcp-server.md). The server
+# assembly lives in app/mcp/docnotate_server.rb; routes are loaded after
+# initialization, so its tool classes are autoloadable here (they would not be
+# inside config/initializers). The transport keeps session state in memory,
+# which is fine for our single Puma process.
+DocnotateServerTransport = MCP::Server::Transports::StreamableHTTPTransport.new(DocnotateServer)
+
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -13,6 +22,10 @@ Rails.application.routes.draw do
   root "home#index"
 
   post "settings/editor", to: "settings#update_editor", as: :settings_editor
+
+  # MCP endpoint for coding agents (see DocnotateServerTransport above)
+  mount DocnotateServerTransport => "/mcp", as: :mcp
+
 
   resources :documents, only: [:index, :show, :update, :destroy] do
     collection do

@@ -1,5 +1,18 @@
 # DocNotate
 
+## Contents
+
+- [Introduction](#introduction)
+- [Demo](#demo)
+- [Features](#features)
+- [Installation](#installation)
+  - [Run locally](#run-locally)
+  - [Run with Docker](#run-with-docker)
+- [Tech stack](#tech-stack)
+- [Credits](#credits)
+
+## Introduction
+
 DocNotate is a web-based Rails application designed to solve a major pain point in the age of AI-driven development.
 
 When you're using AI agents to build features day by day, efficiency is everything. Usually, you plan the workflow with the agent beforehand, and the agent generates a markdown file outlining the full plan. To ensure everything is on track, you have to review and validate that plan. But what happens when you disagree with a specific part?

@@ -19,7 +19,11 @@ const style = document.createElement("style")
 style.textContent = [
   "mark.document__selection-highlight { background: #5fd47e; border-radius: 2px; color: inherit; padding: 0; }",
   "mark.document__comment-highlight { background: #5fd47e; border-bottom: 2px solid #2e8b4a; border-radius: 2px; color: inherit; padding: 0; cursor: pointer; transition: background-color 0.15s ease; }",
-  "mark.document__comment-highlight:hover { background: #4dbb6a; }"
+  "mark.document__comment-highlight:hover { background: #4dbb6a; }",
+  // SVG "marks" are rects painted under the text, so fill plays the background role
+  "rect.document__selection-highlight { fill: #5fd47e; }",
+  "rect.document__comment-highlight { fill: #5fd47e; cursor: pointer; }",
+  "rect.document__comment-highlight:hover { fill: #4dbb6a; }"
 ].join("\n")
 document.head.append(style)
 
@@ -38,6 +42,13 @@ function blockElements() {
 function markRects() {
     return activeMarks
         .flatMap(mark => Array.from(mark.getClientRects()))
+        .map(({ left, top, right, bottom }) => ({ left, top, right, bottom }))
+}
+
+// Selections inside SVG text produce no marks, so fall back to the native range
+// geometry to keep the toolbar anchored; the range survives removeAllRanges().
+function rangeRects(range) {
+    return Array.from(range.getClientRects())
         .map(({ left, top, right, bottom }) => ({ left, top, right, bottom }))
 }
 
@@ -77,7 +88,7 @@ function handleMouseUp() {
         selectedText,
         prefixText,
         postfixText,
-        rects: markRects()
+        rects: activeMarks.length > 0 ? markRects() : rangeRects(range)
     })
 }
 
@@ -165,6 +176,13 @@ function wrapTextRange(root, from, to, commentId) {
     let textNode
 
     while ((textNode = walker.nextNode()) !== null) {
+        // SVG text can't hold HTML marks, but still counts toward cursor offsets so
+        // block-relative offsets stay consistent with the selection that created them.
+        if (textNode.parentNode.closest("svg")) {
+            cursor += textNode.textContent.length
+            continue
+        }
+
         const nodeLength = textNode.textContent.length
         const overlapStart = Math.max(from, cursor)
         const overlapEnd = Math.min(to, cursor + nodeLength)
@@ -175,7 +193,11 @@ function wrapTextRange(root, from, to, commentId) {
         cursor += nodeLength
     }
 
-    return pieces.map(({ textNode, localStart, localEnd }) => {
+    return pieces.flatMap(({ textNode, localStart, localEnd }) => {
+        if (textNode.parentNode.namespaceURI === "http://www.w3.org/2000/svg") {
+            return highlightSvgTextNode(textNode, localStart, localEnd, "document__comment-highlight", commentId)
+        }
+
         const parent = textNode.parentNode
         textNode.splitText(localEnd)
         const highlighted = textNode.splitText(localStart)

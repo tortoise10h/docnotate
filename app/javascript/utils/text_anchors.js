@@ -3,6 +3,8 @@
 // app modules, so HtmlFrameDocument inlines this file into the frame at serve time.
 // Keep it dependency-free.
 
+const SVG_NAMESPACE = "http://www.w3.org/2000/svg"
+
 export function blockIdOf(block) {
     return block.dataset.docnotateBlock ?? block.id
 }
@@ -84,6 +86,11 @@ export function highlightRange(range, root) {
 
         if (startOffset >= endOffset) continue
 
+        if (textNode.parentNode.namespaceURI === SVG_NAMESPACE) {
+            marks.push(...highlightSvgTextNode(textNode, startOffset, endOffset, "document__selection-highlight"))
+            continue
+        }
+
         const parent = textNode.parentNode
         textNode.splitText(endOffset)
         const highlightNode = textNode.splitText(startOffset)
@@ -98,8 +105,59 @@ export function highlightRange(range, root) {
     return marks
 }
 
+// SVG <text> only renders SVG-namespaced content, so an HTML <mark> inserted into it
+// makes the label text vanish. Highlighting there means painting <rect> shapes under
+// the glyphs in the SVG's own coordinate space. Rects double as "marks": they carry no
+// text, so callers just remove them on unwrap.
+export function highlightSvgTextNode(textNode, startOffset, endOffset, className, commentId) {
+    const textElement = textNode.parentNode
+    const inverse = textElement.getScreenCTM()?.inverse()
+    if (!inverse) return []
+
+    const subRange = document.createRange()
+    subRange.selectNodeContents(textNode)
+    subRange.setStart(textNode, startOffset)
+    subRange.setEnd(textNode, endOffset)
+
+    const clientRects = subRange.getClientRects()
+    // Chromium covers SVG text ranges; empty results (e.g. older Firefox) fall back to
+    // the whole label's box so at least the full label gets highlighted.
+    const boxes = clientRects.length > 0 ? Array.from(clientRects) : [textElement.getBoundingClientRect()]
+
+    return boxes.flatMap(box => {
+        const topLeft = transformSvgPoint(inverse, box.left, box.top)
+        const bottomRight = transformSvgPoint(inverse, box.right, box.bottom)
+        const width = bottomRight.x - topLeft.x
+        const height = bottomRight.y - topLeft.y
+        if (width <= 0 || height <= 0) return []
+
+        const padY = height * 0.18
+        const rect = document.createElementNS(SVG_NAMESPACE, "rect")
+        rect.setAttribute("class", className)
+        rect.setAttribute("x", topLeft.x)
+        rect.setAttribute("y", topLeft.y - padY)
+        rect.setAttribute("width", width)
+        rect.setAttribute("height", height + padY * 2)
+        rect.setAttribute("rx", Math.min(3, height / 2))
+        if (commentId !== undefined) rect.dataset.commentId = commentId
+
+        // Inserting before the <text> paints the rect under its glyphs
+        textElement.parentNode.insertBefore(rect, textElement)
+        return [rect]
+    })
+}
+
+function transformSvgPoint(matrix, x, y) {
+    const point = new DOMPoint(x, y).matrixTransform(matrix)
+    return { x: point.x, y: point.y }
+}
+
 export function unwrapHighlights(marks, root) {
     marks.forEach(mark => {
+        if (mark.namespaceURI === SVG_NAMESPACE) {
+            mark.remove()
+            return
+        }
         mark.replaceWith(document.createTextNode(mark.textContent))
     })
     root.normalize()

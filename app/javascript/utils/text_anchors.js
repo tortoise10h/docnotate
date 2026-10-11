@@ -63,6 +63,10 @@ export function highlightRange(range, root) {
         {
             acceptNode: (node) => {
                 if (node.parentNode.closest("mark")) return NodeFilter.FILTER_REJECT
+                // ERB rendering leaves whitespace-only text nodes between <tr>/<td>.
+                // Wrapping one in an element splits the anonymous table box, so each
+                // run of rows lays out its own columns and the table shatters.
+                if (!/\S/.test(node.textContent)) return NodeFilter.FILTER_REJECT
                 return NodeFilter.FILTER_ACCEPT
             }
         },

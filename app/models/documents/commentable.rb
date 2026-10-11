@@ -7,7 +7,7 @@ module Documents
       current_version_comments
         .order(:created_at)
         .map { |c| c.slice(:id, :content, :selected_text, :start_block_id, :end_block_id,
-                           :start_offset, :end_offset, :created_at) }
+                           :start_offset, :end_offset, :is_resolved, :created_at) }
     end
 
     # Comments belong to previous document version, show on a separate section as archived comments
@@ -40,6 +40,17 @@ module Documents
         current: highlight_comments,
         archived: archived_comments_payload
       }
+    end
+
+    # comment_payload filtered by resolution state, for agent surfaces that
+    # want only the feedback still open. Shapes stay identical to the UI's so
+    # both surfaces read the same contract.
+    def comments_payload(status: "all")
+      payload = comment_payload
+      return payload if status == "all"
+
+      resolved = status == "resolved"
+      payload.transform_values { |list| list.select { |comment| comment[:is_resolved] == resolved } }
     end
 
     private

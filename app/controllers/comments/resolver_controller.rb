@@ -5,12 +5,13 @@ class Comments::ResolverController < ApplicationController
   before_action :set_comment
 
   def update
-    if @comment.document_version_id == @document.current_version_id
-      render plain: "Current-version comments cannot be resolved", status: :unprocessable_entity
+    begin
+      @comment = @document.set_comment_resolved!(@comment.id, resolved: !@comment.is_resolved)
+    rescue Documents::Commentable::UnresolvableComment => e
+      render plain: e.message, status: :unprocessable_entity
       return
     end
 
-    @comment.update!(is_resolved: !@comment.is_resolved)
     set_comment_payload
   end
 

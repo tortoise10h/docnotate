@@ -21,6 +21,10 @@ DocnotateServer = MCP::Server.new(
     OpenDocumentTool,
     GetDocumentContentTool,
     GetDocumentCommentsTool,
+    CreateCommentTool,
+    UpdateCommentTool,
+    DeleteCommentTool,
+    ResolveCommentTool,
   ],
   server_context: { app_name: "DocNotate" },
 )

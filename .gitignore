@@ -35,3 +35,13 @@
 
 # Ignore local db files
 db/*.sqlite3
+
+# Ignore local agent tooling.
+/.opencode/
+
+# Ignore local planning notes entirely.
+/plans/
+
+# Keep the docs directory empty on the remote; files are added selectively.
+/docs/*
+!/docs/.gitkeep

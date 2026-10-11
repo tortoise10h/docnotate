@@ -15,7 +15,7 @@
         <% end %>
       </div>
     <% end %>
-    <p class="home__hint">Supports .md, .markdown, .mdx</p>
+    <p class="home__hint">Supports .md, .markdown, .mdx, .html, .htm</p>
   </section>
 
   <section class="home__recent">
@@ -30,7 +30,10 @@
         <% @recent_documents.each do |document| %>
           <li class="recent-files__item">
             <%= link_to open_documents_path(file_path: document.file_path), class: "recent-files__link" do %>
-              <span class="recent-files__name" data-tooltip="<%= document.file_path %>"><%= document.display_name %></span>
+              <span class="recent-files__file">
+                <%= render "application/file_badge", document: document %>
+                <span class="recent-files__name" data-tooltip="<%= document.file_path %>"><%= document.display_name %></span>
+              </span>
               <span class="recent-files__time"><%= time_ago_in_words(document.last_opened_at) %> ago</span>
             <% end %>
           </li>

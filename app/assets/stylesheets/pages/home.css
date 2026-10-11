@@ -145,6 +145,13 @@
   text-decoration: underline;
 }
 
+.recent-files__file {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
 .recent-files__name {
   position: relative;
 }

@@ -1,0 +1,4 @@
+<%# locals: (document:) %>
+<% badge_modifier = %w[markdown html].include?(document.file_type) ? document.file_type : "other" %>
+<% badge_label = { "markdown" => "md", "html" => "html" }.fetch(document.file_type, document.file_type) %>
+<span class="file-badge file-badge--<%= badge_modifier %>"><%= badge_label %></span>

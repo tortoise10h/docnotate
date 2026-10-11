@@ -1,6 +1,7 @@
 <li id="<%= dom_id(document) %>" class="documents__row" data-controller="rename-row">
   <div class="documents__row-display" data-rename-row-target="display">
     <%= link_to open_documents_path(file_path: document.file_path), class: "documents__file-link" do %>
+      <%= render "application/file_badge", document: document %>
       <span class="documents__name" data-tooltip="<%= document.file_path %>">
         <span class="documents__name-text"><%= document.display_name %></span>
       </span>

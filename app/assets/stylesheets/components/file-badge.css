@@ -1,0 +1,31 @@
+/* File badge component — extension label shown in file lists.
+ *
+ * Shape mirrors document__archived-comment-badge; colors reuse the
+ * foundation tokens as low-alpha tints so markdown/html read apart
+ * without shouting. Label is mono since it denotes a file extension. */
+
+.file-badge {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--mono-font);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.file-badge--markdown {
+  color: var(--accent);
+  background: var(--inline-code-bg);
+}
+
+.file-badge--html {
+  color: var(--amber);
+  background: rgba(153, 64, 0, 0.08);
+}
+
+.file-badge--other {
+  color: var(--muted);
+  background: rgba(25, 29, 38, 0.05);
+}

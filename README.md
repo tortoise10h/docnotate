@@ -22,6 +22,9 @@ Normally, you'd have to stop reading, copy the problematic section, paste it int
 That's where DocNotate comes in. It lets you open any markdown file — or an HTML document, rendered as a web page — in a clean, read-only view, with more formats coming soon. As you read, if you spot something you want to change or clarify, just highlight the text, add an inline comment, and keep reading. Once you're done, hit the copy button to grab all your comments and their corresponding code snippets at once. Then, just paste the whole thing into your AI console to get everything fixed in one single prompt.
 
 ## Demo
+<img width="1256" height="653" alt="image" src="https://github.com/user-attachments/assets/7fd6e2ec-a4ef-4d12-8a33-78e2bac07176" />
+
+
 <img width="1342" height="905" alt="image" src="https://github.com/user-attachments/assets/9111e5e1-c702-4237-8106-d8b8818eaecf" />
 
 <img width="1347" height="904" alt="image" src="https://github.com/user-attachments/assets/761ee354-79dc-4b43-b9e1-318cff573175" />

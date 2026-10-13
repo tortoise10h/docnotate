@@ -15,7 +15,8 @@ module Documents
       current_version_comments
         .order(:created_at)
         .map { |c| c.slice(:id, :content, :selected_text, :start_block_id, :end_block_id,
-                           :start_offset, :end_offset, :is_resolved, :created_at) }
+                           :start_offset, :end_offset, :is_resolved, :created_at)
+                    .merge(content_html: c.rendered_content) }
     end
 
     # Model-level comment writes so tools and controllers share one rule set.
@@ -86,7 +87,8 @@ module Documents
     def archived_comments_payload
       archived_comments.map do |comment|
         comment.slice(:id, :content, :selected_text, :created_at, :is_resolved)
-               .merge(version: comment.document_version.version)
+               .merge(version: comment.document_version.version,
+                      content_html: comment.rendered_content)
       end
     end
 

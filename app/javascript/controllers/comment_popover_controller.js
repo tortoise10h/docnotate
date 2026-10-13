@@ -41,7 +41,13 @@ export default class extends Controller {
     }
 
     render(comment) {
-	this.popoverBodyTarget.textContent = comment.content
+	if (comment.content_html) {
+	    // Server renders markdown but ships no wrapper; the class carries the
+	    // markdown styling shared with the archived-comments view
+	    this.popoverBodyTarget.innerHTML = `<div class="document__comment-markdown">${comment.content_html}</div>`
+	} else {
+	    this.popoverBodyTarget.textContent = comment.content
+	}
 	this.popoverDateTarget.textContent = new Date(comment.created_at).toLocaleString()
 	this.deleteFormTarget.action = this.commentEndpoint(comment)
 	this.exitEditMode()

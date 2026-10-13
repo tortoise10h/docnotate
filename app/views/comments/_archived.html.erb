@@ -56,7 +56,7 @@
               &ldquo;<%= comment.selected_text %>&rdquo;
             </blockquote>
 
-            <p class="document__archived-comment-body"><%= comment.content %></p>
+            <div class="document__comment-markdown document__archived-comment-body"><%= comment.rendered_content %></div>
           </div>
         </div>
       <% end %>

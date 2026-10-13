@@ -283,6 +283,9 @@
   line-height: 1.5;
   color: var(--full-contrast);
   white-space: pre-wrap;
+  /* As a flex item, min-width:auto would otherwise follow the widest unbreakable
+     line and blow the popover open instead of letting the code block scroll */
+  min-width: 0;
 }
 
 .document__comment-nav {

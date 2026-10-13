@@ -1,4 +1,6 @@
 class Comment < ApplicationRecord
+  include Comments::Renderable
+
   belongs_to :document
   belongs_to :document_version
 

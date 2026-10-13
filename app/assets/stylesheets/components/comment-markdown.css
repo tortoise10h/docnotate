@@ -1,0 +1,108 @@
+/* Rendered markdown inside comment bubbles (popover and archived comments).
+   The popover body defaults to pre-wrap for plain text; rendered markdown
+   brings its own block structure, so that must not apply. */
+.document__comment-markdown {
+  white-space: normal;
+}
+
+.document__comment-markdown > *:first-child {
+  margin-top: 0;
+}
+
+.document__comment-markdown > *:last-child {
+  margin-bottom: 0;
+}
+
+.document__comment-markdown p {
+  margin: 0 0 0.5em;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.document__comment-markdown h1,
+.document__comment-markdown h2,
+.document__comment-markdown h3,
+.document__comment-markdown h4,
+.document__comment-markdown h5,
+.document__comment-markdown h6 {
+  margin: 0.75em 0 0.35em;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.document__comment-markdown ul,
+.document__comment-markdown ol {
+  margin: 0 0 0.5em;
+  padding-left: 1.4em;
+}
+
+.document__comment-markdown li {
+  margin: 0.15em 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.document__comment-markdown li > p {
+  margin: 0;
+  font-size: inherit;
+}
+
+.document__comment-markdown code {
+  font-family: var(--mono-font);
+  font-size: 0.8125rem;
+  background: var(--inline-code-bg);
+  color: var(--inline-code-fg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
+
+.document__comment-markdown pre {
+  background: var(--pre-bg);
+  border: 1px solid var(--pre-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 0 0 0.5em;
+  overflow-x: auto;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.document__comment-markdown pre code {
+  background: transparent;
+  color: var(--full-contrast);
+  padding: 0;
+  border-radius: 0;
+  white-space: pre;
+}
+
+.document__comment-markdown blockquote {
+  margin: 0.25em 0 0.5em;
+  padding: 2px 0 2px 10px;
+  border-left: 3px solid var(--border-light);
+  color: var(--muted);
+}
+
+.document__comment-markdown blockquote p {
+  color: inherit;
+}
+
+.document__comment-markdown a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.document__comment-markdown table {
+  border-collapse: collapse;
+  margin: 0 0 0.5em;
+  font-size: 0.8125rem;
+}
+
+.document__comment-markdown th,
+.document__comment-markdown td {
+  border: 1px solid var(--border-light);
+  padding: 4px 8px;
+  text-align: left;
+}

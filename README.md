@@ -9,6 +9,7 @@
   - [Run locally](#run-locally)
   - [Run with Docker](#run-with-docker)
 - [Tech stack](#tech-stack)
+- [MCP server](#mcp-server)
 - [Credits](#credits)
 
 ## Introduction
@@ -76,6 +77,36 @@ DocNotate is deliberately lightweight:
 - **SQLite** as the only database, and the Solid suite (cache, queue, cable) running on it
 - **No Node build step** — JavaScript is served via importmap
 - Everything runs on your machine against your local files — no accounts, no external services
+
+## MCP server
+
+DocNotate ships a [Model Context Protocol](https://modelcontextprotocol.io) server at `http://localhost:3535/mcp`. Point your agent (pi, Claude Code, OpenCode, Cursor, etc.) at it and the agent can read your inline comments on any document you're reviewing, fix the plan file directly, mark comments resolved — or open a document, comment on it, and rename or remove it from history. Every conversation reads from the same live app you use.
+
+```json
+{
+  "mcpServers": {
+    "docnotate": {
+      "url": "http://localhost:3535/mcp"
+    }
+  }
+}
+```
+
+Set this up in the MCP config of your agent harness with the Dev server running (`bin/dev`). All tools operate on your own local files — there is no auth because everything stays on localhost.
+
+| Tool | What it does |
+| --- | --- |
+| `app_status` | App connectivity check |
+| `list_documents` | List documents in the library |
+| `open_document` | Open (or re-sync) a file by path and get its id |
+| `get_document_content` | Read a document's full current text |
+| `get_document_comments` | Read inline comments, optionally filtered by status |
+| `create_comment` | Add an inline comment, optionally anchored by `selected_text` |
+| `update_comment` | Edit a comment's content |
+| `delete_comment` | Remove a comment |
+| `resolve_comment` | Mark a comment resolved (or reopen it) |
+| `rename_document` | Change a document's display name |
+| `delete_document` | Remove a document from history, without ever touching the file |
 
 ## Credits
 

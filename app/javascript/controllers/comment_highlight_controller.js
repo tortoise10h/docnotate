@@ -257,10 +257,23 @@ export default class extends Controller {
     }
 
     showComment(comment, rect) {
+	this.activateMarks(comment.id)
 	this.element.dispatchEvent(new CustomEvent("comment-highlight:show", {
 	    detail: { comment, rect },
 	    bubbles: true
 	}))
+    }
+
+    // Marks of the open comment get the accent underline so the popover's subject
+    // is identifiable at a glance among other highlighted comments
+    activateMarks(commentId) {
+	this.allMarks.forEach(mark =>
+	    mark.classList.toggle("document__comment-highlight--active", Number(mark.dataset.commentId) === commentId)
+	)
+    }
+
+    clearActiveMarks() {
+	this.activateMarks(null)
     }
 
     reloadFromSource() {

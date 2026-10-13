@@ -14,6 +14,7 @@
                  comment-highlight:showArchived->document-view#showArchived
                  comment-popover:hide->comment-popover#hide
                  comment-popover:closed->iframe-bridge#unfocusComment
+                 comment-popover:closed->comment-highlight#clearActiveMarks
                  iframe-bridge:selection->text-selection#showFromFrame
                  iframe-bridge:selectionMoved->text-selection#moveFromFrame
                  iframe-bridge:pointerdown->text-selection#hideButton

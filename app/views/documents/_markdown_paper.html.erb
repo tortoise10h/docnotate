@@ -6,6 +6,7 @@
                  comment-highlight:reload->comment-popover#reload
                  comment-highlight:show->comment-popover#show
                  comment-popover:hide->comment-popover#hide
+                 comment-popover:closed->comment-highlight#clearActiveMarks
                  comment-create:reset->text-selection#hideButton">
   <%= render "documents/selection_form", document: @document %>
 

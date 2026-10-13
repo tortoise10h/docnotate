@@ -87,6 +87,13 @@
   background: #4dbb6a;
 }
 
+/* The comment currently shown in the popover is identified by its heavier,
+   blue accent underline */
+.document__comment-highlight--active {
+  border-bottom-width: 3px;
+  border-bottom-color: var(--accent);
+}
+
 .document-node--code .document__selection-highlight,
 .document-node--code-block code .document__selection-highlight,
 .document-node--code .document__comment-highlight,

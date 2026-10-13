@@ -134,6 +134,7 @@ function applyComments(comments) {
         markedIds,
         anchoredIds: anchored.map(({ id }) => id)
     })
+    applyFocusedMarkClass()
     reportFocusedMark()
 }
 
@@ -224,7 +225,16 @@ function marksFor(commentId) {
 function focusComment(commentId) {
     if (commentId !== focusedCommentId) focusedMarkIndex = 0
     focusedCommentId = commentId
+    applyFocusedMarkClass()
     reportFocusedMark()
+}
+
+// Mirror the parent's document__comment-highlight--active styling so the marks
+// of the open comment stand out inside the frame as well.
+function applyFocusedMarkClass() {
+    commentMarks.forEach(mark =>
+        mark.classList.toggle("document__comment-highlight--active", Number(mark.dataset.commentId) === focusedCommentId)
+    )
 }
 
 function reportFocusedMark() {
@@ -304,6 +314,7 @@ document.addEventListener("click", event => {
     const commentId = Number(mark.dataset.commentId)
     focusedCommentId = commentId
     focusedMarkIndex = marksFor(commentId).indexOf(mark)
+    applyFocusedMarkClass()
     postToParent({ type: "docnotate:markClick", commentId, rect: rectOf(mark) })
 })
 

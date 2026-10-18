@@ -23,13 +23,13 @@
     </button>
   </div>
   <div class="document__comment-card" data-text-selection-target="commentInput">
-    <%= f.text_area :content, placeholder: "Add your comment here...", class: "document__comment-textarea", data: { text_selection_target: "commentText", controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize" } %>
+    <%= f.text_area :content, placeholder: "Add your comment here...", class: "document__comment-textarea", id: "comment_create_text", data: { text_selection_target: "commentText", controller: "auto-resize-textarea", action: "input->auto-resize-textarea#resize" } %>
     <p class="document__comment-create-error" id="comment_create_error"></p>
     <div class="document__comment-actions">
       <button type="button" class="document__comment-cancel" data-action="click->text-selection#cancel">Cancel</button>
-      <%= f.button type: "submit", class: "button" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      <%= f.button type: "submit", class: "button", data: { controller: "hotkey", hotkey: "Mod+Enter", hotkey_scope: "comment_create_text" } do %>
         <span>Comment</span>
+        <kbd class="button__hotkey-hint" data-hotkey-target="hint"></kbd>
       <% end %>
     </div>
   </div>

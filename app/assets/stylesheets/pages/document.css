@@ -164,6 +164,14 @@
   gap: 12px;
 }
 
+/* Compact submit button so it stays proportional to the light Cancel action */
+.document__comment-actions .button {
+  padding: 5px 14px;
+  gap: 6px;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+}
+
 .document__comment-cancel {
   padding: 6px 12px;
   background: none;

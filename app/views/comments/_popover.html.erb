@@ -22,15 +22,16 @@
 
   <div class="document__comment-popover-edit-body" data-comment-popover-target="popoverEditBody" hidden>
     <%= form_with url: document_comment_path(document, 0), method: :patch, html: { class: "document__comment-edit-form", data: { comment_popover_target: "editForm" } } do |f| %>
-      <%= f.text_area :content, class: "document__comment-textarea",
+      <%= f.text_area :content, class: "document__comment-textarea", id: "comment_edit_text",
             data: { comment_popover_target: "popoverEditText",
                     controller: "auto-resize-textarea",
                     action: "input->auto-resize-textarea#resize" } %>
       <p class="document__comment-edit-error" id="comment_edit_error" data-comment-popover-target="editError"></p>
       <div class="document__comment-actions">
         <button type="button" class="document__comment-cancel" data-action="click->comment-popover#cancelEdit">Cancel</button>
-        <%= f.button type: :submit, class: "button" do %>
+        <%= f.button type: :submit, class: "button", data: { controller: "hotkey", hotkey: "Mod+Enter", hotkey_scope: "comment_edit_text" } do %>
           <span>Save</span>
+          <kbd class="button__hotkey-hint" data-hotkey-target="hint"></kbd>
         <% end %>
       </div>
     <% end %>

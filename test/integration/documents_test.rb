@@ -129,6 +129,7 @@ class DocumentsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "pre.document-node--code-block code.language-mermaid", /flowchart TD/
+    assert_select "dialog.mermaid-modal"
   ensure
     file.unlink
   end

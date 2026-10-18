@@ -1108,6 +1108,12 @@
 /* Mermaid diagrams rendered client-side by Pele; theme tokens map onto Pele's
    CSS variables so diagrams match the paper */
 .document__mermaid {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.document__mermaid-canvas,
+.mermaid-modal__canvas {
   --pele-bg: var(--pre-bg);
   --pele-fg: var(--full-contrast);
   --pele-muted: var(--muted);
@@ -1120,14 +1126,75 @@
   --pele-error: var(--red);
   --pele-font: var(--font);
   --pele-font-mono: var(--mono-font);
+  --pele-zoom-bottom: 8px;
+  --pele-zoom-right: 8px;
+}
 
-  margin-bottom: 16px;
+.document__mermaid-canvas {
   overflow-x: auto;
 }
 
-.document__mermaid .pele {
+.document__mermaid .pele,
+.mermaid-modal__canvas .pele {
   display: block;
   margin: 0 auto;
+}
+
+.document__mermaid-expand {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  background: var(--pre-bg);
+  border-color: var(--border);
+  box-shadow: 0 1px 2px rgba(9, 78, 206, 0.08);
+}
+
+/* Wide-view dialog for diagrams, re-rendered at full width. The foundation
+   reset zeroes margins, so centering has to be re-declared explicitly. */
+.mermaid-modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(92%, 1240px);
+  height: min(86%, 860px);
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--pre-bg);
+  box-shadow: 0 24px 60px rgba(9, 78, 206, 0.25);
+}
+
+.mermaid-modal[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.mermaid-modal::backdrop {
+  background: rgba(25, 29, 38, 0.5);
+}
+
+.mermaid-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.mermaid-modal__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--full-contrast);
+}
+
+.mermaid-modal__canvas {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 20px;
 }
 
 .document-node--mermaid-source-hidden {

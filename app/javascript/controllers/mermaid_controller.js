@@ -26,18 +26,24 @@ export default class extends Controller {
     const source = code.textContent
     if (source.trim() === "") return
 
-    const container = document.createElement("div")
-    container.className = "document__mermaid"
-    pre.insertAdjacentElement("beforebegin", container)
+    const wrapper = document.createElement("div")
+    wrapper.className = "document__mermaid"
+    wrapper.appendChild(this.expandButton(source))
 
-    const diagram = mount(container, source, {
+    const canvas = document.createElement("div")
+    canvas.className = "document__mermaid-canvas"
+    wrapper.appendChild(canvas)
+
+    pre.insertAdjacentElement("beforebegin", wrapper)
+
+    const diagram = mount(canvas, source, {
       zoom: "auto",
       onError: (error) => {
         // Redraw failures keep mount's own overlay; only a failed first draw
         // falls back to the raw source block.
         if (pre.classList.contains("document-node--mermaid-source-hidden") || pre.dataset.mermaidFailed) return
         pre.dataset.mermaidFailed = "true"
-        container.remove()
+        wrapper.remove()
         pre.insertAdjacentElement("afterend", this.errorNotice(error))
       }
     })
@@ -47,6 +53,19 @@ export default class extends Controller {
     } else {
       pre.classList.add("document-node--mermaid-source-hidden")
     }
+  }
+
+  // Opens the shared wide-view modal; bubbles to the mermaid-modal controller
+  // wired on the paper element.
+  expandButton(source) {
+    const button = document.createElement("button")
+    button.type = "button"
+    button.className = "icon-button icon-button--sm document__mermaid-expand"
+    button.dataset.tooltip = "Open wide view"
+    button.setAttribute("aria-label", "Open diagram in wide view")
+    button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>'
+    button.addEventListener("click", () => this.dispatch("expand", { detail: { source } }))
+    return button
   }
 
   errorNotice(error) {

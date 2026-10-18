@@ -40,7 +40,8 @@ That's where DocNotate comes in. It lets you open any markdown file — or an HT
 - Copy all comments with their surrounding snippets in one click
 - Comment inbox to review, edit, and resolve comments as they get fixed
 - Table of contents with quick navigation
-- Markdown extras: tables, syntax highlighting, and Mermaid diagrams
+- Markdown extras: tables and syntax highlighting
+- Mermaid diagrams rendered as interactive SVG with zoom and pan, with a graceful fallback to the raw source on errors
 - All-files page to browse, rename, delete, and revisit recently opened documents
 - Open a document in your preferred editor directly from the app
 

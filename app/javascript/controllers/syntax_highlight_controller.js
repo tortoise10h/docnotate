@@ -5,7 +5,9 @@ import { Controller } from "@hotwired/stimulus"
 // .tok-* classes. Runs once on connect over the server-rendered node tree.
 export default class extends Controller {
   connect() {
-    this.element.querySelectorAll('pre code[class^="language-"]').forEach((el) => {
+    // Mermaid blocks are usually hidden behind their rendered diagram; skip
+    // them so the render-error fallback shows plain source.
+    this.element.querySelectorAll('pre code[class^="language-"]:not(.language-mermaid)').forEach((el) => {
       const src = el.textContent
       const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
       const re = new RegExp([

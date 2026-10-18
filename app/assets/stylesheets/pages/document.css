@@ -1105,6 +1105,64 @@
 .tok-key { color: var(--full-contrast); font-weight: 600; }
 .tok-fn  { color: #8a4a00; }
 
+/* Mermaid diagrams rendered client-side by Pele; theme tokens map onto Pele's
+   CSS variables so diagrams match the paper */
+.document__mermaid {
+  --pele-bg: var(--pre-bg);
+  --pele-fg: var(--full-contrast);
+  --pele-muted: var(--muted);
+  --pele-line: var(--fg);
+  --pele-surface: var(--bg);
+  --pele-surface-alt: var(--note-bg);
+  --pele-border: var(--border);
+  --pele-accent: var(--accent);
+  --pele-critical: var(--red);
+  --pele-error: var(--red);
+  --pele-font: var(--font);
+  --pele-font-mono: var(--mono-font);
+
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+
+.document__mermaid .pele {
+  display: block;
+  margin: 0 auto;
+}
+
+.document-node--mermaid-source-hidden {
+  display: none;
+}
+
+.document__mermaid-error {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--warn-border);
+  border-radius: 8px;
+  background: var(--warn-bg);
+  font-size: 0.8125rem;
+}
+
+.document__mermaid-error-summary {
+  color: var(--red);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.document__mermaid-error-detail {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--pre-border);
+  border-radius: 6px;
+  background: var(--pre-bg);
+  font-family: var(--mono-font);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--full-contrast);
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
 .document-node--list {
   margin-bottom: 16px;
   padding-left: 24px;

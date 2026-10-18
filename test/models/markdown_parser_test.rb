@@ -19,4 +19,16 @@ class MarkdownParserTest < ActiveSupport::TestCase
     assert_equal [ true, true, false, false ], cells.map { |cell| cell[:meta]["is_header"] }
     assert cells.all? { |cell| cell[:node_id].start_with?("block-") }
   end
+
+  test "captures the fence language on code blocks" do
+    nodes = MarkdownParser.new(
+      document_version_id: 1,
+      content: "```mermaid\nflowchart TD\n  A --> B\n```\n"
+    ).parse
+
+    code_block = nodes.find { |node| node[:node_type] == "code_block" }
+
+    assert_equal "mermaid", code_block[:meta]["language"]
+    assert code_block[:node_id].start_with?("block-")
+  end
 end

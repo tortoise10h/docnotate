@@ -16,7 +16,7 @@
 
   <%= render "comments/payload_source", comment_payload: @comment_payload %>
 
-  <div class="document__content" data-controller="syntax-highlight" data-text-selection-target="content" data-comment-popover-target="content">
+  <div class="document__content" data-controller="syntax-highlight mermaid" data-text-selection-target="content" data-comment-popover-target="content">
     <% @root_nodes.each do |root_node| %>
       <%= render "document_node", node: root_node %>
     <% end %>

@@ -120,6 +120,19 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "renders mermaid code blocks with the mermaid language class" do
+    file = Tempfile.new([ "diagram", ".md" ])
+    file.write("```mermaid\nflowchart TD\n  A --> B\n```")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+
+    assert_response :success
+    assert_select "pre.document-node--code-block code.language-mermaid", /flowchart TD/
+  ensure
+    file.unlink
+  end
+
   test "resolves a relative file path to an absolute path" do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do

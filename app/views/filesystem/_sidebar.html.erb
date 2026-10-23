@@ -1,0 +1,42 @@
+<%# locals: (id: "file_sidebar", frame_id: "file_sidebar_tree", path: nil, active_file_path: nil, result: nil, extra_class: nil) %>
+<% id = local_assigns[:id] || "file_sidebar" %>
+<% frame_id = local_assigns[:frame_id] || "file_sidebar_tree" %>
+<% path = local_assigns[:path] || Dir.home %>
+<% active_file_path = local_assigns[:active_file_path] %>
+<% result = local_assigns[:result] %>
+<% extra_class = local_assigns[:extra_class] %>
+
+<aside class="<%= class_names("file-sidebar", extra_class) %>" id="<%= id %>" data-file-sidebar-target="panel" hidden>
+  <div class="file-sidebar__header">
+    <div class="file-sidebar__title-group">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+      <span class="file-sidebar__heading">Files</span>
+    </div>
+    <button class="icon-button icon-button--sm"
+            data-action="click->file-sidebar#close"
+            type="button"
+            aria-label="Close sidebar">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
+  <div class="file-sidebar__body">
+    <% if result %>
+      <%= render "filesystem/tree",
+                 result: result,
+                 active_file_path: active_file_path,
+                 frame_id: frame_id %>
+    <% else %>
+      <turbo-frame id="<%= frame_id %>"
+                   data-file-sidebar-target="frame"
+                   data-src="<%= filesystem_path(path: path, frame_id: frame_id, active_file_path: active_file_path) %>"
+                   class="file-tree">
+        <div class="file-tree__empty"><p>Loading files...</p></div>
+      </turbo-frame>
+    <% end %>
+  </div>
+</aside>
+
+<div class="<%= class_names("file-sidebar__backdrop", ("#{extra_class}-backdrop" if extra_class.present?)) %>"
+     data-file-sidebar-target="backdrop"
+     data-action="click->file-sidebar#close"
+     hidden></div>

@@ -1,9 +1,21 @@
-<div class="home">
+<div class="home" data-controller="file-sidebar">
   <%= render "application/brand" %>
 
   <section class="home__action">
     <%= form_with url: open_documents_path, method: :get, class: "home__form" do |form| %>
       <div class="home__input-group">
+        <button type="button"
+                class="icon-button home__file-tree-button"
+                data-file-sidebar-target="toggle"
+                data-action="click->file-sidebar#toggle"
+                data-controller="hotkey"
+                data-hotkey="Mod+b"
+                aria-label="Browse files"
+                aria-controls="home_sidebar"
+                aria-expanded="false"
+                data-tooltip="Browse files (⌘B)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"/><path d="M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.53l-.42-.85a1 1 0 0 0-.9-.62H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"/><path d="M3 5v14a2 2 0 0 0 2 2h3"/><path d="M3 10h5"/></svg>
+        </button>
         <%= form.text_field :file_path,
                             placeholder: "Enter local file path",
                             class: "home__input",
@@ -47,4 +59,9 @@
   </section>
 
   <%= render "settings" %>
+
+  <%= render "filesystem/sidebar",
+             id: "home_sidebar",
+             frame_id: "home_sidebar_tree",
+             path: Dir.home %>
 </div>

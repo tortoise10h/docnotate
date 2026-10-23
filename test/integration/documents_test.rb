@@ -103,6 +103,34 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "renders file sidebar toggle button and panel in document view without scanning filesystem initially" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello")
+    file.close
+
+    original_scan = Filesystem::DirectoryScanner.method(:scan)
+    scanned = false
+    Filesystem::DirectoryScanner.define_singleton_method(:scan) do |*args|
+      scanned = true
+      original_scan.call(*args)
+    end
+
+    begin
+      get open_documents_path, params: { file_path: file.path }
+    ensure
+      Filesystem::DirectoryScanner.define_singleton_method(:scan, original_scan)
+      file.unlink
+    end
+
+    assert_response :success
+    assert_not scanned, "Expected DirectoryScanner.scan not to be called on page load"
+    assert_select ".document__sidebar-button[data-hotkey='Mod+b']"
+    assert_select "aside.document__sidebar#document_sidebar[hidden]"
+    assert_select "turbo-frame#document_sidebar_tree"
+    assert_select "turbo-frame#document_sidebar_tree[src]", count: 0
+    assert_select "turbo-frame#document_sidebar_tree[data-src*='filesystem']"
+  end
+
   test "renders markdown tables" do
     file = Tempfile.new([ "table", ".md" ])
     file.write("| Name | Status |\n| --- | --- |\n| Alice | Active |")

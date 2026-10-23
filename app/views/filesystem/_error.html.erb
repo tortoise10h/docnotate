@@ -1,0 +1,9 @@
+<%# locals: (message:, path:, frame_id: "filesystem_tree") %>
+<% frame_id = local_assigns[:frame_id] || "filesystem_tree" %>
+<turbo-frame id="<%= frame_id %>" class="file-tree">
+  <div class="file-tree__error">
+    <svg class="file-tree__error-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+    <p class="file-tree__error-text"><%= message %></p>
+    <%= link_to "Reset to Home (~)", filesystem_path(path: Dir.home, frame_id: frame_id), class: "button button--sm", data: { turbo_frame: frame_id } %>
+  </div>
+</turbo-frame>

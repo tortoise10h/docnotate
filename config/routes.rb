@@ -26,6 +26,9 @@ Rails.application.routes.draw do
   # MCP endpoint for coding agents (see DocnotateServerTransport above)
   mount DocnotateServerTransport => "/mcp", as: :mcp
 
+  resource :filesystem, only: [:show], controller: "filesystem" do
+    get :nodes
+  end
 
   resources :documents, only: [:index, :show, :update, :destroy] do
     collection do

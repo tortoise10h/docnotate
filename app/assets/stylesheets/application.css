@@ -17,6 +17,8 @@
 @import url("components/section-title.css");
 @import url("components/comment-markdown.css");
 @import url("components/brand.css");
+@import url("components/file-tree.css");
+@import url("components/file-sidebar.css");
 
 /* Pages */
 @import url("pages/error.css");

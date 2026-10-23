@@ -1,0 +1,11 @@
+<%# locals: (entries:, active_file_path: nil) %>
+<% active_file_path = local_assigns[:active_file_path] %>
+<ul class="file-tree__list" role="tree">
+  <% if entries.empty? %>
+    <li class="file-tree__empty-hint">Empty folder</li>
+  <% else %>
+    <% entries.each do |entry| %>
+      <%= render "filesystem/node", entry: entry, active_file_path: active_file_path %>
+    <% end %>
+  <% end %>
+</ul>

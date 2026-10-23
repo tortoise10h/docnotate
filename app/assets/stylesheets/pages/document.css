@@ -669,13 +669,23 @@
   padding: 24px 24px 48px;
 }
 
-.document--markdown {
+.document--markdown-wide {
   max-width: 90vw;
   padding-inline: 0;
 }
 
 .document--markdown .document__paper {
+  padding-inline: clamp(16px, 4.5vw, 64px);
+}
+
+.document--markdown-wide .document__paper {
   padding-inline: clamp(16px, 2vw, 32px);
+}
+
+.document__width-toggle[aria-pressed="true"] {
+  color: var(--accent);
+  background: var(--border-light);
+  border-color: var(--border);
 }
 
 /* Edge annotations can overlap the fixed navigation on the wider canvas. */
@@ -704,8 +714,8 @@
 }
 
 /* Wide documents leave navigation in the page margin, outside their content. */
-.document--markdown .document__toc-toggle,
-.document--markdown .document__sidebar-button {
+.document--markdown-wide .document__toc-toggle,
+.document--markdown-wide .document__sidebar-button {
   left: max(4px, calc(2.5vw - 18px));
 }
 

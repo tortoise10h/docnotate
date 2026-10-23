@@ -12,6 +12,7 @@ class HtmlDocumentsSystemTest < ApplicationSystemTestCase
       assert_text "Frame text"
     end
     assert_selector ".document__toc-item", text: "Intro", visible: :all
+    assert_no_selector "button[aria-label='Wide view']"
   ensure
     file.unlink
   end

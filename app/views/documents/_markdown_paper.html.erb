@@ -8,6 +8,8 @@
                  comment-popover:hide->comment-popover#hide
                  comment-popover:closed->comment-highlight#clearActiveMarks
                  comment-create:reset->text-selection#hideButton
+                 document-width:change@window->text-selection#hideButton
+                 document-width:change@window->comment-popover#hide
                  mermaid:expand->mermaid-modal#open">
   <%= render "documents/selection_form", document: @document %>
 

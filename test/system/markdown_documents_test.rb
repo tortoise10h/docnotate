@@ -38,10 +38,17 @@ class MarkdownDocumentsSystemTest < ApplicationSystemTestCase
     @file.unlink
   end
 
-  test "wide blocks expand independently of prose and stay within narrow viewports" do
+  test "reading view is the default and wide view expands blocks without widening prose" do
     page.current_window.resize_to(1440, 1000)
     visit open_documents_path(file_path: @file.path)
     assert_selector ".document__mermaid-canvas > svg", count: 2
+
+    reading_width = find("#document_paper").rect.width
+    assert_operator reading_width, :<, 900
+    assert_selector "button[aria-label='Wide view'][aria-pressed='false']"
+    find("button[aria-label='Wide view']").click
+    assert_selector "button[aria-label='Wide view'][aria-pressed='true']"
+    assert_operator find("#document_paper").rect.width, :>, 1200
 
     prose = first(".document__content > p").rect
     assert_operator prose.width, :<=, 700
@@ -50,6 +57,11 @@ class MarkdownDocumentsSystemTest < ApplicationSystemTestCase
     assert_operator all("table")[1].rect.width, :>, prose.width * 1.5
     assert_operator all(".document__mermaid-canvas > svg")[0].rect.width, :>, prose.width * 1.5
     assert_operator all(".document__mermaid-canvas > svg")[1].rect.width, :<, prose.width
+
+    find("button[aria-label='Wide view']").send_keys(:space)
+    assert_selector "button[aria-label='Wide view'][aria-pressed='false']"
+    assert_in_delta reading_width, find("#document_paper").rect.width, 1
+    find("button[aria-label='Wide view']").click
 
     [ 900, 390 ].each do |width|
       page.current_window.resize_to(width, 1000)
@@ -61,12 +73,20 @@ class MarkdownDocumentsSystemTest < ApplicationSystemTestCase
         assert_operator diagram.rect.x + diagram.rect.width, :<=, width
       end
     end
+
+    find("button[aria-label='Wide view']").click
+    assert_no_horizontal_page_overflow
+    find("button[aria-label='Wide view']").click
+    assert_selector "button[aria-label='Wide view'][aria-pressed='true']"
+    refresh
+    assert_selector "button[aria-label='Wide view'][aria-pressed='false']"
   end
 
   test "comments on the right edge of a wide table remain accessible and anchored" do
     page.current_window.resize_to(1440, 1000)
     visit open_documents_path(file_path: @file.path)
     assert_selector ".document__mermaid-canvas > svg", count: 2
+    find("button[aria-label='Wide view']").click
 
     page.execute_script(<<~JS)
       const table = document.querySelectorAll("table")[1]
@@ -97,6 +117,7 @@ class MarkdownDocumentsSystemTest < ApplicationSystemTestCase
 
     refresh
     assert_selector "td:last-child .document__comment-highlight", text: "Approved", visible: :all
+    find("button[aria-label='Wide view']").click
     [ 1440, 390 ].each do |width|
       page.current_window.resize_to(width, 1000)
       page.execute_script("const table = document.querySelectorAll('table')[1]; table.scrollLeft = table.scrollWidth")

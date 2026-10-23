@@ -1,5 +1,5 @@
 <% content_for :body_class, "html-document-page" if @document.html? %>
-<div class="<%= class_names("document", "document--wide": @document.html?) %>" data-controller="scroll-to-top file-sidebar">
+<div class="<%= class_names("document", "document--wide": @document.html?, "document--markdown": !@document.html?) %>" data-controller="scroll-to-top file-sidebar">
   <header class="document__header">
     <div class="document__leading">
       <%= link_to root_path, class: "document__home-button" do %>

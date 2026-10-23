@@ -62,10 +62,13 @@ export default class extends Controller {
 	const containerRect = this.element.getBoundingClientRect()
 	const left = this.remoteValue
 	    ? contentRect.right - containerRect.left - this.popoverTarget.offsetWidth - REMOTE_EDGE_GAP
-	    : contentRect.right - containerRect.left + 16
+	    : Math.max(16, Math.min(markRect.right + 16, document.documentElement.clientWidth - this.popoverTarget.offsetWidth - 16)) - containerRect.left
 
 	this.popoverTarget.style.left = `${left}px`
-	this.popoverTarget.style.top = `${markRect.top - containerRect.top}px`
+	const top = !this.remoteValue && left + containerRect.left < markRect.right
+	    ? markRect.bottom + 8
+	    : markRect.top
+	this.popoverTarget.style.top = `${top - containerRect.top}px`
     }
 
     editComment() {

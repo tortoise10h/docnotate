@@ -108,6 +108,8 @@ export default class extends Controller {
         this.selectedTextTarget.value = text
         this.prefixTextTarget.value = prefixText
         this.postfixTextTarget.value = postfixText
+
+        this.keepWithinViewport(this.buttonTarget)
     }
 
     showCommentInput(event) {
@@ -116,7 +118,17 @@ export default class extends Controller {
 
         this.buttonTarget.style.display = "none"
         this.commentInputTarget.style.display = "flex"
+        this.keepWithinViewport(this.commentInputTarget)
         this.commentTextTarget.focus()
+    }
+
+    keepWithinViewport(element) {
+        if (!this.contentTarget.classList.contains("document__content")) return
+
+        const containerRect = this.element.getBoundingClientRect()
+        const rect = element.getBoundingClientRect()
+        const left = Math.max(16, Math.min(rect.left, document.documentElement.clientWidth - rect.width - 16))
+        element.style.left = `${left - containerRect.left}px`
     }
 
     cancel() {

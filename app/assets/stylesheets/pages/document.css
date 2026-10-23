@@ -669,6 +669,22 @@
   padding: 24px 24px 48px;
 }
 
+.document--markdown {
+  max-width: 90vw;
+  padding-inline: 0;
+}
+
+.document--markdown .document__paper {
+  padding-inline: clamp(16px, 2vw, 32px);
+}
+
+/* Edge annotations can overlap the fixed navigation on the wider canvas. */
+.document--markdown .document__selection-toolbar,
+.document--markdown .document__comment-card,
+.document--markdown .document__comment-popover {
+  z-index: 40;
+}
+
 /* HTML files get a wider canvas so their own layouts (dashboards, charts) fit */
 .document--wide {
   display: flex;
@@ -687,7 +703,12 @@
   background: var(--pre-bg);
 }
 
-/* The frame fills the width, so the table-of-contents button moves into the page margin */
+/* Wide documents leave navigation in the page margin, outside their content. */
+.document--markdown .document__toc-toggle,
+.document--markdown .document__sidebar-button {
+  left: max(4px, calc(2.5vw - 18px));
+}
+
 .html-document-page .document__toc-toggle,
 .html-document-page .document__sidebar-button {
   left: 16px;
@@ -1024,16 +1045,25 @@
 
 /* Body text sits one notch below the guide's 16px — Quattro S runs visually large */
 .document__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 700px) minmax(0, 1fr);
   font-size: 0.9375rem;
   line-height: 1.65;
   color: var(--fg);
 }
 
-/* Text measures follow the style guide: prose never spans the full paper width */
-.document__content > p,
-.document__content > ul,
-.document__content > ol {
-  max-width: 700px;
+/* Keep every ordinary block on the reading track; only visual blocks break out. */
+.document__content > * {
+  grid-column: 2;
+  min-width: 0;
+}
+
+.document__content > .document-node--table,
+.document__content > .document__mermaid {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: fit-content;
+  max-width: 100%;
 }
 
 /* The iframe scrolls internally; the page itself never scrolls for HTML files */
@@ -1205,6 +1235,9 @@
 }
 
 .document__mermaid-canvas {
+  /* Reserve a rail so expand and zoom controls never cover diagram labels. */
+  padding: 40px 44px 8px 0;
+  min-height: 160px;
   overflow-x: auto;
 }
 
@@ -1704,5 +1737,3 @@
 .document__comment-inbox-badge[hidden] {
   display: none;
 }
-
-

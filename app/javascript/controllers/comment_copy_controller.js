@@ -1,17 +1,24 @@
 import { Controller } from "@hotwired/stimulus"
+import { install, uninstall } from "@github/hotkey"
 
 export default class extends Controller {
-    static targets = ["source", "button", "divider"]
+    static targets = ["source", "button", "divider", "defaultIcon", "successIcon"]
     static values = { remote: Boolean }
 
     connect() {
         this.copyTimeout = null
         this.anchoredIds = []
+        this.hotkeyInstalled = false
         this.loadComments()
     }
 
     disconnect() {
         if (this.copyTimeout) clearTimeout(this.copyTimeout)
+        this.resetState()
+        if (this.hotkeyInstalled) {
+            uninstall(this.buttonTarget)
+            this.hotkeyInstalled = false
+        }
     }
 
     loadComments() {
@@ -30,6 +37,18 @@ export default class extends Controller {
         const visible = this.orderedComments.length > 0
         this.buttonTarget.style.display = visible ? "inline-flex" : "none"
         this.dividerTarget.style.display = visible ? "block" : "none"
+
+        if (visible) {
+            if (!this.hotkeyInstalled) {
+                install(this.buttonTarget)
+                this.hotkeyInstalled = true
+            }
+        } else {
+            if (this.hotkeyInstalled) {
+                uninstall(this.buttonTarget)
+                this.hotkeyInstalled = false
+            }
+        }
     }
 
     receiveAnchors(event) {
@@ -78,12 +97,25 @@ export default class extends Controller {
     }
 
     flashCopied() {
+        this.buttonTarget.classList.add("document__comment-copy--copied")
+        if (this.hasDefaultIconTarget && this.hasSuccessIconTarget) {
+            this.defaultIconTarget.classList.add("document__comment-copy-icon--hidden")
+            this.successIconTarget.classList.remove("document__comment-copy-icon--hidden")
+        }
         this.buttonTarget.dataset.tooltip = "Copied!"
         this.buttonTarget.setAttribute("aria-label", "Copied!")
+
         if (this.copyTimeout) clearTimeout(this.copyTimeout)
-        this.copyTimeout = setTimeout(() => {
-            this.buttonTarget.dataset.tooltip = "Copy comments"
-            this.buttonTarget.setAttribute("aria-label", "Copy comments")
-        }, 2000)
+        this.copyTimeout = setTimeout(() => this.resetState(), 1800)
+    }
+
+    resetState() {
+        this.buttonTarget.classList.remove("document__comment-copy--copied")
+        if (this.hasDefaultIconTarget && this.hasSuccessIconTarget) {
+            this.defaultIconTarget.classList.remove("document__comment-copy-icon--hidden")
+            this.successIconTarget.classList.add("document__comment-copy-icon--hidden")
+        }
+        this.buttonTarget.dataset.tooltip = "Copy comments (⇧⌘Y)"
+        this.buttonTarget.setAttribute("aria-label", "Copy comments")
     }
 }

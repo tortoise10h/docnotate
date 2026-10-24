@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { install, uninstall } from "@github/hotkey"
 import { BLOCK_SELECTOR } from "utils/dom_selectors"
 import {
     blockIdOf,
@@ -11,10 +12,11 @@ import {
 } from "utils/text_anchors"
 
 export default class extends Controller {
-    static targets = ["button", "content", "form", "startBlockId", "endBlockId", "startOffset", "endOffset", "selectedText", "prefixText", "postfixText", "commentInput", "commentText", "copyButton"]
+    static targets = ["button", "content", "form", "startBlockId", "endBlockId", "startOffset", "endOffset", "selectedText", "prefixText", "postfixText", "commentInput", "commentText", "copyButton", "addNoteButton"]
 
     connect() {
         this.activeMarks = []
+        this.hotkeyInstalled = false
 
         this.boundEvaluateSelection = this.evaluateSelection.bind(this)
         this.boundHandleMouseDown = this.handleMouseDown.bind(this)
@@ -26,6 +28,7 @@ export default class extends Controller {
     }
 
     disconnect() {
+        this.uninstallHotkey()
         this.contentTarget.removeEventListener("mouseup", this.boundEvaluateSelection)
         this.contentTarget.removeEventListener("mousedown", this.boundHandleMouseDown)
         document.removeEventListener("mousedown", this.boundHandleOutsideClick)
@@ -110,16 +113,34 @@ export default class extends Controller {
         this.postfixTextTarget.value = postfixText
 
         this.keepWithinViewport(this.buttonTarget)
+        this.installHotkey()
     }
 
     showCommentInput(event) {
-        event.preventDefault()
-        event.stopPropagation()
+        if (event) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
 
+        this.uninstallHotkey()
         this.buttonTarget.style.display = "none"
         this.commentInputTarget.style.display = "flex"
         this.keepWithinViewport(this.commentInputTarget)
         this.commentTextTarget.focus()
+    }
+
+    installHotkey() {
+        if (this.hasAddNoteButtonTarget && !this.hotkeyInstalled) {
+            install(this.addNoteButtonTarget)
+            this.hotkeyInstalled = true
+        }
+    }
+
+    uninstallHotkey() {
+        if (this.hasAddNoteButtonTarget && this.hotkeyInstalled) {
+            uninstall(this.addNoteButtonTarget)
+            this.hotkeyInstalled = false
+        }
     }
 
     keepWithinViewport(element) {
@@ -136,6 +157,7 @@ export default class extends Controller {
     }
 
     hideButton() {
+        this.uninstallHotkey()
         this.clearActiveHighlight()
 
         this.buttonTarget.style.display = "none"

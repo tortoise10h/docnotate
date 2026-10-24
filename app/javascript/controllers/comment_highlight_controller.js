@@ -1,8 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
+import { install, uninstall } from "@github/hotkey"
 import { BLOCK_SELECTOR } from "utils/dom_selectors"
 
 export default class extends Controller {
-    static targets = ["source", "nav", "navCurrent", "navTotal", "inboxBadge"]
+    static targets = ["source", "nav", "navCurrent", "navTotal", "inboxBadge", "previousButton", "nextButton"]
     static values = { remote: Boolean }
 
     connect() {
@@ -11,6 +12,7 @@ export default class extends Controller {
 	this.allMarks = []
 	this.navigableComments = []
 	this.currentCommentIndex = -1
+	this.hotkeysInstalled = false
 
 	this.markedIds = []
 	this.contentEl = this.element.querySelector(".document__content")
@@ -24,6 +26,11 @@ export default class extends Controller {
 
     disconnect() {
 	this.contentEl?.removeEventListener("click", this.boundHandleMarkClick)
+	if (this.hotkeysInstalled) {
+		if (this.hasPreviousButtonTarget) uninstall(this.previousButtonTarget)
+		if (this.hasNextButtonTarget) uninstall(this.nextButtonTarget)
+		this.hotkeysInstalled = false
+	}
     }
 
     loadComments() {
@@ -211,6 +218,20 @@ export default class extends Controller {
 	this.navCurrentTarget.textContent = total > 0 ? this.currentCommentIndex + 1 : 0
 	this.navTarget.style.display = (total > 0 || this.archivedComments.length > 0) ? "flex" : "none"
 
+	if (total > 0) {
+		if (!this.hotkeysInstalled) {
+			if (this.hasPreviousButtonTarget) install(this.previousButtonTarget)
+			if (this.hasNextButtonTarget) install(this.nextButtonTarget)
+			this.hotkeysInstalled = true
+		}
+	} else {
+		if (this.hotkeysInstalled) {
+			if (this.hasPreviousButtonTarget) uninstall(this.previousButtonTarget)
+			if (this.hasNextButtonTarget) uninstall(this.nextButtonTarget)
+			this.hotkeysInstalled = false
+		}
+	}
+
 	if (this.hasInboxBadgeTarget) {
 	    this.inboxBadgeTarget.textContent = this.unresolvedArchivedCount
 	    this.inboxBadgeTarget.hidden = this.unresolvedArchivedCount === 0
@@ -218,7 +239,8 @@ export default class extends Controller {
     }
 
     previousComment() {
-	this.goToComment(this.currentCommentIndex - 1)
+	const baseIndex = this.currentCommentIndex === -1 ? 0 : this.currentCommentIndex
+	this.goToComment(baseIndex - 1)
     }
 
     nextComment() {
@@ -226,9 +248,10 @@ export default class extends Controller {
     }
 
     goToComment(index) {
-	if (this.navigableComments.length === 0) return
+	const count = this.navigableComments.length
+	if (count === 0) return
 
-	this.currentCommentIndex = (index + this.navigableComments.length) % this.navigableComments.length
+	this.currentCommentIndex = ((index % count) + count) % count
 	const { comment, firstMark } = this.navigableComments[this.currentCommentIndex]
 
 	const rect = this.scrollToComment(comment.id, firstMark)

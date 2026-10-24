@@ -51,6 +51,9 @@ export default class extends Controller {
             case "docnotate:headings":
                 this.handleHeadings(message)
                 break
+            case "docnotate:keydown":
+                this.handleKeydown(message)
+                break
         }
     }
 
@@ -80,6 +83,20 @@ export default class extends Controller {
 
     clearSelection() {
         this.send({ type: "docnotate:clearSelection" })
+    }
+
+    handleKeydown(message) {
+        const event = new KeyboardEvent("keydown", {
+            key: message.key,
+            code: message.code,
+            metaKey: message.metaKey,
+            ctrlKey: message.ctrlKey,
+            altKey: message.altKey,
+            shiftKey: message.shiftKey,
+            bubbles: true,
+            cancelable: true
+        })
+        document.dispatchEvent(event)
     }
 
     handleReady() {

@@ -8,8 +8,10 @@ export default class extends Controller {
     static targets = ["defaultIcon", "successIcon"]
 
     async copy(event) {
-        event.preventDefault()
-        event.stopPropagation()
+        if (event) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
 
         try {
             await navigator.clipboard.writeText(this.textValue)
@@ -20,6 +22,12 @@ export default class extends Controller {
     }
 
     showSuccess() {
+        if (!this.originalTooltip && this.element.dataset.tooltip) {
+            this.originalTooltip = this.element.dataset.tooltip
+        }
+        this.element.dataset.tooltip = "Copied!"
+        this.element.setAttribute("aria-label", "Copied!")
+
         this.defaultIconTarget.classList.add("document__copy-icon--hidden")
         this.successIconTarget.classList.remove("document__copy-icon--hidden")
 
@@ -28,14 +36,27 @@ export default class extends Controller {
         }
 
         this.successTimeout = setTimeout(() => {
+            this.resetState()
+        }, 2000)
+    }
+
+    resetState() {
+        if (this.hasDefaultIconTarget && this.hasSuccessIconTarget) {
             this.defaultIconTarget.classList.remove("document__copy-icon--hidden")
             this.successIconTarget.classList.add("document__copy-icon--hidden")
-        }, 2000)
+        }
+        if (this.originalTooltip) {
+            this.element.dataset.tooltip = this.originalTooltip
+        } else {
+            delete this.element.dataset.tooltip
+        }
+        this.element.setAttribute("aria-label", "Copy file path")
     }
 
     disconnect() {
         if (this.successTimeout) {
             clearTimeout(this.successTimeout)
         }
+        this.resetState()
     }
 }

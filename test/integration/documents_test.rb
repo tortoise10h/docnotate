@@ -125,6 +125,7 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_not scanned, "Expected DirectoryScanner.scan not to be called on page load"
     assert_select ".document__sidebar-button[data-hotkey='Mod+b']"
+    assert_select "button[data-controller~='clipboard'][data-controller~='hotkey'][data-hotkey='Mod+Shift+l,Mod+Shift+L'][data-tooltip='Copy file path (⇧⌘L)']"
     assert_select "aside.document__sidebar#document_sidebar[hidden]"
     assert_select "turbo-frame#document_sidebar_tree"
     assert_select "turbo-frame#document_sidebar_tree[src]", count: 0

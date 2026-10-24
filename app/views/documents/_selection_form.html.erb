@@ -7,9 +7,15 @@
   <%= f.hidden_field :prefix_text, data: { text_selection_target: "prefixText" } %>
   <%= f.hidden_field :postfix_text, data: { text_selection_target: "postfixText" } %>
   <div class="document__selection-toolbar" data-text-selection-target="button">
-    <button class="document__selection-button" data-action="click->text-selection#showCommentInput" type="button">
+    <button class="document__selection-button"
+            data-text-selection-target="addNoteButton"
+            data-action="click->text-selection#showCommentInput"
+            data-hotkey="Mod+/"
+            type="button"
+            data-tooltip="Add note (⌘/)">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-      Add Note
+      <span>Add Note</span>
+      <kbd class="button__hotkey-hint" aria-hidden="true">⌘/</kbd>
     </button>
     <button class="document__selection-copy-button"
             data-controller="selection-copy"

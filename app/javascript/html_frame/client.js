@@ -300,6 +300,20 @@ function announceReady(attempt = 0) {
 
 document.addEventListener("mouseup", handleMouseUp)
 
+document.addEventListener("keydown", event => {
+    if (event.metaKey || event.ctrlKey) {
+        postToParent({
+            type: "docnotate:keydown",
+            key: event.key,
+            code: event.code,
+            metaKey: event.metaKey,
+            ctrlKey: event.ctrlKey,
+            altKey: event.altKey,
+            shiftKey: event.shiftKey
+        })
+    }
+})
+
 document.addEventListener("mousedown", () => {
     clearSelection()
     postToParent({ type: "docnotate:pointerdown" })

@@ -585,6 +585,7 @@
 }
 
 .document__comment-nav-button {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -602,6 +603,30 @@
 .document__comment-nav-button:hover {
   color: var(--full-contrast);
   background: rgba(25, 29, 38, 0.045);
+}
+
+.document__comment-nav-button::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 4px 8px;
+  background: var(--full-contrast);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  pointer-events: none;
+}
+
+.document__comment-nav-button:hover::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 .document__comment-nav-count {
@@ -661,6 +686,49 @@
 .document__comment-copy:hover::after {
   opacity: 1;
   visibility: visible;
+}
+
+.document__comment-copy-icon {
+  flex-shrink: 0;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.document__comment-copy-icon--hidden {
+  display: none;
+}
+
+.document__comment-copy-icon--success {
+  color: var(--accent);
+}
+
+@keyframes comment-copy-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.document__comment-copy--copied {
+  animation: comment-copy-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: rgba(46, 139, 74, 0.12) !important;
+  color: var(--accent) !important;
+}
+
+.document__comment-copy--copied::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) scale(1.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .document__comment-copy--copied {
+    animation: none;
+  }
 }
 
 .document {

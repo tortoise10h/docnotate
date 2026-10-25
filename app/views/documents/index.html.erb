@@ -10,7 +10,7 @@
                           class: "documents__search input",
                           data: { action: "input->filter#search" } %>
     <%= form.select :file_type,
-                    [["All types", ""], ["Markdown", "markdown"], ["HTML", "html"]],
+                    [["All types", ""], ["Markdown", "markdown"], ["HTML", "html"], ["JSON", "json"]],
                     { selected: @file_type },
                     { aria: { label: "Filter by file type" },
                       class: "documents__type-filter input",

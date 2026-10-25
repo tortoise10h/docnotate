@@ -127,4 +127,37 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal [ newest, oldest ], Document.recently_opened.to_a
     assert_not_includes Document.recently_opened, never_opened
   end
+
+  test "parses a JSON document and anchors comments to leaf line blocks" do
+    json_text = <<~JSON
+      {
+        "service": "DocNotate",
+        "port": 3000
+      }
+    JSON
+
+    document = Document.create!(
+      file_path: "/tmp/server.json",
+      content: json_text,
+      file_type: "json"
+    )
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: json_text.bytesize, last_modified_at: Time.current))
+
+    assert_equal "json", document.file_type
+    assert document.json?
+    assert_empty document.table_of_contents
+
+    outline = document.content_outline
+    assert_equal 4, outline.size # { , "service": "DocNotate", , "port": 3000 , }
+    assert_equal "{", outline[0][:text]
+    assert_equal "\"service\": \"DocNotate\",", outline[1][:text]
+    assert_equal "\"port\": 3000", outline[2][:text]
+    assert_equal "}", outline[3][:text]
+
+    comment = document.create_comment!(content: "Change port to 8080", selected_text: "3000")
+    assert_equal outline[2][:block_id], comment.start_block_id
+    assert_equal outline[2][:block_id], comment.end_block_id
+    assert_equal 8, comment.start_offset
+    assert_equal 12, comment.end_offset
+  end
 end

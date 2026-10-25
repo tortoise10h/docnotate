@@ -13,7 +13,7 @@ class ListDocumentsTool < MCP::Tool
       },
       file_type: {
         type: "string",
-        enum: %w[markdown html],
+        enum: %w[markdown html json],
         description: "Only list documents of this file type. Omit for all types.",
       },
     },

@@ -34,7 +34,13 @@ module Documents
     end
 
     def document_parser_for(document_version_id)
-      parser_class = html? ? HtmlParser : MarkdownParser
+      parser_class = if html?
+        HtmlParser
+      elsif json?
+        JsonParser
+      else
+        MarkdownParser
+      end
       parser_class.new(document_version_id:, content:)
     end
 

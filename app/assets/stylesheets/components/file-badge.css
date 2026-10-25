@@ -25,6 +25,11 @@
   background: rgba(153, 64, 0, 0.08);
 }
 
+.file-badge--json {
+  color: var(--purple);
+  background: rgba(124, 58, 237, 0.08);
+}
+
 .file-badge--other {
   color: var(--muted);
   background: rgba(25, 29, 38, 0.05);

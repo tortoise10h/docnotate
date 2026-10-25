@@ -78,6 +78,8 @@
 
   <% if @document.html? %>
     <%= render "documents/html_paper" %>
+  <% elsif @document.json? %>
+    <%= render "documents/json_paper" %>
   <% else %>
     <%= render "documents/markdown_paper" %>
   <% end %>

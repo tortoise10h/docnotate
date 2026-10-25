@@ -3,7 +3,7 @@
 class OpenDocumentTool < MCP::Tool
   tool_name "open_document"
   title "Open Document"
-  description "Opens a markdown or html file by path. DocNotate reads it from disk, upserts its record, and snapshots a new version if the file changed since last time — the same write path the app's UI uses. Returns the document's metadata and a block-level content outline; block ids double as comment anchors for comment tools."
+  description "Opens a markdown, html, or json file by path. DocNotate reads it from disk, upserts its record, and snapshots a new version if the file changed since last time — the same write path the app's UI uses. Returns the document's metadata and a block-level content outline; block ids double as comment anchors for comment tools."
 
   input_schema(
     properties: {

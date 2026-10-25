@@ -3,7 +3,7 @@
 class GetDocumentContentTool < MCP::Tool
   tool_name "get_document_content"
   title "Get Document Content"
-  description "Returns the raw stored content of a document by id (the exact text of its latest parsed version: markdown or html source). Use this before editing content later; open_document is preferred for reading structure."
+  description "Returns the raw stored content of a document by id (the exact text of its latest parsed version: markdown, html, or json source). Use this before editing content later; open_document is preferred for reading structure."
 
   input_schema(
     properties: {

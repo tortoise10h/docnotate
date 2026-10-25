@@ -286,6 +286,33 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "opens and renders a JSON document" do
+    file = Tempfile.new([ "sample", ".json" ])
+    file.write(%({"app": "DocNotate", "active": true}))
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+
+    assert_response :success
+    assert_select ".file-badge--json", text: "json"
+    assert_select ".json-viewer"
+    assert_select ".json-viewer__toolbar"
+    assert_select ".json-line"
+  ensure
+    file.unlink
+  end
+
+  test "filters documents by json file type" do
+    create_document("note.md")
+    Document.create!(file_path: "/tmp/package.json", content: "{}", file_type: "json", last_opened_at: Time.current)
+
+    get documents_path, params: { file_type: "json" }
+
+    assert_response :success
+    assert_select ".documents__row", count: 1
+    assert_select ".file-badge--json", text: "json"
+  end
+
   private
 
   def create_document(file_path, last_opened_at: Time.current)

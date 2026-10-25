@@ -2,7 +2,7 @@ module Documents
   module FileTypeable
     extend ActiveSupport::Concern
 
-    FILE_TYPES = %w[markdown html text pdf].freeze
+    FILE_TYPES = %w[markdown html json text pdf].freeze
 
     FILE_TYPES.each do |type|
       define_method("#{type}?") { file_type == type }
@@ -15,6 +15,7 @@ module Documents
     class_methods do
       MARKDOWN_EXTENSIONS = %w[.md .markdown .mdx].freeze
       HTML_EXTENSIONS = %w[.html .htm].freeze
+      JSON_EXTENSIONS = %w[.json].freeze
 
       def file_type_from_path(file_path)
         ext = File.extname(file_path).downcase
@@ -23,6 +24,8 @@ module Documents
           "markdown"
         when *HTML_EXTENSIONS
           "html"
+        when *JSON_EXTENSIONS
+          "json"
         when ".txt"
           "text"
         else
@@ -31,7 +34,7 @@ module Documents
       end
 
       def supported_file?(file_path)
-        markdown_file?(file_path) || html_file?(file_path)
+        markdown_file?(file_path) || html_file?(file_path) || json_file?(file_path)
       end
 
       def markdown_file?(file_path)
@@ -40,6 +43,10 @@ module Documents
 
       def html_file?(file_path)
         HTML_EXTENSIONS.include?(File.extname(file_path).downcase)
+      end
+
+      def json_file?(file_path)
+        JSON_EXTENSIONS.include?(File.extname(file_path).downcase)
       end
     end
   end

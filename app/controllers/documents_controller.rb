@@ -3,7 +3,7 @@ class DocumentsController < ApplicationController
 
   def index
     @query = params[:query].presence
-    @file_type = params[:file_type].presence_in(%w[markdown html])
+    @file_type = params[:file_type].presence_in(%w[markdown html json])
     @pagy, @documents = pagy(Document.matching_title(@query).with_file_type(@file_type).order(last_opened_at: :desc))
   end
 

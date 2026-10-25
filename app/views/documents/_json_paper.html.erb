@@ -1,0 +1,44 @@
+<div class="document__paper" id="document_paper"
+     data-controller="text-selection comment-highlight comment-copy comment-popover json-viewer document-view"
+     data-document-id="<%= @document.id %>"
+     data-action="comment-highlight:reload->comment-highlight#reloadFromSource
+                 comment-highlight:reload->comment-copy#loadComments
+                 comment-highlight:reload->comment-popover#reload
+                 comment-highlight:show->comment-popover#show
+                 comment-highlight:showArchived->document-view#showArchived
+                 document-view:show-document->document-view#showDocument
+                 comment-popover:hide->comment-popover#hide
+                 comment-popover:closed->comment-highlight#clearActiveMarks
+                 comment-create:reset->text-selection#hideButton
+                 document-width:change@window->text-selection#hideButton
+                 document-width:change@window->comment-popover#hide
+                 table-of-contents:navigate@window->document-view#showDocument">
+  <%= render "documents/selection_form", document: @document %>
+
+  <%= render "comments/popover", document: @document %>
+
+  <%= render "documents/comment_nav", archived_comments_by_version: @archived_comments_by_version, unresolved_archived_count: @unresolved_archived_count, show_inbox: @archived_comments_by_version.any? %>
+
+  <%= render "comments/payload_source", comment_payload: @comment_payload %>
+
+  <div class="json-viewer__toolbar">
+    <div class="json-viewer__actions">
+      <button type="button" class="json-viewer__button" data-action="click->json-viewer#expandAll">
+        Expand all
+      </button>
+      <button type="button" class="json-viewer__button" data-action="click->json-viewer#collapseAll">
+        Collapse all
+      </button>
+    </div>
+  </div>
+
+  <div class="document__content json-viewer" data-document-view-target="panel" data-view="document" data-text-selection-target="content" data-comment-popover-target="content">
+    <% @root_nodes.each do |root_node| %>
+      <%= render "documents/json_node", node: root_node %>
+    <% end %>
+  </div>
+
+  <div class="document__archived-panel" data-document-view-target="panel" data-view="archived" hidden>
+    <%= render "comments/archived", document: @document, archived_comments_by_version: @archived_comments_by_version %>
+  </div>
+</div>

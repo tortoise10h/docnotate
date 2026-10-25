@@ -1,0 +1,50 @@
+<% case node.node_type %>
+<% when "json_object", "json_array" %>
+  <% open_node = node.children.first %>
+  <% close_node = node.children.last %>
+  <% body_nodes = node.children[1...-1] || [] %>
+  <% summary = open_node&.meta&.dig("summary") %>
+  <% close_bracket = close_node&.meta&.dig("bracket") %>
+  <% comma = close_node&.meta&.dig("trailing_comma") ? "," : "" %>
+  <% depth = open_node&.meta&.dig("depth") || 0 %>
+  <div class="json-block" data-json-viewer-target="block" data-collapsed="false" data-depth="<%= depth %>">
+    <div class="json-line json-line--open" style="--depth: <%= depth %>;">
+      <button type="button" class="json-line__toggle" data-action="click->json-viewer#toggle" aria-expanded="true" aria-label="Toggle block">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="json-line__toggle-icon"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div id="<%= open_node.node_id %>" class="json-line__content"><%= render_json_tokens(open_node) %></div>
+      <button type="button" class="json-line__summary" data-action="click->json-viewer#toggle" data-summary="<%= "... #{close_bracket}#{comma} // #{summary}" %>" aria-label="Expand block"></button>
+    </div>
+    <div class="json-block__children" data-json-viewer-target="children">
+      <% body_nodes.each do |child| %>
+        <%= render "documents/json_node", node: child %>
+      <% end %>
+    </div>
+    <div class="json-line json-line--close" style="--depth: <%= depth %>;">
+      <span class="json-line__gutter"></span>
+      <div id="<%= close_node.node_id %>" class="json-line__content"><%= render_json_tokens(close_node) %></div>
+    </div>
+  </div>
+<% when "json_primitive" %>
+  <div class="json-line" style="--depth: <%= node.meta&.dig("depth") || 0 %>;">
+    <span class="json-line__gutter"></span>
+    <div id="<%= node.node_id %>" class="json-line__content"><%= render_json_tokens(node) %></div>
+  </div>
+<% when "json_error" %>
+  <div class="json-error-banner" role="alert">
+    <div class="json-error-banner__header">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+      <strong>Invalid JSON</strong>
+    </div>
+    <p class="json-error-banner__message"><%= node.meta&.dig("error_message") %></p>
+  </div>
+<% when "json_raw_line" %>
+  <div class="json-line json-line--raw">
+    <span class="json-line__line-number"><%= node.meta&.dig("line_number") %></span>
+    <div id="<%= node.node_id %>" class="json-line__content"><%= node.content %></div>
+  </div>
+<% else %>
+  <% node.children.each do |child| %>
+    <%= render "documents/json_node", node: child %>
+  <% end %>
+<% end %>

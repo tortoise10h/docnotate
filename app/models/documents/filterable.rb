@@ -13,7 +13,7 @@ module Documents
       }
 
       scope :with_file_type, ->(file_type) {
-        if file_type.in?(%w[markdown html])
+        if file_type.in?(%w[markdown html json])
           where(file_type: file_type)
         else
           all

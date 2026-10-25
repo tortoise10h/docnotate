@@ -267,8 +267,22 @@ export default class extends Controller {
 		return null
 	}
 
+	this.expandCollapsedAncestors(firstMark)
+
 	firstMark.scrollIntoView({ behavior: "smooth", block: "center" })
 	return firstMark.getBoundingClientRect()
+    }
+
+    expandCollapsedAncestors(element) {
+	let parent = element?.parentElement
+	while (parent) {
+		if (parent.matches?.('.json-block[data-collapsed="true"]')) {
+			parent.dataset.collapsed = "false"
+			const toggle = parent.querySelector(":scope > .json-line > .json-line__toggle")
+			if (toggle) toggle.setAttribute("aria-expanded", "true")
+		}
+		parent = parent.parentElement
+	}
     }
 
     scrollToArchived() {

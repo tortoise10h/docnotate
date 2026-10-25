@@ -161,6 +161,73 @@ class MarkdownDocumentsSystemTest < ApplicationSystemTestCase
     assert_selector ".document__archived-panel", visible: false
   end
 
+  test "syntax highlights code blocks while keeping comments anchored and interactive" do
+    code_file = Tempfile.new([ "code-sample", ".md" ])
+    code_file.write(<<~MARKDOWN)
+      # Code Example
+
+      ```ruby
+      def calculate_total(items)
+        items.sum(&:price)
+      end
+      ```
+
+      ```
+      plain text block without fence language
+      ```
+
+      ```customlang
+      unknown language block
+      ```
+
+      ```mermaid
+      flowchart TD
+        A --> B
+      ```
+    MARKDOWN
+    code_file.close
+
+    visit open_documents_path(file_path: code_file.path)
+
+    assert_selector "pre code.language-ruby[data-highlighted='true']"
+    assert_selector "pre code.language-ruby .hljs-keyword", text: "def"
+    assert_selector "pre code.language-ruby .hljs-title.function_", text: "calculate_total"
+
+    # Untagged block should be processed via highlightAuto
+    assert_selector "pre code:not([class*='language-'])[data-highlighted='true']", text: /plain text block/
+
+    # Unknown language block should be marked highlighted but left without syntax spans
+    assert_selector "pre code.language-customlang[data-highlighted='true']", text: /unknown language block/
+    assert_no_selector "pre code.language-customlang span[class^='hljs-']"
+
+    assert_selector ".document__mermaid-canvas > svg"
+    assert_no_selector "pre code.language-mermaid[data-highlighted='true']"
+
+    document = Document.find_by!(file_path: File.realpath(code_file.path))
+    version = document.current_version
+    code_node = version.document_nodes.find_by!(node_type: "code_block")
+
+    start_offset = code_node.content.index("calculate_total")
+    end_offset = start_offset + "calculate_total".length
+    version.comments.create!(
+      content: "Ensure this handles empty lists.",
+      start_block_id: code_node.node_id,
+      end_block_id: code_node.node_id,
+      start_offset: start_offset,
+      end_offset: end_offset
+    )
+
+    refresh
+
+    assert_selector "pre code.language-ruby[data-highlighted='true']"
+    assert_selector "pre code.language-ruby .document__comment-highlight", text: "calculate_total"
+
+    find("pre code.language-ruby .document__comment-highlight").click
+    assert_selector ".document__comment-popover", text: "Ensure this handles empty lists."
+  ensure
+    code_file.unlink
+  end
+
   private
 
   def assert_no_horizontal_page_overflow

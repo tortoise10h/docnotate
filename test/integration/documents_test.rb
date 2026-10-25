@@ -186,6 +186,20 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "renders code blocks with language class when tagged and without language class when untagged" do
+    file = Tempfile.new([ "code-blocks", ".md" ])
+    file.write("```ruby\ndef greet; puts 'hi'; end\n```\n\n```\nplain text\n```")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+
+    assert_response :success
+    assert_select "pre.document-node--code-block code.language-ruby", text: /def greet/
+    assert_select "pre.document-node--code-block code:not([class*='language-'])", text: /plain text/
+  ensure
+    file.unlink
+  end
+
   test "resolves a relative file path to an absolute path" do
     Dir.mktmpdir do |dir|
       Dir.chdir(dir) do

@@ -64,6 +64,7 @@ export default class extends Controller {
         const item = this.headings.find(({ link }) => link === event.currentTarget)
         if (!item) return
 
+        this.dispatch("navigate", { detail: { blockId: item.heading.id } })
         item.heading.scrollIntoView({ behavior: "smooth", block: "start" })
     }
 

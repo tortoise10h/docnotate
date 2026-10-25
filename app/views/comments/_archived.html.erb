@@ -1,6 +1,10 @@
 <section id="previous-comments" class="document__archived">
   <h2 class="document__archived-title">Previous comments (<%= archived_comments_by_version.values.sum(&:size) %>)</h2>
 
+  <% if archived_comments_by_version.empty? %>
+    <p class="empty-state">No previous comments</p>
+  <% end %>
+
   <% archived_comments_by_version.each do |version, comments| %>
     <div class="document__archived-version">
       <h3 class="document__archived-version-name"><%= version.version %></h3>

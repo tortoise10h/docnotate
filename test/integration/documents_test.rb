@@ -103,6 +103,29 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "wires document-view panels for document content and previous comments in markdown" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello\n\nParagraph")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by!(file_path: File.realpath(file.path))
+    first_version = document.current_version
+    first_version.comments.create!(content: "Archived note")
+
+    File.write(file.path, "# Hello\n\nUpdated paragraph")
+    get open_documents_path, params: { file_path: file.path }
+
+    assert_response :success
+    assert_select "#document_paper[data-controller~='document-view']"
+    assert_select "#document_paper .document__content[data-document-view-target='panel'][data-view='document']"
+    assert_select "#document_paper .document__archived-panel[data-document-view-target='panel'][data-view='archived']"
+    assert_select "#document_paper .document__archived-panel #previous-comments"
+    assert_select ".document__comment-inbox-button"
+  ensure
+    file.unlink
+  end
+
   test "renders file sidebar toggle button and panel in document view without scanning filesystem initially" do
     file = Tempfile.new([ "sample", ".md" ])
     file.write("# Hello")

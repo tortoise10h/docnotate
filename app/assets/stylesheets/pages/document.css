@@ -1161,22 +1161,24 @@
   border-radius: 8px;
 }
 
-/* Shown in place of the file when the nav's inbox button is pressed */
-.html-archived-panel {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 0 40px 40px;
-}
-
-.html-archived-panel .document__archived {
-  margin-top: 0;
-  padding-top: 32px;
-}
-
+/* Document content panels */
+.document__content[hidden],
+.document__archived-panel[hidden],
 .html-archived-panel[hidden],
 .html-viewer[hidden] {
-  display: none;
+  display: none !important;
+}
+
+/* Shown in place of the file when the nav's inbox button is pressed */
+.document__archived-panel {
+  flex: 1;
+  min-height: 0;
+}
+
+.document__paper--html .document__archived-panel,
+.html-archived-panel {
+  overflow-y: auto;
+  padding: 0 40px 40px;
 }
 
 .html-viewer__frame {
@@ -1280,12 +1282,65 @@
   white-space: pre;
 }
 
-/* Syntax token tints, shared with the explain-html style guide */
-.tok-com { color: var(--muted); font-style: italic; }
-.tok-str { color: #0b53d0; }
-.tok-num { color: #0b53d0; }
-.tok-key { color: var(--full-contrast); font-weight: 600; }
-.tok-fn  { color: #8a4a00; }
+/* Syntax token tints, mapped to DocNotate's paper palette */
+.tok-com,
+.hljs-comment,
+.hljs-quote {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.tok-key,
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-operator {
+  color: var(--full-contrast);
+  font-weight: 600;
+}
+
+.tok-str,
+.hljs-string,
+.hljs-regexp,
+.hljs-meta .hljs-string {
+  color: var(--accent);
+}
+
+.tok-num,
+.hljs-number,
+.hljs-literal,
+.hljs-type,
+.hljs-built_in,
+.hljs-variable.constant_ {
+  color: var(--purple);
+}
+
+.tok-fn,
+.hljs-title,
+.hljs-title.function_,
+.hljs-title.class_,
+.hljs-section,
+.hljs-attr,
+.hljs-attribute,
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--amber);
+}
+
+.hljs-addition {
+  color: var(--green);
+}
+
+.hljs-deletion {
+  color: var(--red);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 700;
+}
 
 /* Mermaid diagrams rendered client-side by Pele; theme tokens map onto Pele's
    CSS variables so diagrams match the paper */
@@ -1529,8 +1584,10 @@
 
 /* Previous comments section */
 .document__archived {
-  margin-top: 80px;
-  padding-top: 48px;
+  margin-top: 0;
+  padding-top: 32px;
+  max-width: 800px;
+  margin-inline: auto;
 }
 
 .document__archived-title {

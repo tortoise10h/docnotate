@@ -12,6 +12,7 @@
                  comment-highlight:show->comment-popover#show
                  comment-highlight:scrollTo->iframe-bridge#scrollToComment
                  comment-highlight:showArchived->document-view#showArchived
+                 document-view:show-document->document-view#showDocument
                  comment-popover:hide->comment-popover#hide
                  comment-popover:closed->iframe-bridge#unfocusComment
                  comment-popover:closed->comment-highlight#clearActiveMarks
@@ -23,12 +24,13 @@
                  iframe-bridge:markClick->comment-highlight#openFromFrame
                  iframe-bridge:markRect->comment-popover#reposition
                  table-of-contents:navigate@window->iframe-bridge#scrollToBlock
+                 table-of-contents:navigate@window->document-view#showDocument
                  text-selection:hidden->iframe-bridge#clearSelection">
   <%= render "documents/selection_form", document: @document %>
 
   <%= render "comments/popover", document: @document %>
 
-  <%= render "documents/comment_nav", archived_comments_by_version: @archived_comments_by_version, unresolved_archived_count: @unresolved_archived_count, show_inbox: true %>
+  <%= render "documents/comment_nav", archived_comments_by_version: @archived_comments_by_version, unresolved_archived_count: @unresolved_archived_count, show_inbox: @archived_comments_by_version.any? %>
 
   <%= render "comments/payload_source", comment_payload: @comment_payload %>
 
@@ -41,7 +43,7 @@
             data-iframe-bridge-target="frame"></iframe>
   </div>
 
-  <div class="html-archived-panel" data-document-view-target="panel" data-view="archived" hidden>
+  <div class="document__archived-panel html-archived-panel" data-document-view-target="panel" data-view="archived" hidden>
     <%= render "comments/archived", document: @document, archived_comments_by_version: @archived_comments_by_version %>
   </div>
 </div>

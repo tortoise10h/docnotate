@@ -251,6 +251,8 @@ export default class extends Controller {
 	const count = this.navigableComments.length
 	if (count === 0) return
 
+	this.element.dispatchEvent(new CustomEvent("document-view:show-document", { bubbles: true }))
+
 	this.currentCommentIndex = ((index % count) + count) % count
 	const { comment, firstMark } = this.navigableComments[this.currentCommentIndex]
 
@@ -270,13 +272,7 @@ export default class extends Controller {
     }
 
     scrollToArchived() {
-	if (this.remoteValue) {
-		this.dispatch("showArchived")
-		return
-	}
-
-	const section = document.getElementById("previous-comments")
-	if (section) section.scrollIntoView({ behavior: "smooth" })
+	this.dispatch("showArchived")
     }
 
     showComment(comment, rect) {

@@ -132,6 +132,35 @@ class MarkdownDocumentsSystemTest < ApplicationSystemTestCase
     end
   end
 
+  test "toggles between document content and previous comments" do
+    visit open_documents_path(file_path: @file.path)
+    document = Document.find_by!(file_path: File.realpath(@file.path))
+    first_version = document.current_version
+    first_version.comments.create!(content: "Note from previous version")
+
+    @file.open
+    @file.write("# Updated Overview\n\nNew paragraph content.")
+    @file.close
+
+    visit open_documents_path(file_path: @file.path)
+
+    assert_selector ".document__content", visible: true
+    assert_selector ".document__archived-panel", visible: false
+
+    find(".document__comment-inbox-button").click
+
+    assert_selector ".document__comment-inbox-button[aria-pressed='true'][aria-label='Back to document']"
+    assert_selector ".document__content", visible: false
+    assert_selector ".document__archived-panel", visible: true
+    assert_text "Note from previous version"
+
+    find(".document__comment-inbox-button").click
+
+    assert_selector ".document__comment-inbox-button[aria-pressed='false'][aria-label='Previous comments']"
+    assert_selector ".document__content", visible: true
+    assert_selector ".document__archived-panel", visible: false
+  end
+
   private
 
   def assert_no_horizontal_page_overflow

@@ -149,6 +149,9 @@ class HtmlDocumentsTest < ActionDispatch::IntegrationTest
 
     get open_documents_path, params: { file_path: "file://#{file.path}#heading-1" }
 
+    assert_redirected_to open_documents_path(file_path: file.path)
+    follow_redirect!
+
     document = Document.find_by!(file_path: File.realpath(file.path))
     assert document.html?
     assert_response :success

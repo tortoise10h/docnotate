@@ -15,6 +15,11 @@ class DocumentsController < ApplicationController
       return
     end
 
+    if params[:file_path].present? && params[:file_path] != file_path
+      redirect_to open_documents_path(file_path: file_path)
+      return
+    end
+
     unless Document.supported_file?(file_path)
       @file_path = file_path
       render :unsupported_file, status: :unsupported_media_type

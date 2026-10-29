@@ -1,1 +1,2 @@
 <%= turbo_stream.replace @document, partial: "document_row", locals: { document: @document } %>
+<%= turbo_stream.replace dom_id(@document, :title), partial: "title", locals: { document: @document } %>

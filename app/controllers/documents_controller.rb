@@ -70,12 +70,12 @@ class DocumentsController < ApplicationController
     if @document.update(document_params)
       respond_to do |format|
         format.turbo_stream
-        format.html { redirect_to documents_path, notice: "File renamed" }
+        format.html { redirect_back_or_to documents_path, notice: "File renamed" }
       end
     else
       respond_to do |format|
         format.turbo_stream { render :update, status: :unprocessable_entity }
-        format.html { redirect_to documents_path, alert: "Unable to rename file" }
+        format.html { redirect_back_or_to documents_path, alert: "Unable to rename file" }
       end
     end
   end

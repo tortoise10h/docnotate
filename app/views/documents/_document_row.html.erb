@@ -1,5 +1,5 @@
-<li id="<%= dom_id(document) %>" class="documents__row" data-controller="rename-row">
-  <div class="documents__row-display" data-rename-row-target="display">
+<li id="<%= dom_id(document) %>" class="documents__row" data-controller="rename">
+  <div class="documents__row-display" data-rename-target="display">
     <%= link_to open_documents_path(file_path: document.file_path), class: "documents__file-link", data: { turbo_frame: "_top" } do %>
       <%= render "application/file_badge", document: document %>
       <span class="documents__name" data-tooltip="<%= document.file_path %>">
@@ -19,7 +19,7 @@
               class="documents__icon-button"
               title="Rename"
               aria-label="Rename <%= document.display_name %>"
-              data-action="click->rename-row#edit">
+              data-action="click->rename#edit">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
       </button>
       <%= button_to document_path(document),
@@ -37,13 +37,13 @@
   <%= form_with model: document,
                 class: "documents__rename-form",
                 html: { hidden: true },
-                data: { rename_row_target: "form", turbo_stream: true } do |form| %>
+                data: { rename_target: "form", turbo_stream: true } do |form| %>
     <%= form.text_field :name,
                         value: document.display_name,
                         class: "documents__name-input input",
                         aria: { label: "File name" },
-                        data: { rename_row_target: "input" } %>
+                        data: { rename_target: "input", action: "keydown.esc->rename#cancel" } %>
     <%= form.submit "Save", class: "documents__save-button" %>
-    <button type="button" class="documents__cancel-button" data-action="click->rename-row#cancel">Cancel</button>
+    <button type="button" class="documents__cancel-button" data-action="click->rename#cancel">Cancel</button>
   <% end %>
 </li>

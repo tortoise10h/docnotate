@@ -45,7 +45,31 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     assert_match %r{text/vnd.turbo-stream.html}, response.content_type
     assert_equal "New name", document.reload.name
     assert_match %r{action="replace" target="document_#{document.id}"}, response.body
+    assert_match %r{action="replace" target="title_document_#{document.id}"}, response.body
     assert_match "New name", response.body
+  end
+
+  test "renders rename controls on document show page and updates title via turbo stream" do
+    file = Tempfile.new([ "show-rename", ".md" ])
+    file.write("# Heading")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    assert_response :success
+    document = Document.find_by!(file_path: File.realpath(file.path))
+
+    assert_select "#title_document_#{document.id}[data-controller='rename']"
+    assert_select "button[data-action='click->rename#edit']"
+    assert_select "form.document__rename-form[action=?]", document_path(document)
+
+    patch document_path(document), params: { document: { name: "Updated title" } }, as: :turbo_stream
+
+    assert_response :ok
+    assert_equal "Updated title", document.reload.name
+    assert_match %r{action="replace" target="title_document_#{document.id}"}, response.body
+    assert_match "Updated title", response.body
+  ensure
+    file&.unlink
   end
 
   test "removes a document and its history without deleting the file" do

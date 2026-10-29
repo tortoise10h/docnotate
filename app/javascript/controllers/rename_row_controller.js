@@ -1,17 +1,3 @@
-import { Controller } from "@hotwired/stimulus"
+import RenameController from "controllers/rename_controller"
 
-export default class extends Controller {
-  static targets = ["display", "form", "input"]
-
-  edit() {
-    this.displayTarget.hidden = true
-    this.formTarget.hidden = false
-    this.inputTarget.focus()
-    this.inputTarget.select()
-  }
-
-  cancel() {
-    this.formTarget.hidden = true
-    this.displayTarget.hidden = false
-  }
-}
+export default class extends RenameController {}

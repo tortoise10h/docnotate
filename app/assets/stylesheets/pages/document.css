@@ -865,6 +865,24 @@
   min-width: 0;
 }
 
+.document__title-wrapper {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  flex: 1;
+}
+
+.document__title-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.document__title-display[hidden] {
+  display: none;
+}
+
 .document__title {
   position: relative;
   font-size: 1rem;
@@ -875,6 +893,64 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.document__rename-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 480px;
+  width: 100%;
+}
+
+.document__rename-form[hidden] {
+  display: none;
+}
+
+.document__rename-input {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 4px 8px;
+  font-size: 0.8125rem;
+  box-sizing: border-box;
+}
+
+.document__save-button,
+.document__cancel-button {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.document__save-button {
+  color: #ffffff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.document__save-button:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.document__cancel-button {
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.document__cancel-button:hover {
+  color: var(--full-contrast);
+  background: rgba(25, 29, 38, 0.045);
 }
 
 /* Copy button uses the shared .icon-button component; only the icon-swap state lives here */

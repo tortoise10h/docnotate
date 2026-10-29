@@ -127,4 +127,14 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal [ newest, oldest ], Document.recently_opened.to_a
     assert_not_includes Document.recently_opened, never_opened
   end
+
+  test "normalize_file_path strips file:// prefix, localhost authority, fragments, queries, and decodes percent encoding" do
+    assert_equal "/Users/test/doc.html", Document.normalize_file_path("file:///Users/test/doc.html")
+    assert_equal "/Users/test/doc.html", Document.normalize_file_path("file://localhost/Users/test/doc.html")
+    assert_equal "/Users/test/my notes.html", Document.normalize_file_path("file:///Users/test/my%20notes.html#heading")
+    assert_equal "/Users/test/doc.html", Document.normalize_file_path("file:///Users/test/doc.html?v=1")
+    assert_equal "C:/Users/test/doc.html", Document.normalize_file_path("file:///C:/Users/test/doc.html")
+    assert_equal "/Users/test/doc.html", Document.normalize_file_path("/Users/test/doc.html")
+    assert_nil Document.normalize_file_path(nil)
+  end
 end

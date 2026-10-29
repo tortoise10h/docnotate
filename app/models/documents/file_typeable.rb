@@ -17,6 +17,7 @@ module Documents
       HTML_EXTENSIONS = %w[.html .htm].freeze
 
       def file_type_from_path(file_path)
+        file_path = normalize_file_path(file_path) if respond_to?(:normalize_file_path)
         ext = File.extname(file_path).downcase
         case ext
         when *MARKDOWN_EXTENSIONS
@@ -35,10 +36,12 @@ module Documents
       end
 
       def markdown_file?(file_path)
+        file_path = normalize_file_path(file_path) if respond_to?(:normalize_file_path)
         MARKDOWN_EXTENSIONS.include?(File.extname(file_path).downcase)
       end
 
       def html_file?(file_path)
+        file_path = normalize_file_path(file_path) if respond_to?(:normalize_file_path)
         HTML_EXTENSIONS.include?(File.extname(file_path).downcase)
       end
     end

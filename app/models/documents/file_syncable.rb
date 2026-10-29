@@ -3,7 +3,34 @@ module Documents
     extend ActiveSupport::Concern
 
     class_methods do
+      def normalize_file_path(path)
+        return path if path.blank?
+
+        cleaned = path.to_s.strip
+        return cleaned unless cleaned.start_with?(%r{file:}i)
+
+        cleaned = cleaned.sub(%r{\Afile://localhost(?=/|\z)}i, "")
+        cleaned = cleaned.sub(%r{\Afile://}i, "")
+        cleaned = cleaned.sub(%r{\Afile:}i, "")
+        cleaned = cleaned.split(/[?#]/, 2).first
+
+        begin
+          cleaned = URI.decode_uri_component(cleaned)
+        rescue ArgumentError
+        end
+
+        if cleaned.match?(%r{\A/[a-zA-Z]:/})
+          cleaned.sub(%r{\A/}, "")
+        elsif !cleaned.start_with?("/") && !cleaned.match?(%r{\A[a-zA-Z]:})
+          "/#{cleaned}"
+        else
+          cleaned
+        end
+      end
+
       def open(file_path)
+        file_path = normalize_file_path(file_path)
+
         # Always work with absolute file path instead of relative
         file_path = File.expand_path(file_path)
 

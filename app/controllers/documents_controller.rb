@@ -100,7 +100,7 @@ class DocumentsController < ApplicationController
   end
 
   def resolve_file_path
-    params[:file_path]
+    Document.normalize_file_path(params[:file_path])
   end
 
   def prepare_document

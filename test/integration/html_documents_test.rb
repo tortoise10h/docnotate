@@ -141,4 +141,19 @@ class HtmlDocumentsTest < ActionDispatch::IntegrationTest
   ensure
     FileUtils.remove_entry(root) if root
   end
+
+  test "opens an html file from a browser file url with file:// prefix" do
+    file = Tempfile.new([ "browser-url", ".html" ])
+    file.write(%(<html><body><h1>From Browser</h1><p>Body</p></body></html>))
+    file.close
+
+    get open_documents_path, params: { file_path: "file://#{file.path}#heading-1" }
+
+    document = Document.find_by!(file_path: File.realpath(file.path))
+    assert document.html?
+    assert_response :success
+    assert_select ".document__title", File.basename(file.path)
+  ensure
+    file.unlink
+  end
 end

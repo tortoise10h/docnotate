@@ -3,7 +3,7 @@
     <span class="document__comment-popover-date" data-comment-popover-target="popoverDate"></span>
     <div class="document__comment-popover-actions">
       <%= form_with url: document_comment_path(document, 0), method: :delete, class: "document__comment-delete-form", data: { comment_popover_target: "deleteForm" } do |f| %>
-        <%= f.button type: :submit, class: "document__comment-delete", aria: { label: "Delete comment" } do %>
+        <%= f.button type: :submit, class: "document__comment-delete", title: "Delete comment (⇧⌘D)", aria: { label: "Delete comment" } do %>
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
         <% end %>
       <% end %>
@@ -12,7 +12,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
       </button>
       <button type="button" class="document__comment-popover-close"
-              data-action="click->comment-popover#hide" aria-label="Close">&times;</button>
+              data-action="click->comment-popover#hide" title="Close (Esc)" aria-label="Close">&times;</button>
     </div>
   </div>
 
@@ -28,7 +28,7 @@
                     action: "input->auto-resize-textarea#resize" } %>
       <p class="document__comment-edit-error" id="comment_edit_error" data-comment-popover-target="editError"></p>
       <div class="document__comment-actions">
-        <button type="button" class="document__comment-cancel" data-action="click->comment-popover#cancelEdit">Cancel</button>
+        <button type="button" class="document__comment-cancel" data-action="click->comment-popover#cancelEdit" title="Cancel (Esc)">Cancel</button>
         <%= f.button type: :submit, class: "button", data: { controller: "hotkey", hotkey: "Mod+Enter", hotkey_scope: "comment_edit_text" } do %>
           <span>Save</span>
           <kbd class="button__hotkey-hint" data-hotkey-target="hint"></kbd>

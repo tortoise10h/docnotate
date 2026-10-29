@@ -3,6 +3,17 @@
 
   <% if archived_comments_by_version.empty? %>
     <p class="empty-state">No previous comments</p>
+  <% else %>
+    <% all_archived_resolved = archived_comments_by_version.values.flatten.all?(&:is_resolved) %>
+    <%= form_with url: document_version_resolver_path(document), method: :patch, data: { turbo_stream: true } do |f| %>
+      <%= f.hidden_field :resolved, value: all_archived_resolved ? "0" : "1" %>
+      <button type="submit"
+              hidden
+              data-controller="hotkey"
+              data-hotkey="Mod+Alt+s,Mod+Alt+S"
+              aria-label="<%= all_archived_resolved ? "Undo resolve all" : "Resolve all" %>">
+      </button>
+    <% end %>
   <% end %>
 
   <% archived_comments_by_version.each do |version, comments| %>
@@ -16,6 +27,7 @@
         <%= f.hidden_field :resolved, value: all_resolved ? "0" : "1" %>
         <button type="submit"
                 class="document__archived-version-checkall <%= "document__archived-version-checkall--resolved" if all_resolved %>"
+                title="<%= all_resolved ? "Undo resolve all (⌥⌘S)" : "Resolve all (⌥⌘S)" %>"
                 aria-label="<%= all_resolved ? "Undo resolve all" : "Resolve all" %>">
           <% if all_resolved %>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/></svg>

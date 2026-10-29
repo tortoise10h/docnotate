@@ -6,7 +6,7 @@ export default class extends Controller {
     toggle() {
         const wide = this.element.classList.toggle("document--markdown-wide")
         this.buttonTarget.setAttribute("aria-pressed", wide)
-        this.buttonTarget.dataset.tooltip = wide ? "Switch to reading view" : "Switch to wide view"
+        this.buttonTarget.dataset.tooltip = wide ? "Switch to reading view (⇧⌘X)" : "Switch to wide view (⇧⌘X)"
         this.dispatch("change")
     }
 }

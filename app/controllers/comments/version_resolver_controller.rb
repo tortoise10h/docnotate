@@ -2,11 +2,15 @@ class Comments::VersionResolverController < ApplicationController
   include CommentPayloadable
 
   before_action :set_document
-  before_action :set_document_version
+  before_action :set_document_version, if: -> { params[:document_version_id].present? }
 
   def update
     begin
-      @document.set_version_comments_resolved!(@document_version.id, resolved: resolved?)
+      if @document_version
+        @document.set_version_comments_resolved!(@document_version.id, resolved: resolved?)
+      else
+        @document.set_all_archived_comments_resolved!(resolved: resolved?)
+      end
     rescue Documents::Commentable::UnresolvableComment => e
       render plain: e.message, status: :unprocessable_entity
       return

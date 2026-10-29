@@ -277,6 +277,47 @@ class CommentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "version resolver marks all comments across all archived versions resolved when document_version_id is omitted" do
+    file = Tempfile.new([ "sample", ".md" ])
+    file.write("# Hello world")
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    document = Document.find_by(file_path: File.realpath(file.path))
+    document.comments.create!(
+      content: "First comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 8,
+      selected_text: "Hello", prefix_text: "# ", postfix_text: " world"
+    )
+
+    document.update!(content: "# Second world")
+    document.parse_ast_and_save!(
+      metadata: Documents::AstParseable::ParseMetadata.new(size: 200, last_modified_at: Time.current)
+    )
+    document.comments.create!(
+      content: "Second comment",
+      start_block_id: "block-1", end_block_id: "block-1",
+      start_offset: 3, end_offset: 9,
+      selected_text: "Second", prefix_text: "# ", postfix_text: " world"
+    )
+
+    document.update!(content: "# Third world")
+    document.parse_ast_and_save!(
+      metadata: Documents::AstParseable::ParseMetadata.new(size: 200, last_modified_at: Time.current)
+    )
+
+    assert_equal 2, document.archived_comments.count
+    assert document.archived_comments.none?(&:is_resolved)
+
+    patch document_version_resolver_path(document), params: { resolved: "1" }, as: :turbo_stream
+
+    assert_response :ok
+    assert document.archived_comments.all?(&:is_resolved)
+  ensure
+    file.unlink
+  end
+
   test "version resolver rejects the current version" do
     file = Tempfile.new([ "sample", ".md" ])
     file.write("# Hello world")

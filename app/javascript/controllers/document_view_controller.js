@@ -47,6 +47,6 @@ export default class extends Controller {
 
         button.setAttribute("aria-pressed", inArchived)
         button.setAttribute("aria-label", label)
-        button.dataset.tooltip = label
+        button.dataset.tooltip = `${label} (⇧⌘")`
     }
 }

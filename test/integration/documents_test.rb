@@ -121,7 +121,9 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     assert_select "#document_paper .document__content[data-document-view-target='panel'][data-view='document']"
     assert_select "#document_paper .document__archived-panel[data-document-view-target='panel'][data-view='archived']"
     assert_select "#document_paper .document__archived-panel #previous-comments"
-    assert_select ".document__comment-inbox-button"
+    assert_select ".document__comment-inbox-button[data-controller='hotkey']"
+    assert_select ".document__width-toggle[data-controller='hotkey']"
+    assert_select "#previous-comments button[data-controller='hotkey']"
   ensure
     file.unlink
   end

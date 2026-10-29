@@ -68,6 +68,10 @@ module Documents
       end
     end
 
+    def set_all_archived_comments_resolved!(resolved: true)
+      comments.where.not(document_version_id: current_version_id).update_all(is_resolved: resolved)
+    end
+
     # Comments belong to previous document version, show on a separate section as archived comments
     def archived_comments
       comments

@@ -30,7 +30,7 @@
 
   <%= render "comments/popover", document: @document %>
 
-  <%= render "documents/comment_nav", archived_comments_by_version: @archived_comments_by_version, unresolved_archived_count: @unresolved_archived_count, show_inbox: @archived_comments_by_version.any? %>
+  <%= render "documents/comment_nav", archived_comments_by_version: @archived_comments_by_version, unresolved_archived_count: @unresolved_archived_count, show_inbox: true %>
 
   <%= render "comments/payload_source", comment_payload: @comment_payload %>
 

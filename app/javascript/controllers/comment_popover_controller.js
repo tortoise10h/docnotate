@@ -12,6 +12,47 @@ export default class extends Controller {
     connect() {
 	this.currentComment = null
 	this.documentId = this.element.dataset.documentId
+	this.boundKeydown = this.keydown.bind(this)
+	document.addEventListener("keydown", this.boundKeydown)
+    }
+
+    disconnect() {
+	document.removeEventListener("keydown", this.boundKeydown)
+    }
+
+    keydown(event) {
+	if (!this.isOpen()) return
+
+	if (event.key === "Escape") {
+	    event.preventDefault()
+	    if (this.isEditing()) {
+		this.cancelEdit()
+	    } else {
+		this.hide()
+	    }
+	    return
+	}
+
+	const isMod = event.metaKey || event.ctrlKey
+	if (isMod && event.shiftKey && event.key.toLowerCase() === "d") {
+	    event.preventDefault()
+	    this.deleteComment()
+	    return
+	}
+    }
+
+    isOpen() {
+	return this.currentComment !== null && this.popoverTarget.style.display !== "none"
+    }
+
+    isEditing() {
+	return this.hasPopoverEditBodyTarget && !this.popoverEditBodyTarget.hidden
+    }
+
+    deleteComment() {
+	if (!this.currentComment) return
+	const submitButton = this.deleteFormTarget.querySelector('button[type="submit"]')
+	if (submitButton) submitButton.click()
     }
 
     // A null rect means the anchor is unknown (remote nav) or off-screen (remote scroll)

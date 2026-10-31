@@ -6,4 +6,10 @@ class ApplicationController < ActionController::Base
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
+
+  helper_method :theme_preference
+
+  def theme_preference
+    cookies[:theme].presence_in(AppSetting::THEMES) || AppSetting.theme
+  end
 end

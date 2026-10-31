@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   root "home#index"
 
   post "settings/editor", to: "settings#update_editor", as: :settings_editor
+  post "settings/theme", to: "settings#update_theme", as: :settings_theme
 
   # MCP endpoint for coding agents (see DocnotateServerTransport above)
   mount DocnotateServerTransport => "/mcp", as: :mcp

@@ -21,8 +21,10 @@ class MarkdownParser
   private
 
   def build_nodes(node:, parent_id:, parent_node:, position:, nodes:)
+    callout_meta = Markdown::CalloutParser.parse_callout(node) if node.type == :block_quote
+
     db_id = SecureRandom.uuid_v7
-    attrs = node_attributes(node:, parent_id:, parent_node:, position:)
+    attrs = node_attributes(node:, parent_id:, parent_node:, position:, callout_meta:)
     attrs[:id] = db_id
 
     nodes << attrs
@@ -36,7 +38,7 @@ class MarkdownParser
     end
   end
 
-  def node_attributes(node:, parent_id:, parent_node:, position:)
+  def node_attributes(node:, parent_id:, parent_node:, position:, callout_meta: nil)
     {
       document_version_id: @document_version_id,
       parent_id:,
@@ -44,7 +46,7 @@ class MarkdownParser
       node_type: node.type.to_s,
       content: node_content(node),
       heading_level: node_heading_level(node),
-      meta: node_metadata(node, parent_node:, position:),
+      meta: node_metadata(node, parent_node:, position:, callout_meta:),
       node_id: block_level?(node) ? unique_block_id : nil,
       created_at: Time.current,
       updated_at: Time.current
@@ -67,8 +69,10 @@ class MarkdownParser
     node.header_level
   end
 
-  def node_metadata(node, parent_node:, position:)
+  def node_metadata(node, parent_node:, position:, callout_meta: nil)
     case node.type
+    when :block_quote
+      { "callout" => callout_meta } if callout_meta
     when :code_block
       { "language" => node.fence_info.to_s }
     when :link

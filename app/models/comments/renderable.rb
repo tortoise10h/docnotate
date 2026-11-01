@@ -7,7 +7,8 @@ module Comments
     # default render.unsafe = false omits raw HTML from the source, which is
     # why no extra sanitizer is needed for agent-supplied content.
     def rendered_content
-      Commonmarker.to_html(content, plugins: { syntax_highlighter: nil }).html_safe
+      html = Commonmarker.to_html(content, options: { render: { unsafe: false } }, plugins: { syntax_highlighter: nil })
+      Markdown::CalloutParser.render_callouts_in_html(html).html_safe
     end
   end
 end

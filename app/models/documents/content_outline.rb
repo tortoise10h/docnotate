@@ -37,6 +37,10 @@ module Documents
       return nil unless node.node_id
 
       entry = { block_id: node.node_id, type: node.node_type }
+      if node.meta&.dig("callout")
+        entry[:callout_type] = node.meta.dig("callout", "type")
+        entry[:title] = node.meta.dig("callout", "title")
+      end
       entry[:level] = node.heading_level if node.heading_level.present?
       entry[:text] = collect_text(node).strip
       children = build_outline(node.children)
@@ -46,6 +50,7 @@ module Documents
 
     def collect_text(node)
       own = node.content.to_s
+      own = node.meta.dig("callout", "title").to_s if own.empty? && node.meta&.dig("callout")
       child_text = node.children.filter_map { |child| collect_text(child) unless child.node_id }.join
       own + child_text
     end

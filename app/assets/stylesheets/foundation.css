@@ -81,6 +81,10 @@
   --warn-border: #ffd2b2;
   --ok-bg: #eef7f0;
   --ok-border: #bfdec9;
+  --important-bg: #fbf7fe;
+  --important-border: #e9d5ff;
+  --caution-bg: #fdf2f2;
+  --caution-border: #fecaca;
   --table-border: rgba(9, 78, 206, 0.15);
   --table-header-bg: #d9e1f2;
   --table-alternate-bg: rgba(9, 78, 206, 0.035);
@@ -128,6 +132,10 @@
   --warn-border: rgba(251, 191, 36, 0.25);
   --ok-bg: rgba(52, 211, 153, 0.1);
   --ok-border: rgba(52, 211, 153, 0.25);
+  --important-bg: rgba(192, 132, 252, 0.1);
+  --important-border: rgba(192, 132, 252, 0.25);
+  --caution-bg: rgba(248, 113, 113, 0.1);
+  --caution-border: rgba(248, 113, 113, 0.25);
   --table-border: rgba(91, 149, 255, 0.2);
   --table-header-bg: #222936;
   --table-alternate-bg: rgba(255, 255, 255, 0.02);
@@ -173,6 +181,10 @@
     --warn-border: rgba(251, 191, 36, 0.25);
     --ok-bg: rgba(52, 211, 153, 0.1);
     --ok-border: rgba(52, 211, 153, 0.25);
+    --important-bg: rgba(192, 132, 252, 0.1);
+    --important-border: rgba(192, 132, 252, 0.25);
+    --caution-bg: rgba(248, 113, 113, 0.1);
+    --caution-border: rgba(248, 113, 113, 0.25);
     --table-border: rgba(91, 149, 255, 0.2);
     --table-header-bg: #222936;
     --table-alternate-bg: rgba(255, 255, 255, 0.02);

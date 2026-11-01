@@ -68,10 +68,15 @@ module DocumentsHelper
       alt = ERB::Util.h(node.content)
       title = ERB::Util.h(node.meta&.dig("title"))
       buf << %(<img src="#{url}" alt="#{alt}" title="#{title}" id="#{ERB::Util.h(node.node_id)}" class="document-node document-node--image">)
-    when "blockquote"
-      buf << %(<blockquote id="#{ERB::Util.h(node.node_id)}" class="document-node document-node--blockquote">)
-      append_document_node_children(node, buf)
-      buf << "</blockquote>"
+    when "block_quote", "blockquote"
+      callout = node.meta&.dig("callout")
+      if callout
+        append_callout_node(node, callout, buf)
+      else
+        buf << %(<blockquote id="#{ERB::Util.h(node.node_id)}" class="document-node document-node--blockquote">)
+        append_document_node_children(node, buf)
+        buf << "</blockquote>"
+      end
     when "thematic_break"
       buf << %(<hr id="#{ERB::Util.h(node.node_id)}" class="document-node document-node--thematic-break">)
     when "table"
@@ -104,5 +109,29 @@ module DocumentsHelper
 
   def append_document_node_children(node, buf)
     node.children.each { |child| append_document_node(child, buf) }
+  end
+
+  def append_callout_node(node, callout, buf)
+    theme = ERB::Util.h(callout["type"] || "note")
+    title = ERB::Util.h(callout["title"])
+    collapsible = callout["collapsible"]
+    is_collapsible = collapsible.present?
+    tag = is_collapsible ? "details" : "div"
+    header_tag = is_collapsible ? "summary" : "div"
+    open_attr = (collapsible == "expanded") ? " open" : ""
+    collapsible_cls = is_collapsible ? " callout--collapsible" : ""
+
+    buf << %(<#{tag} id="#{ERB::Util.h(node.node_id)}" class="document-node document-node--callout callout callout--#{theme}#{collapsible_cls}"#{open_attr}>)
+    buf << %(<#{header_tag} class="callout__header">)
+    buf << %(<span class="callout__icon" aria-hidden="true">#{Markdown::CalloutParser.icon_svg(callout["type"])}</span>)
+    buf << %(<span class="callout__title">#{title}</span>)
+    if is_collapsible
+      buf << %(<span class="callout__fold-icon" aria-hidden="true">#{Markdown::CalloutParser::FOLD_ICON_SVG}</span>)
+    end
+    buf << %(</#{header_tag}>)
+    buf << %(<div class="callout__content">)
+    append_document_node_children(node, buf)
+    buf << %(</div>)
+    buf << %(</#{tag}>)
   end
 end

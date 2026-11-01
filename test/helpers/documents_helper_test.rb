@@ -127,15 +127,79 @@ class DocumentsHelperTest < ActionView::TestCase
     )
     assert_equal '<img src="/logo.png" alt="Alt Text" title="Logo" id="block-img" class="document-node document-node--image">', render_document_node(img)
 
-    quote = NodeStub.new(
-      node_type: "blockquote",
-      node_id: "block-quote",
-      children: [ NodeStub.new(node_type: "text", content: "quote") ]
+    document = Document.create!(
+      file_path: "/tmp/quote_test.md",
+      content: "> quote\n",
+      file_type: "markdown"
     )
-    assert_equal '<blockquote id="block-quote" class="document-node document-node--blockquote">quote</blockquote>', render_document_node(quote)
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 8, last_modified_at: Time.current))
+    quote = document.root_node_tree.first.children.first
+    assert_equal "block_quote", quote.node_type
+    expected_quote = %(<blockquote id="#{quote.node_id}" class="document-node document-node--blockquote"><p id="#{quote.children.first.node_id}" class="document-node document-node--paragraph">quote</p></blockquote>)
+    assert_equal expected_quote, render_document_node(quote)
+
+    legacy_quote = NodeStub.new(
+      node_type: "blockquote",
+      node_id: "block-legacy",
+      children: [ NodeStub.new(node_type: "text", content: "legacy") ]
+    )
+    assert_equal '<blockquote id="block-legacy" class="document-node document-node--blockquote">legacy</blockquote>', render_document_node(legacy_quote)
 
     hr = NodeStub.new(node_type: "thematic_break", node_id: "block-hr")
     assert_equal '<hr id="block-hr" class="document-node document-node--thematic-break">', render_document_node(hr)
+  end
+
+  test "renders non-collapsible callout with custom title and icon" do
+    document = Document.create!(
+      file_path: "/tmp/callout_test.md",
+      content: "> [!NOTE] Key Architectural Decisions\n> We chose a unified model concern.\n",
+      file_type: "markdown"
+    )
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
+    callout = document.root_node_tree.first.children.first
+
+    result = render_document_node(callout)
+    assert_match %r{\A<div id="block-[a-f0-9]{8}" class="document-node document-node--callout callout callout--note">}, result
+    assert_includes result, '<div class="callout__header">'
+    assert_includes result, '<span class="callout__icon" aria-hidden="true">'
+    assert_includes result, '<span class="callout__title">Key Architectural Decisions</span>'
+    assert_includes result, '<div class="callout__content">'
+    assert_includes result, "We chose a unified model concern.</p>"
+    refute_includes result, "<details"
+    refute_includes result, "callout__fold-icon"
+  end
+
+  test "renders collapsible callout in collapsed state" do
+    document = Document.create!(
+      file_path: "/tmp/callout_collapsed.md",
+      content: "> [!NOTE]- Detailed Analysis\n> Collapsed deep-dive.\n",
+      file_type: "markdown"
+    )
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
+    callout = document.root_node_tree.first.children.first
+
+    result = render_document_node(callout)
+    assert_match %r{\A<details id="block-[a-f0-9]{8}" class="document-node document-node--callout callout callout--note callout--collapsible">}, result
+    assert_includes result, '<summary class="callout__header">'
+    assert_includes result, '<span class="callout__title">Detailed Analysis</span>'
+    assert_includes result, '<span class="callout__fold-icon" aria-hidden="true">'
+    refute_match %r{<details[^>]*\bopen\b}, result
+  end
+
+  test "renders collapsible callout in expanded state" do
+    document = Document.create!(
+      file_path: "/tmp/callout_expanded.md",
+      content: "> [!TIP]+ Expanded Recommendation\n> Open by default.\n",
+      file_type: "markdown"
+    )
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 100, last_modified_at: Time.current))
+    callout = document.root_node_tree.first.children.first
+
+    result = render_document_node(callout)
+    assert_match %r{\A<details id="block-[a-f0-9]{8}" class="document-node document-node--callout callout callout--tip callout--collapsible" open>}, result
+    assert_includes result, '<summary class="callout__header">'
+    assert_includes result, '<span class="callout__title">Expanded Recommendation</span>'
+    assert_includes result, '<span class="callout__fold-icon" aria-hidden="true">'
   end
 
   test "renders tables with header and body rows" do
@@ -197,5 +261,21 @@ class DocumentsHelperTest < ActionView::TestCase
     assert_includes result, 'title="Title &quot;with&quot; quotes"'
     assert_includes result, "Safe &amp; Sound"
     refute_includes result, "<script>"
+
+    unsafe_callout = NodeStub.new(
+      node_type: "block_quote",
+      node_id: "block-callout-xss",
+      meta: {
+        "callout" => {
+          "type" => "note",
+          "title" => "<script>alert('xss')</script>",
+          "custom_title" => true
+        }
+      },
+      children: [ NodeStub.new(node_type: "paragraph", node_id: "block-p-safe", children: [ NodeStub.new(node_type: "text", content: "Safe") ]) ]
+    )
+    callout_result = render_document_node(unsafe_callout)
+    assert_includes callout_result, "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;"
+    refute_includes callout_result, "<script>"
   end
 end

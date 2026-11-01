@@ -137,4 +137,33 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal "/Users/test/doc.html", Document.normalize_file_path("/Users/test/doc.html")
     assert_nil Document.normalize_file_path(nil)
   end
+
+  test "content_outline includes callout_type and title for callout blocks and table_of_contents excludes them" do
+    content = <<~MD
+      # Document Title
+
+      > [!NOTE] Architecture Decisions
+      > We chose a unified model concern.
+
+      ## Section Two
+    MD
+
+    document = Document.create!(file_path: "/tmp/outline_test.md", content:, file_type: "markdown")
+    document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: content.bytesize, last_modified_at: Time.current))
+
+    outline = document.content_outline
+    callout_entry = outline.find { |entry| entry[:type] == "block_quote" }
+
+    assert_not_nil callout_entry
+    assert_equal "note", callout_entry[:callout_type]
+    assert_equal "Architecture Decisions", callout_entry[:title]
+    assert_equal "Architecture Decisions", callout_entry[:text]
+    assert_equal 1, callout_entry[:children].size
+    assert_equal "We chose a unified model concern.", callout_entry[:children].first[:text]
+
+    toc = document.table_of_contents
+    toc_texts = toc.map(&:text)
+    assert_equal [ "Document Title", "Section Two" ], toc_texts
+    refute_includes toc_texts, "Architecture Decisions"
+  end
 end

@@ -1,0 +1,122 @@
+/* Callout component (GitHub & Obsidian alerts) */
+
+.callout {
+  --callout-accent: var(--accent);
+  --callout-bg: var(--note-bg);
+  --callout-border: var(--note-border);
+
+  background: var(--callout-bg);
+  border: 1px solid var(--callout-border);
+  border-left: 4px solid var(--callout-accent);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 1rem 0;
+  color: var(--fg);
+  font-family: var(--font);
+}
+
+.callout--note {
+  --callout-accent: var(--accent);
+  --callout-bg: var(--note-bg);
+  --callout-border: var(--note-border);
+}
+
+.callout--tip {
+  --callout-accent: var(--green);
+  --callout-bg: var(--ok-bg);
+  --callout-border: var(--ok-border);
+}
+
+.callout--important {
+  --callout-accent: var(--purple);
+  --callout-bg: var(--important-bg);
+  --callout-border: var(--important-border);
+}
+
+.callout--warning {
+  --callout-accent: var(--amber);
+  --callout-bg: var(--warn-bg);
+  --callout-border: var(--warn-border);
+}
+
+.callout--caution {
+  --callout-accent: var(--red);
+  --callout-bg: var(--caution-bg);
+  --callout-border: var(--caution-border);
+}
+
+.callout__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--callout-accent);
+  user-select: none;
+}
+
+summary.callout__header {
+  list-style: none;
+  cursor: pointer;
+}
+
+summary.callout__header::-webkit-details-marker {
+  display: none;
+}
+
+summary.callout__header::marker {
+  display: none;
+}
+
+.callout__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--callout-accent);
+}
+
+.callout__title {
+  flex-grow: 1;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--callout-accent);
+}
+
+.callout__fold-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.callout__fold-icon svg {
+  transition: transform 0.2s ease;
+}
+
+details.callout--collapsible[open] > summary.callout__header .callout__fold-icon svg {
+  transform: rotate(180deg);
+}
+
+.callout__content {
+  margin-top: 8px;
+  color: var(--fg);
+}
+
+.callout__content > *:first-child {
+  margin-top: 0;
+}
+
+.callout__content > *:last-child {
+  margin-bottom: 0;
+}
+
+.callout__content p {
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+.callout__content p:last-child {
+  margin-bottom: 0;
+}

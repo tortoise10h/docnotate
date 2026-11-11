@@ -1,18 +1,22 @@
 <div class="document__markdown-editor" data-markdown-editor-target="editorPanel" hidden>
-  <div class="document__markdown-editor-header">
-    <div class="document__markdown-editor-status">
-      <span class="document__markdown-editor-indicator" aria-hidden="true"></span>
-      <span class="document__markdown-editor-title">Editing Markdown</span>
-      <span class="document__markdown-editor-filename" title="<%= document.file_path %>"><%= document.display_name %></span>
-    </div>
-    <div class="document__markdown-editor-actions">
-      <span class="document__markdown-editor-hint">⌘↵ to save</span>
-      <button type="button" class="button button--secondary" data-action="click->markdown-editor#cancel">Cancel</button>
-      <button type="button" class="button button--primary" data-action="click->markdown-editor#save">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        <span>Save</span>
-      </button>
-    </div>
+  <div class="document__markdown-editor-floating document__markdown-editor-actions" role="toolbar" aria-label="Editor actions">
+    <button type="button"
+            class="document__markdown-editor-floating-btn document__markdown-editor-floating-btn--save"
+            data-action="click->markdown-editor#save"
+            data-tooltip="Save (⌘↵)"
+            aria-label="Save">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      <span class="visually-hidden">Save</span>
+    </button>
+    <div class="document__markdown-editor-floating-divider" role="separator" aria-hidden="true"></div>
+    <button type="button"
+            class="document__markdown-editor-floating-btn document__markdown-editor-floating-btn--cancel"
+            data-action="click->markdown-editor#cancel"
+            data-tooltip="Cancel (Esc)"
+            aria-label="Cancel">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <span class="visually-hidden">Cancel</span>
+    </button>
   </div>
 
   <div class="document__markdown-editor-error" id="markdown_editor_error" data-markdown-editor-target="error" hidden></div>

@@ -232,6 +232,16 @@ export default class extends Controller {
       return
     }
 
+    if (this.isEditing && (event.key === "Escape" || event.key === "Esc")) {
+      if (this.hasDialogTarget && this.dialogTarget.open) {
+        this.cancelSave()
+      } else {
+        event.preventDefault()
+        this.cancel()
+      }
+      return
+    }
+
     if (this.isEditing && isMod && (event.key === "Enter" || event.keyCode === 13)) {
       if (!this.hasDialogTarget || !this.dialogTarget.open) {
         event.preventDefault()

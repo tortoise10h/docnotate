@@ -1959,12 +1959,24 @@
   display: none !important;
 }
 
-/* In-app Markdown Editor */
+/* Remove outside paper box in edit mode so only the editor surface is displayed */
+.document--editing .document__paper {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* In-app Markdown Editor - Single cohesive surface */
 .document__markdown-editor {
   display: flex;
   flex-direction: column;
-  gap: 12px;
   width: 100%;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: var(--pre-bg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
 }
 
 .document__markdown-editor[hidden] {
@@ -1976,10 +1988,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 10px 14px;
+  padding: 10px 16px;
   background: var(--surface-subtle);
-  border: 1px solid var(--border-light);
-  border-radius: 8px;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .document__markdown-editor-status {
@@ -2034,12 +2045,13 @@
 }
 
 .document__markdown-editor-error {
+  margin: 12px 16px 0;
   padding: 10px 14px;
   font-size: 0.875rem;
   color: var(--red);
   background: var(--warn-bg);
   border: 1px solid var(--warn-border);
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .document__markdown-editor-error[hidden] {
@@ -2048,7 +2060,10 @@
 
 .document__markdown-editor-container {
   width: 100%;
-  min-height: 450px;
+  height: calc(100vh - 220px);
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Match OverType editor surface and typography to document paper */
@@ -2067,18 +2082,22 @@
   --code-bg: var(--inline-code-bg) !important;
   --cursor: var(--accent) !important;
 
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
   background: var(--pre-bg) !important;
-  border: 1px solid var(--border-light) !important;
-  border-radius: 8px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   overflow: hidden !important;
-  box-shadow: 0 1px 3px var(--pre-shadow);
 }
 
 .document__markdown-editor-container .overtype-toolbar {
   border-bottom: 1px solid var(--border-light) !important;
   background: var(--surface-subtle) !important;
-  padding: 6px 10px !important;
+  padding: 6px 12px !important;
   gap: 2px !important;
+  flex-shrink: 0 !important;
 }
 
 .document__markdown-editor-container .overtype-toolbar-button {
@@ -2107,7 +2126,12 @@
 }
 
 .document__markdown-editor-container .overtype-wrapper {
+  flex: 1 1 0 !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
   background: var(--pre-bg) !important;
+  overflow: hidden !important;
 }
 
 .document__markdown-editor-container .overtype-wrapper,

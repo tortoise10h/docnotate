@@ -76,7 +76,6 @@ export default class extends Controller {
     }
 
     this.initEditor()
-    this.editor?._updateAutoHeight?.()
     this.editor?.focus()
   }
 
@@ -126,13 +125,12 @@ export default class extends Controller {
         value: this.initialContent,
         toolbar: true,
         toolbarButtons: buttons,
-        autoResize: true,
-        minHeight: "450px",
+        autoResize: false,
         theme: this.currentTheme,
         fontFamily: '"Lilex", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
         fontSize: "0.9375rem",
         lineHeight: 1.65,
-        padding: "20px 24px"
+        padding: "24px 32px"
       })
       this.editor = Array.isArray(instances) ? instances[0] : instances
     }
@@ -141,7 +139,6 @@ export default class extends Controller {
   cancel() {
     if (this.editor) {
       this.editor.setValue(this.initialContent)
-      this.editor._updateAutoHeight?.()
     }
     this.exitEditMode()
   }

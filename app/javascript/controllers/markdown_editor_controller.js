@@ -76,7 +76,34 @@ export default class extends Controller {
     }
 
     this.initEditor()
-    this.editor?.focus()
+    this.resetScrollAndFocus()
+  }
+
+  resetScrollAndFocus() {
+    window.scrollTo(0, 0)
+
+    if (this.editor?.textarea) {
+      this.editor.textarea.setSelectionRange(0, 0)
+      this.editor.textarea.focus({ preventScroll: true })
+      this.editor.textarea.scrollTop = 0
+    } else {
+      this.editor?.focus()
+    }
+
+    if (this.editor?.preview) {
+      this.editor.preview.scrollTop = 0
+    }
+
+    requestAnimationFrame(() => {
+      window.scrollTo(0, 0)
+      if (this.editor?.textarea) {
+        this.editor.textarea.setSelectionRange(0, 0)
+        this.editor.textarea.scrollTop = 0
+      }
+      if (this.editor?.preview) {
+        this.editor.preview.scrollTop = 0
+      }
+    })
   }
 
   exitEditMode() {

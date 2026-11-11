@@ -22,10 +22,17 @@ export default class extends Controller {
     this.confirmed = false
     this.boundKeydown = this.handleKeydown.bind(this)
     window.addEventListener("keydown", this.boundKeydown)
+
+    this.themeObserver = new MutationObserver(this.handleThemeChange.bind(this))
+    this.themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"]
+    })
   }
 
   disconnect() {
     window.removeEventListener("keydown", this.boundKeydown)
+    this.themeObserver?.disconnect()
     this.cleanupEditor()
   }
 
@@ -38,6 +45,18 @@ export default class extends Controller {
 
   get isEditing() {
     return this.element.classList.contains("document--editing")
+  }
+
+  get currentTheme() {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark" ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.getAttribute("data-theme") !== "light")
+    return isDark ? "cave" : "solar"
+  }
+
+  handleThemeChange() {
+    if (this.editor) {
+      this.editor.setTheme(this.currentTheme)
+    }
   }
 
   enterEditMode() {
@@ -57,6 +76,7 @@ export default class extends Controller {
     }
 
     this.initEditor()
+    this.editor?._updateAutoHeight?.()
     this.editor?.focus()
   }
 
@@ -105,7 +125,14 @@ export default class extends Controller {
       const instances = new OverType(this.editorContainerTarget, {
         value: this.initialContent,
         toolbar: true,
-        toolbarButtons: buttons
+        toolbarButtons: buttons,
+        autoResize: true,
+        minHeight: "450px",
+        theme: this.currentTheme,
+        fontFamily: '"Lilex", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+        fontSize: "0.9375rem",
+        lineHeight: 1.65,
+        padding: "20px 24px"
       })
       this.editor = Array.isArray(instances) ? instances[0] : instances
     }
@@ -114,6 +141,7 @@ export default class extends Controller {
   cancel() {
     if (this.editor) {
       this.editor.setValue(this.initialContent)
+      this.editor._updateAutoHeight?.()
     }
     this.exitEditMode()
   }
@@ -203,6 +231,14 @@ export default class extends Controller {
       if (!this.isEditing) {
         event.preventDefault()
         this.enterEditMode()
+      }
+      return
+    }
+
+    if (this.isEditing && isMod && (event.key === "Enter" || event.keyCode === 13)) {
+      if (!this.hasDialogTarget || !this.dialogTarget.open) {
+        event.preventDefault()
+        this.save(event)
       }
     }
   }

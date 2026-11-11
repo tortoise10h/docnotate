@@ -1,9 +1,17 @@
 <div class="document__markdown-editor" data-markdown-editor-target="editorPanel" hidden>
-  <div class="document__markdown-editor-bar">
-    <span class="document__markdown-editor-title">Editing Markdown</span>
+  <div class="document__markdown-editor-header">
+    <div class="document__markdown-editor-status">
+      <span class="document__markdown-editor-indicator" aria-hidden="true"></span>
+      <span class="document__markdown-editor-title">Editing Markdown</span>
+      <span class="document__markdown-editor-filename" title="<%= document.file_path %>"><%= document.display_name %></span>
+    </div>
     <div class="document__markdown-editor-actions">
+      <span class="document__markdown-editor-hint">⌘↵ to save</span>
       <button type="button" class="button button--secondary" data-action="click->markdown-editor#cancel">Cancel</button>
-      <button type="button" class="button button--primary" data-action="click->markdown-editor#save">Save</button>
+      <button type="button" class="button button--primary" data-action="click->markdown-editor#save">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span>Save</span>
+      </button>
     </div>
   </div>
 
@@ -27,9 +35,14 @@
           data-action="click->markdown-editor#backdropClick cancel->markdown-editor#handleDialogCancel"
           aria-labelledby="document_save_dialog_title">
     <div class="document__save-dialog-content">
-      <h3 class="document__save-dialog-title" id="document_save_dialog_title">Save changes to disk?</h3>
+      <div class="document__save-dialog-header">
+        <div class="document__save-dialog-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        </div>
+        <h3 class="document__save-dialog-title" id="document_save_dialog_title">Save changes to disk?</h3>
+      </div>
       <p class="document__save-dialog-warning">
-        This will overwrite <strong><%= document.file_path %></strong> on your local disk and create a new document version.
+        This will overwrite <code class="document__save-dialog-path"><%= document.file_path %></code> on your local disk and create a new document version.
       </p>
       <div class="document__save-dialog-actions">
         <button type="button"

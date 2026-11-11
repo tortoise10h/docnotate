@@ -1963,7 +1963,7 @@
 .document__markdown-editor {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -1971,36 +1971,75 @@
   display: none !important;
 }
 
-.document__markdown-editor-bar {
+.document__markdown-editor-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 8px 12px;
-  background: var(--surface-hover);
+  gap: 16px;
+  padding: 10px 14px;
+  background: var(--surface-subtle);
   border: 1px solid var(--border-light);
-  border-radius: 6px;
+  border-radius: 8px;
+}
+
+.document__markdown-editor-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.document__markdown-editor-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--pre-bg), 0 0 6px var(--accent);
+  flex-shrink: 0;
 }
 
 .document__markdown-editor-title {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--full-contrast);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.document__markdown-editor-filename {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  font-family: var(--mono-font);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .document__markdown-editor-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.document__markdown-editor-hint {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--mono-font);
+  background: var(--surface-hover);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
 }
 
 .document__markdown-editor-error {
-  padding: 8px 12px;
+  padding: 10px 14px;
   font-size: 0.875rem;
   color: var(--red);
   background: var(--warn-bg);
   border: 1px solid var(--warn-border);
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .document__markdown-editor-error[hidden] {
@@ -2008,30 +2047,84 @@
 }
 
 .document__markdown-editor-container {
-  min-height: 480px;
   width: 100%;
+  min-height: 450px;
 }
 
 /* Match OverType editor surface and typography to document paper */
 .document__markdown-editor-container .overtype-container {
-  background: transparent;
-  border: 1px solid var(--border-light);
-  border-radius: 6px;
+  --bg-primary: var(--pre-bg) !important;
+  --bg-secondary: var(--pre-bg) !important;
+  --toolbar-bg: var(--surface-subtle) !important;
+  --text: var(--fg) !important;
+  --text-primary: var(--full-contrast) !important;
+  --border: var(--border-light) !important;
+  --toolbar-icon: var(--fg) !important;
+  --toolbar-hover: var(--surface-hover) !important;
+  --toolbar-active: var(--border-light) !important;
+  --primary: var(--accent) !important;
+  --selection: var(--selection-bg) !important;
+  --code-bg: var(--inline-code-bg) !important;
+  --cursor: var(--accent) !important;
+
+  background: var(--pre-bg) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 3px var(--pre-shadow);
 }
 
 .document__markdown-editor-container .overtype-toolbar {
-  border-bottom: 1px solid var(--border-light);
-  background: var(--pre-bg);
-  color: var(--fg);
+  border-bottom: 1px solid var(--border-light) !important;
+  background: var(--surface-subtle) !important;
+  padding: 6px 10px !important;
+  gap: 2px !important;
+}
+
+.document__markdown-editor-container .overtype-toolbar-button {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 6px !important;
+  color: var(--fg) !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.document__markdown-editor-container .overtype-toolbar-button:hover {
+  background: var(--surface-hover) !important;
+  color: var(--full-contrast) !important;
+}
+
+.document__markdown-editor-container .overtype-toolbar-button.active {
+  background: var(--border-light) !important;
+  color: var(--accent) !important;
+}
+
+.document__markdown-editor-container .overtype-toolbar-separator {
+  background: var(--border-light) !important;
+  width: 1px !important;
+  height: 16px !important;
+  margin: 0 4px !important;
+}
+
+.document__markdown-editor-container .overtype-wrapper {
+  background: var(--pre-bg) !important;
 }
 
 .document__markdown-editor-container .overtype-wrapper,
 .document__markdown-editor-container .overtype-input,
 .document__markdown-editor-container .overtype-preview {
-  font-family: var(--mono-font), monospace;
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--fg);
+  font-family: var(--mono-font), monospace !important;
+  font-size: 0.9375rem !important;
+  line-height: 1.65 !important;
+  color: var(--fg) !important;
+  caret-color: var(--accent) !important;
+}
+
+.document__markdown-editor-container .overtype-preview code,
+.document__markdown-editor-container .overtype-preview .code-fence {
+  background: var(--inline-code-bg) !important;
+  color: var(--inline-code-fg) !important;
+  border-radius: 4px;
 }
 
 /* Save confirmation dialog */
@@ -2039,14 +2132,14 @@
   position: fixed;
   inset: 0;
   margin: auto;
-  width: min(90%, 480px);
+  width: min(92%, 460px);
   max-width: none;
   max-height: none;
   padding: 24px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--pre-bg);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
   color: var(--fg);
 }
 
@@ -2057,27 +2150,54 @@
 
 .document__save-dialog::backdrop {
   background: var(--backdrop-bg);
+  backdrop-filter: blur(2px);
 }
 
 .document__save-dialog-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+}
+
+.document__save-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.document__save-dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface-hover);
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
 .document__save-dialog-title {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 600;
   color: var(--full-contrast);
 }
 
 .document__save-dialog-warning {
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--muted);
 }
 
-.document__save-dialog-warning strong {
+.document__save-dialog-path {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 8px;
+  font-family: var(--mono-font), monospace;
+  font-size: 0.8125rem;
+  background: var(--surface-hover);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
   color: var(--full-contrast);
   word-break: break-all;
 }
@@ -2087,5 +2207,5 @@
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 8px;
+  margin-top: 6px;
 }

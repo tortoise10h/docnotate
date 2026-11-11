@@ -1,0 +1,46 @@
+<div class="document__markdown-editor" data-markdown-editor-target="editorPanel" hidden>
+  <div class="document__markdown-editor-bar">
+    <span class="document__markdown-editor-title">Editing Markdown</span>
+    <div class="document__markdown-editor-actions">
+      <button type="button" class="button button--secondary" data-action="click->markdown-editor#cancel">Cancel</button>
+      <button type="button" class="button button--primary" data-action="click->markdown-editor#save">Save</button>
+    </div>
+  </div>
+
+  <div class="document__markdown-editor-error" id="markdown_editor_error" data-markdown-editor-target="error" hidden></div>
+
+  <div class="document__markdown-editor-container" data-markdown-editor-target="editorContainer"></div>
+
+  <%= form_with scope: :document,
+                url: document_markdown_files_path(document),
+                method: :patch,
+                class: "document__markdown-editor-form",
+                data: {
+                  markdown_editor_target: "form",
+                  action: "submit->markdown-editor#save turbo:submit-end->markdown-editor#handleSubmitEnd"
+                } do |form| %>
+    <%= form.hidden_field :content, value: document.content, data: { markdown_editor_target: "contentInput" } %>
+  <% end %>
+
+  <dialog class="document__save-dialog"
+          data-markdown-editor-target="dialog"
+          data-action="click->markdown-editor#backdropClick cancel->markdown-editor#handleDialogCancel"
+          aria-labelledby="document_save_dialog_title">
+    <div class="document__save-dialog-content">
+      <h3 class="document__save-dialog-title" id="document_save_dialog_title">Save changes to disk?</h3>
+      <p class="document__save-dialog-warning">
+        This will overwrite <strong><%= document.file_path %></strong> on your local disk and create a new document version.
+      </p>
+      <div class="document__save-dialog-actions">
+        <button type="button"
+                class="button button--secondary"
+                data-markdown-editor-target="cancelDialogButton"
+                data-action="click->markdown-editor#cancelSave"
+                autofocus>Cancel</button>
+        <button type="button"
+                class="button button--primary"
+                data-action="click->markdown-editor#confirmSave">Save to disk</button>
+      </div>
+    </div>
+  </dialog>
+</div>

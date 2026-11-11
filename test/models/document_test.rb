@@ -137,4 +137,85 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal "/Users/test/doc.html", Document.normalize_file_path("/Users/test/doc.html")
     assert_nil Document.normalize_file_path(nil)
   end
+
+  test "save_markdown_file! updates file on disk, content, bumps version v1 to v2, reparses nodes, and archives comments" do
+    Dir.mktmpdir do |dir|
+      file_path = File.join(dir, "test.md")
+      File.write(file_path, "# Initial Title\n\nInitial paragraph text.")
+
+      document = Document.open(file_path)
+      assert_equal "v1", document.current_version.version
+      initial_version = document.current_version
+      initial_nodes = document.document_nodes.to_a
+
+      comment = document.create_comment!(content: "Note on heading", selected_text: "Initial Title")
+      assert_includes document.highlight_comments.map { |c| c[:id] }, comment.id
+      assert_empty document.archived_comments
+
+      new_content = "# Updated Heading\n\n- Point one\n- Point two"
+      result = document.save_markdown_file!(new_content)
+
+      assert result
+      assert_equal new_content, File.read(file_path)
+      assert_equal new_content, document.reload.content
+      assert_equal "v2", document.current_version.version
+      assert_not_equal initial_version, document.current_version
+      assert_not_equal initial_nodes.map(&:id), document.document_nodes.pluck(:id)
+
+      assert_empty document.highlight_comments
+      assert_includes document.archived_comments, comment
+    end
+  end
+
+  test "save_markdown_file! is a no-op when content has not changed" do
+    Dir.mktmpdir do |dir|
+      file_path = File.join(dir, "test.md")
+      content = "# Unchanged Content\n\nParagraph."
+      File.write(file_path, content)
+
+      document = Document.open(file_path)
+      initial_version = document.current_version
+
+      result = document.save_markdown_file!(content)
+
+      assert_equal false, result
+      assert_equal initial_version, document.reload.current_version
+      assert_equal "v1", document.current_version.version
+    end
+  end
+
+  test "save_markdown_file! normalizes CRLF to LF" do
+    Dir.mktmpdir do |dir|
+      file_path = File.join(dir, "test.md")
+      File.write(file_path, "# Initial")
+
+      document = Document.open(file_path)
+      document.save_markdown_file!("Line 1\r\nLine 2\r\n")
+
+      assert_equal "Line 1\nLine 2\n", File.read(file_path)
+      assert_equal "Line 1\nLine 2\n", document.reload.content
+    end
+  end
+
+  test "save_markdown_file! rejects HTML documents and blank content" do
+    Dir.mktmpdir do |dir|
+      html_path = File.join(dir, "test.html")
+      File.write(html_path, "<h1>Hello</h1>")
+      html_doc = Document.open(html_path)
+
+      html_error = assert_raises(ArgumentError) do
+        html_doc.save_markdown_file!("<h1>Updated</h1>")
+      end
+      assert_match(/markdown/i, html_error.message)
+
+      md_path = File.join(dir, "test.md")
+      File.write(md_path, "# Hello")
+      md_doc = Document.open(md_path)
+
+      blank_error = assert_raises(ArgumentError) do
+        md_doc.save_markdown_file!("   \n\t  ")
+      end
+      assert_match(/blank/i, blank_error.message)
+    end
+  end
 end

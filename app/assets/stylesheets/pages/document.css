@@ -1948,3 +1948,144 @@
 .document__comment-inbox-badge[hidden] {
   display: none;
 }
+
+/* Document editing mode: hide read-only content, TOC, comment highlights & nav */
+.document--editing .document__content,
+.document--editing .document__toc,
+.document--editing .document__comment-nav,
+.document--editing .comment-popover,
+.document--editing .document__selection-toolbar,
+.document--editing .document__archived-panel {
+  display: none !important;
+}
+
+/* In-app Markdown Editor */
+.document__markdown-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.document__markdown-editor[hidden] {
+  display: none !important;
+}
+
+.document__markdown-editor-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--surface-hover);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+}
+
+.document__markdown-editor-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--full-contrast);
+}
+
+.document__markdown-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.document__markdown-editor-error {
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  color: var(--red);
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: 6px;
+}
+
+.document__markdown-editor-error[hidden] {
+  display: none !important;
+}
+
+.document__markdown-editor-container {
+  min-height: 480px;
+  width: 100%;
+}
+
+/* Match OverType editor surface and typography to document paper */
+.document__markdown-editor-container .overtype-container {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+}
+
+.document__markdown-editor-container .overtype-toolbar {
+  border-bottom: 1px solid var(--border-light);
+  background: var(--pre-bg);
+  color: var(--fg);
+}
+
+.document__markdown-editor-container .overtype-wrapper,
+.document__markdown-editor-container .overtype-input,
+.document__markdown-editor-container .overtype-preview {
+  font-family: var(--mono-font), monospace;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+/* Save confirmation dialog */
+.document__save-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(90%, 480px);
+  max-width: none;
+  max-height: none;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--pre-bg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  color: var(--fg);
+}
+
+.document__save-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.document__save-dialog::backdrop {
+  background: var(--backdrop-bg);
+}
+
+.document__save-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.document__save-dialog-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--full-contrast);
+}
+
+.document__save-dialog-warning {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.document__save-dialog-warning strong {
+  color: var(--full-contrast);
+  word-break: break-all;
+}
+
+.document__save-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}

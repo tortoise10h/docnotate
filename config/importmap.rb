@@ -10,3 +10,4 @@ pin "turbo_stream_actions", to: "turbo_stream_actions.js"
 pin "@github/hotkey", to: "@github--hotkey.js" # @3.1.4
 pin "pele" # @1.13.0
 pin "highlight.js", to: "highlight.js" # @11.11.1
+pin "overtype" # @2.7.0

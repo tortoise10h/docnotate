@@ -1949,7 +1949,23 @@
   display: none;
 }
 
-/* Document editing mode: hide read-only content, TOC, comment highlights & nav */
+/* Document editing mode: full vertical height, hide read-only content, TOC, comment highlights & nav */
+.document--editing {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 16px;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.document--editing .document__header {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+
 .document--editing .document__content,
 .document--editing .document__toc,
 .document--editing .document__comment-nav,
@@ -1961,16 +1977,23 @@
 
 /* Remove outside paper box in edit mode so only the editor surface is displayed */
 .document--editing .document__paper {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
   padding: 0 !important;
 }
 
-/* In-app Markdown Editor - Single cohesive surface */
+/* In-app Markdown Editor - Single cohesive surface filling full vertical height */
 .document__markdown-editor {
   display: flex;
   flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
   width: 100%;
   border: 1px solid var(--border-light);
   border-radius: 10px;
@@ -2117,8 +2140,9 @@
 
 .document__markdown-editor-container {
   width: 100%;
-  height: calc(100vh - 180px);
-  min-height: 520px;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -2141,6 +2165,8 @@
 
   display: flex !important;
   flex-direction: column !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
   height: 100% !important;
   background: var(--pre-bg) !important;
   border: none !important;
@@ -2184,6 +2210,7 @@
 
 .document__markdown-editor-container .overtype-wrapper {
   flex: 1 1 0 !important;
+  min-height: 0 !important;
   position: relative !important;
   width: 100% !important;
   height: 100% !important;

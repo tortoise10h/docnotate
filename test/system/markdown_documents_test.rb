@@ -224,6 +224,16 @@ class MarkdownDocumentsSystemTest < ApplicationSystemTestCase
 
     find("pre code.language-ruby .document__comment-highlight").click
     assert_selector ".document__comment-popover", text: "Ensure this handles empty lists."
+
+    # In reading mode, code block is constrained to the 700px reading track
+    reading_code_width = first(".document-node--code-block").rect.width
+    assert_operator reading_code_width, :<=, 700
+
+    # In wide mode, code block expands across the full available paper canvas
+    find("button[aria-label='Wide view']").click
+    assert_selector "button[aria-label='Wide view'][aria-pressed='true']"
+    wide_code_width = first(".document-node--code-block").rect.width
+    assert_operator wide_code_width, :>, reading_code_width
   ensure
     code_file.unlink
   end

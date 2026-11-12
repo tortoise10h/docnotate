@@ -1351,6 +1351,14 @@
   max-width: 100%;
 }
 
+/* In wide mode, code blocks break out of the 700px reading track to use all available space */
+.document--markdown-wide .document__content > .document-node--code-block {
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 /* The iframe scrolls internally; the page itself never scrolls for HTML files */
 .document__paper--html {
   display: flex;

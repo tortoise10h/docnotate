@@ -4,45 +4,17 @@
      <% if @document.markdown? %>data-markdown-editor-initial-content-value="<%= @document.content %>"<% end %>>
   <header class="document__header">
     <div class="document__leading">
-      <%= link_to root_path, class: "document__home-button" do %>
+      <%= link_to root_path, class: "document__home-button", aria: { label: "Home" }, data: { tooltip: "Home" } do %>
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span>Home</span>
       <% end %>
     </div>
     <div class="document__title-group" data-controller="document-switcher">
-      <button class="icon-button icon-button--sm"
-              data-document-switcher-target="toggle"
-              data-action="click->document-switcher#toggle"
-              data-tooltip="Switch file"
-              type="button"
-              aria-label="Switch file"
-              aria-controls="document_switcher_panel"
-              aria-expanded="false"
-              aria-haspopup="menu">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6\"/></svg>
-      </button>
-      <%= render "application/file_badge", document: @document %>
-      <%= render "documents/title", document: @document %>
-      <div class="document__switcher-panel" id="document_switcher_panel" data-document-switcher-target="panel" hidden>
-        <div class="document__switcher-header">
-          <span class="document__switcher-heading">Recent files</span>
-        </div>
-        <ul class="document__switcher-list">
-          <% @recent_documents.each do |document| %>
-            <li>
-              <%= link_to open_documents_path(file_path: document.file_path), class: "document__switcher-item" do %>
-                <span class="document__switcher-name" data-tooltip="<%= document.file_path %>"><%= document.display_name %></span>
-                <span class="document__switcher-time"><%= time_ago_in_words(document.last_opened_at) %> ago</span>
-              <% end %>
-            </li>
-          <% end %>
-        </ul>
-      </div>
+      <%= render "documents/title", document: @document, recent_documents: @recent_documents, editor_preference: @editor_preference %>
     </div>
     <div class="document__actions">
       <%= render "width_toggle" unless @document.html? %>
       <%= render "edit_button", document: @document if @document.markdown? %>
-      <%= render "editor_open", document: @document, editor_preference: @editor_preference %>
       <button class="icon-button document__scroll-top-button" data-scroll-to-top-target="button" data-action="click->scroll-to-top#scrollToTop" type="button" aria-label="Scroll to top">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
       </button>

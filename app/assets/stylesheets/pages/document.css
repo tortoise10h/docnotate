@@ -893,6 +893,137 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: -4px;
+  margin-right: -4px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.document__title--clickable:hover {
+  background-color: var(--surface-hover);
+  color: var(--accent);
+}
+
+.document__hub-toggle {
+  color: var(--muted);
+  transition: color 0.15s ease;
+}
+
+.document__hub-toggle svg {
+  transition: transform 0.2s ease;
+}
+
+.document__hub-toggle[aria-expanded="true"] {
+  color: var(--accent);
+}
+
+.document__hub-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.document__hub-toggle[aria-expanded="true"]::after {
+  display: none;
+}
+
+.document__hub-panel {
+  width: 340px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.document__hub-path-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface-subtle);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.document__hub-path {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+  color: var(--muted);
+}
+
+.document__hub-path-icon {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.document__hub-path-text {
+  font-family: var(--mono-font);
+  font-size: 0.6875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: rtl;
+  text-align: left;
+}
+
+.document__hub-actions {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+.document__hub-actions .document__editor {
+  display: block;
+  width: 100%;
+}
+
+.document__hub-actions .document__editor-panel {
+  top: 0;
+  left: 0;
+  right: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.document__hub-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 12px;
+  background: none;
+  border: none;
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.document__hub-action-btn:hover {
+  background: var(--surface-hover);
+  color: var(--full-contrast);
+}
+
+.document__hub-action-btn svg {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.document__hub-action-btn:hover svg {
+  color: var(--accent);
+}
+
+.document__hub-action-btn span {
+  flex: 1;
+}
+
+.document__hub-divider {
+  height: 1px;
+  background: var(--border-light);
+  margin: 4px 0;
 }
 
 .document__rename-form {

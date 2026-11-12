@@ -7,6 +7,10 @@ export default class extends Controller {
     this.originalValue = this.inputTarget.value
     this.displayTarget.hidden = true
     this.formTarget.hidden = false
+
+    const panel = document.getElementById("document_switcher_panel")
+    if (panel) panel.hidden = true
+
     this.inputTarget.focus()
     this.inputTarget.select()
   }

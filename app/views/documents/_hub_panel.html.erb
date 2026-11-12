@@ -1,0 +1,51 @@
+<%# locals: (document:, recent_documents: nil, editor_preference: nil) %>
+<% recent_docs = recent_documents || @recent_documents || Document.recently_opened.limit(5) %>
+<% editor_pref = editor_preference || @editor_preference || AppSetting.get("editor_application") %>
+
+<div class="document__hub-panel document__switcher-panel" id="document_switcher_panel" data-document-switcher-target="panel" hidden>
+  <div class="document__hub-path-box">
+    <div class="document__hub-path" title="<%= document.file_path %>">
+      <svg class="document__hub-path-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 2 2h4"/></svg>
+      <span class="document__hub-path-text"><%= document.file_path %></span>
+    </div>
+    <button class="icon-button icon-button--sm"
+            data-controller="clipboard hotkey"
+            data-clipboard-text-value="<%= document.file_path %>"
+            data-action="click->clipboard#copy"
+            data-hotkey="Mod+Shift+l,Mod+Shift+L"
+            data-tooltip="Copy file path (⇧⌘L)"
+            type="button"
+            aria-label="Copy file path">
+      <svg class="document__copy-icon" data-clipboard-target="defaultIcon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></svg>
+      <svg class="document__copy-icon document__copy-icon--hidden" data-clipboard-target="successIcon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+  </div>
+
+  <div class="document__hub-actions">
+    <button type="button"
+            class="document__hub-action-btn"
+            data-action="click->rename#edit">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+      <span>Rename file...</span>
+    </button>
+
+    <%= render "documents/editor_open", document: document, editor_preference: editor_pref %>
+  </div>
+
+  <% if recent_docs.any? %>
+    <div class="document__hub-divider"></div>
+    <div class="document__switcher-header">
+      <span class="document__switcher-heading">Recent files</span>
+    </div>
+    <ul class="document__switcher-list">
+      <% recent_docs.each do |recent_doc| %>
+        <li>
+          <%= link_to open_documents_path(file_path: recent_doc.file_path), class: "document__switcher-item" do %>
+            <span class="document__switcher-name" data-tooltip="<%= recent_doc.file_path %>"><%= recent_doc.display_name %></span>
+            <span class="document__switcher-time"><%= time_ago_in_words(recent_doc.last_opened_at) %> ago</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

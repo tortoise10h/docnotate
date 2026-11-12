@@ -26,7 +26,7 @@
     <%= render_document_nodes(@root_nodes) %>
   </div>
 
-  <%= render "documents/markdown_editor", document: @document %>
+  <%= render "documents/markdown_editor", document: @document if @document.markdown? %>
 
   <%= render "documents/mermaid_modal" %>
 

@@ -30,7 +30,25 @@ module DocumentsHelper
     when "heading"
       level = ERB::Util.h(node.heading_level)
       buf << %(<h#{level} id="#{ERB::Util.h(node.node_id)}" class="document-node document-node--heading document-node--heading-#{level}">)
+      todo = node.meta&.dig("todo_keyword")
+      if todo.present?
+        modifier = case todo.upcase
+        when "WORKING", "GOING", "DOING", "IN-PROGRESS", "IN_PROGRESS"
+          " document-node--org-todo--working"
+        when "DONE"
+          " document-node--org-todo--done"
+        else
+          ""
+        end
+        buf << %(<span class="document-node document-node--org-todo#{modifier}">#{ERB::Util.h(todo)}</span> )
+      end
       append_document_node_children(node, buf)
+      tags = node.meta&.dig("tags")
+      if tags.present? && tags.is_a?(Array)
+        tags.each do |tag|
+          buf << %( <span class="document-node document-node--org-tag">:#{ERB::Util.h(tag)}:</span>)
+        end
+      end
       buf << "</h#{level}>"
     when "text"
       buf << ERB::Util.h(node.content)
@@ -42,6 +60,10 @@ module DocumentsHelper
       buf << '<em class="document-node document-node--emph">'
       append_document_node_children(node, buf)
       buf << "</em>"
+    when "underline"
+      buf << '<u class="document-node document-node--underline">'
+      append_document_node_children(node, buf)
+      buf << "</u>"
     when "code"
       buf << %(<code class="document-node document-node--code">#{ERB::Util.h(node.content)}</code>)
     when "code_block"
@@ -68,7 +90,7 @@ module DocumentsHelper
       alt = ERB::Util.h(node.content)
       title = ERB::Util.h(node.meta&.dig("title"))
       buf << %(<img src="#{url}" alt="#{alt}" title="#{title}" id="#{ERB::Util.h(node.node_id)}" class="document-node document-node--image">)
-    when "blockquote"
+    when "block_quote", "blockquote"
       buf << %(<blockquote id="#{ERB::Util.h(node.node_id)}" class="document-node document-node--blockquote">)
       append_document_node_children(node, buf)
       buf << "</blockquote>"

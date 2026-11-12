@@ -1948,3 +1948,372 @@
 .document__comment-inbox-badge[hidden] {
   display: none;
 }
+
+/* Document editing mode: full vertical height, hide read-only content, TOC, comment highlights & nav */
+.document--editing {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 16px;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.document--editing .document__header {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+}
+
+.document--editing .document__content,
+.document--editing .document__toc,
+.document--editing .document__comment-nav,
+.document--editing .comment-popover,
+.document--editing .document__selection-toolbar,
+.document--editing .document__archived-panel {
+  display: none !important;
+}
+
+/* Remove outside paper box in edit mode so only the editor surface is displayed */
+.document--editing .document__paper {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* In-app Markdown Editor - Single cohesive surface filling full vertical height */
+.document__markdown-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: var(--pre-bg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  position: relative;
+}
+
+.document__markdown-editor[hidden] {
+  display: none !important;
+}
+
+/* Floating Save & Cancel dock on the right (matching .document__comment-nav) */
+.document__markdown-editor-floating {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 6px;
+  background: var(--pre-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  z-index: 40;
+}
+
+.document__markdown-editor-floating-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--fg);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.document__markdown-editor-floating-btn:hover {
+  background: var(--surface-hover);
+  color: var(--full-contrast);
+  border-color: var(--border-light);
+}
+
+.document__markdown-editor-floating-btn:active {
+  transform: scale(0.96);
+}
+
+.document__markdown-editor-floating-btn--save {
+  color: var(--accent);
+  background: rgba(9, 78, 206, 0.08);
+}
+
+.document__markdown-editor-floating-btn--save:hover {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+}
+
+[data-theme="dark"] .document__markdown-editor-floating-btn--save {
+  color: var(--accent);
+  background: rgba(91, 149, 255, 0.15);
+}
+
+[data-theme="dark"] .document__markdown-editor-floating-btn--save:hover {
+  background: var(--accent);
+  color: #13161c;
+  border-color: var(--accent);
+}
+
+.document__markdown-editor-floating-btn--cancel:hover {
+  color: var(--red);
+  background: rgba(194, 42, 30, 0.08);
+  border-color: rgba(194, 42, 30, 0.2);
+}
+
+.document__markdown-editor-floating-btn::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 4px 8px;
+  background: var(--tooltip-bg);
+  color: var(--tooltip-fg);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  z-index: 50;
+}
+
+.document__markdown-editor-floating-btn:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.document__markdown-editor-floating-divider {
+  width: 20px;
+  height: 1px;
+  margin: 2px 0;
+  background: var(--border-light);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.document__markdown-editor-error {
+  margin: 12px 16px 0;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  color: var(--red);
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: 6px;
+}
+
+.document__markdown-editor-error[hidden] {
+  display: none !important;
+}
+
+.document__markdown-editor-container {
+  width: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Match OverType editor surface and typography to document paper */
+.document__markdown-editor-container .overtype-container {
+  --bg-primary: var(--pre-bg) !important;
+  --bg-secondary: var(--pre-bg) !important;
+  --toolbar-bg: var(--surface-subtle) !important;
+  --text: var(--fg) !important;
+  --text-primary: var(--full-contrast) !important;
+  --border: var(--border-light) !important;
+  --toolbar-icon: var(--fg) !important;
+  --toolbar-hover: var(--surface-hover) !important;
+  --toolbar-active: var(--border-light) !important;
+  --primary: var(--accent) !important;
+  --selection: var(--selection-bg) !important;
+  --code-bg: var(--inline-code-bg) !important;
+  --cursor: var(--accent) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  background: var(--pre-bg) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.document__markdown-editor-container .overtype-toolbar {
+  border-bottom: 1px solid var(--border-light) !important;
+  background: var(--surface-subtle) !important;
+  padding: 6px 12px !important;
+  gap: 2px !important;
+  flex-shrink: 0 !important;
+}
+
+.document__markdown-editor-container .overtype-toolbar-button {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 6px !important;
+  color: var(--fg) !important;
+  transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.document__markdown-editor-container .overtype-toolbar-button:hover {
+  background: var(--surface-hover) !important;
+  color: var(--full-contrast) !important;
+}
+
+.document__markdown-editor-container .overtype-toolbar-button.active {
+  background: var(--border-light) !important;
+  color: var(--accent) !important;
+}
+
+.document__markdown-editor-container .overtype-toolbar-separator {
+  background: var(--border-light) !important;
+  width: 1px !important;
+  height: 16px !important;
+  margin: 0 4px !important;
+}
+
+.document__markdown-editor-container .overtype-wrapper {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: var(--pre-bg) !important;
+  overflow: hidden !important;
+}
+
+.document__markdown-editor-container .overtype-wrapper,
+.document__markdown-editor-container .overtype-input,
+.document__markdown-editor-container .overtype-preview {
+  font-family: var(--mono-font), monospace !important;
+  font-size: 0.9375rem !important;
+  line-height: 1.65 !important;
+  color: var(--fg) !important;
+  caret-color: var(--accent) !important;
+}
+
+.document__markdown-editor-container .overtype-preview code,
+.document__markdown-editor-container .overtype-preview .code-fence {
+  background: var(--inline-code-bg) !important;
+  color: var(--inline-code-fg) !important;
+  border-radius: 4px;
+}
+
+/* Save confirmation dialog */
+.document__save-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(92%, 460px);
+  max-width: none;
+  max-height: none;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--pre-bg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  color: var(--fg);
+}
+
+.document__save-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.document__save-dialog::backdrop {
+  background: var(--backdrop-bg);
+  backdrop-filter: blur(2px);
+}
+
+.document__save-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.document__save-dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.document__save-dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--surface-hover);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.document__save-dialog-title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--full-contrast);
+}
+
+.document__save-dialog-warning {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.document__save-dialog-path {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 8px;
+  font-family: var(--mono-font), monospace;
+  font-size: 0.8125rem;
+  background: var(--surface-hover);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  color: var(--full-contrast);
+  word-break: break-all;
+}
+
+.document__save-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}

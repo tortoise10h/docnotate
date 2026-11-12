@@ -1,0 +1,63 @@
+<div class="document__markdown-editor" data-markdown-editor-target="editorPanel" hidden>
+  <div class="document__markdown-editor-floating document__markdown-editor-actions" role="toolbar" aria-label="Editor actions">
+    <button type="button"
+            class="document__markdown-editor-floating-btn document__markdown-editor-floating-btn--save"
+            data-action="click->markdown-editor#save"
+            data-tooltip="Save (⌘↵)"
+            aria-label="Save">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      <span class="visually-hidden">Save</span>
+    </button>
+    <div class="document__markdown-editor-floating-divider" role="separator" aria-hidden="true"></div>
+    <button type="button"
+            class="document__markdown-editor-floating-btn document__markdown-editor-floating-btn--cancel"
+            data-action="click->markdown-editor#cancel"
+            data-tooltip="Cancel (Esc)"
+            aria-label="Cancel">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <span class="visually-hidden">Cancel</span>
+    </button>
+  </div>
+
+  <div class="document__markdown-editor-error" id="markdown_editor_error" data-markdown-editor-target="error" hidden></div>
+
+  <div class="document__markdown-editor-container" data-markdown-editor-target="editorContainer"></div>
+
+  <%= form_with scope: :document,
+                url: document_markdown_files_path(document),
+                method: :patch,
+                class: "document__markdown-editor-form",
+                data: {
+                  markdown_editor_target: "form",
+                  action: "submit->markdown-editor#save turbo:submit-end->markdown-editor#handleSubmitEnd"
+                } do |form| %>
+    <%= form.hidden_field :content, value: document.content, data: { markdown_editor_target: "contentInput" } %>
+  <% end %>
+
+  <dialog class="document__save-dialog"
+          data-markdown-editor-target="dialog"
+          data-action="click->markdown-editor#backdropClick cancel->markdown-editor#handleDialogCancel"
+          aria-labelledby="document_save_dialog_title">
+    <div class="document__save-dialog-content">
+      <div class="document__save-dialog-header">
+        <div class="document__save-dialog-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        </div>
+        <h3 class="document__save-dialog-title" id="document_save_dialog_title">Save changes to disk?</h3>
+      </div>
+      <p class="document__save-dialog-warning">
+        This will overwrite <code class="document__save-dialog-path"><%= document.file_path %></code> on your local disk and create a new document version.
+      </p>
+      <div class="document__save-dialog-actions">
+        <button type="button"
+                class="button button--secondary"
+                data-markdown-editor-target="cancelDialogButton"
+                data-action="click->markdown-editor#cancelSave"
+                autofocus>Cancel</button>
+        <button type="button"
+                class="button button--primary"
+                data-action="click->markdown-editor#confirmSave">Save to disk</button>
+      </div>
+    </div>
+  </dialog>
+</div>

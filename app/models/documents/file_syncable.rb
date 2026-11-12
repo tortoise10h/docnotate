@@ -1,9 +1,46 @@
+require "tempfile"
+
 module Documents
   module FileSyncable
     extend ActiveSupport::Concern
 
     def browser_url
       "#{self.class.browser_base_url}/documents/open?file_path=#{ERB::Util.url_encode(file_path)}"
+    end
+
+    def save_markdown_file!(new_content)
+      raise ArgumentError, "Only Markdown documents can be edited" unless markdown?
+      raise ArgumentError, "Content cannot be blank" if new_content.blank?
+
+      normalized_content = new_content.to_s.gsub("\r\n", "\n")
+      return false if normalized_content == content
+
+      dir = File.dirname(file_path)
+      temp_file = Tempfile.new([ ".docnotate-", ".tmp" ], dir)
+      temp_path = temp_file.path
+
+      begin
+        temp_file.binmode
+        temp_file.write(normalized_content)
+        temp_file.flush
+        temp_file.close
+
+        File.rename(temp_path, file_path)
+      ensure
+        temp_file.close unless temp_file.closed?
+        File.unlink(temp_path) if File.exist?(temp_path)
+      end
+
+      file_stats = File.stat(file_path)
+      file_mtime = file_stats.mtime.change(nsec: file_stats.mtime.usec * 1000)
+      metadata = AstParseable::ParseMetadata.new(size: file_stats.size, last_modified_at: file_mtime)
+
+      transaction do
+        update!(content: normalized_content)
+        parse_ast_and_save!(metadata: metadata)
+      end
+
+      true
     end
 
     class_methods do

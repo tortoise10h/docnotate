@@ -25,6 +25,20 @@
   border-color: var(--border);
 }
 
+.icon-button--active,
+.icon-button[aria-pressed="true"] {
+  color: var(--accent);
+  background: var(--border-light);
+  border-color: var(--border);
+}
+
+.icon-button--active:hover,
+.icon-button[aria-pressed="true"]:hover {
+  color: var(--accent);
+  background: var(--border-light);
+  border-color: var(--border);
+}
+
 .icon-button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;

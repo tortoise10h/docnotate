@@ -59,6 +59,18 @@ export default class extends Controller {
     }
   }
 
+  toggle() {
+    if (this.isEditing) {
+      this.cancel()
+    } else {
+      this.enterEditMode()
+    }
+  }
+
+  get isEditing() {
+    return this.element.classList.contains("document--editing")
+  }
+
   enterEditMode() {
     this.element.classList.add("document--editing")
 
@@ -67,8 +79,9 @@ export default class extends Controller {
     }
 
     if (this.hasEditButtonTarget) {
-      this.editButtonTarget.disabled = true
-      this.editButtonTarget.setAttribute("aria-disabled", "true")
+      this.editButtonTarget.setAttribute("aria-pressed", "true")
+      this.editButtonTarget.classList.add("icon-button--active")
+      this.editButtonTarget.dataset.tooltip = "Close editor (⌘⇧E)"
     }
 
     if (this.hasEditorPanelTarget) {
@@ -114,8 +127,9 @@ export default class extends Controller {
     }
 
     if (this.hasEditButtonTarget) {
-      this.editButtonTarget.disabled = false
-      this.editButtonTarget.removeAttribute("aria-disabled")
+      this.editButtonTarget.setAttribute("aria-pressed", "false")
+      this.editButtonTarget.classList.remove("icon-button--active")
+      this.editButtonTarget.dataset.tooltip = "Edit markdown (⌘⇧E)"
     }
 
     if (this.hasEditorPanelTarget) {

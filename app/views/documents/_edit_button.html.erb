@@ -1,11 +1,12 @@
 <div class="document__edit">
-  <button class="icon-button icon-button--tooltip-end"
+  <button class="icon-button icon-button--tooltip-end document__edit-button"
           data-markdown-editor-target="editButton"
-          data-action="click->markdown-editor#enterEditMode"
+          data-action="click->markdown-editor#toggle"
           data-controller="hotkey"
           data-hotkey="Mod+Shift+e,Mod+Shift+E"
           type="button"
           aria-label="Edit markdown"
+          aria-pressed="false"
           data-tooltip="Edit markdown (⌘⇧E)">
     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M12 20h9"/>

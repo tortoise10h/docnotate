@@ -71,4 +71,25 @@ class MarkdownEditorTest < ApplicationSystemTestCase
     assert_selector "h1", text: "Initial Heading"
     assert_equal "# Initial Heading\n\nInitial paragraph text.", File.read(@file.path)
   end
+
+  test "clicking edit button toggles between edit mode and read-only mode" do
+    visit open_documents_path(file_path: @file.path)
+
+    edit_button = find("button[aria-label='Edit markdown']")
+    assert_equal "false", edit_button["aria-pressed"]
+    assert_no_selector ".icon-button--active"
+
+    # Click to enter edit mode
+    edit_button.click
+    assert_selector ".document__markdown-editor", visible: true
+    assert_equal "true", edit_button["aria-pressed"]
+    assert_selector "button[aria-label='Edit markdown'].icon-button--active"
+
+    # Click again to exit back to read-only mode
+    edit_button.click
+    assert_no_selector ".document__markdown-editor", visible: true
+    assert_selector ".document__content", visible: true
+    assert_equal "false", edit_button["aria-pressed"]
+    assert_no_selector "button[aria-label='Edit markdown'].icon-button--active"
+  end
 end

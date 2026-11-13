@@ -25,6 +25,11 @@
   background: rgba(153, 64, 0, 0.08);
 }
 
+.file-badge--org {
+  color: var(--green);
+  background: rgba(24, 133, 84, 0.05);
+}
+
 .file-badge--other {
   color: var(--muted);
   background: var(--surface-hover);

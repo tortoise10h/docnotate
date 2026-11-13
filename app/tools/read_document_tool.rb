@@ -3,7 +3,7 @@
 class ReadDocumentTool < MCP::Tool
   tool_name "read_document"
   title "Read Document"
-  description "Reads a markdown or html file by path, registering or syncing it into DocNotate (upserts record, snapshots a new version if modified on disk). Returns document metadata and a structured block-level content outline. Block ids serve as anchors for comment tools."
+  description "Reads a markdown, html, or org file by path, registering or syncing it into DocNotate (upserts record, snapshots a new version if modified on disk). Returns document metadata and a structured block-level content outline. Block ids serve as anchors for comment tools."
 
   input_schema(
     properties: {

@@ -34,8 +34,13 @@ module Documents
     end
 
     def document_parser_for(document_version_id)
-      parser_class = html? ? HtmlParser : MarkdownParser
-      parser_class.new(document_version_id:, content:)
+      if html?
+        HtmlParser.new(document_version_id:, content:)
+      elsif org?
+        OrgParser.new(document_version_id:, content:)
+      else
+        MarkdownParser.new(document_version_id:, content:)
+      end
     end
 
     def next_version

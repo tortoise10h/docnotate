@@ -198,4 +198,80 @@ class DocumentsHelperTest < ActionView::TestCase
     assert_includes result, "Safe &amp; Sound"
     refute_includes result, "<script>"
   end
+
+  test "renders headings with 3-tier todo pills and tags" do
+    # 1. Working group (amber badge modifier)
+    working_node = NodeStub.new(
+      node_type: "heading",
+      heading_level: 2,
+      node_id: "block-h2-working",
+      meta: { "todo_keyword" => "WORKING", "tags" => %w[dev v1] },
+      children: [ NodeStub.new(node_type: "text", content: "Active Task") ]
+    )
+    expected_working = '<h2 id="block-h2-working" class="document-node document-node--heading document-node--heading-2">' \
+                       '<span class="document-node document-node--org-todo document-node--org-todo--working">WORKING</span> ' \
+                       'Active Task' \
+                       ' <span class="document-node document-node--org-tag">:dev:</span>' \
+                       ' <span class="document-node document-node--org-tag">:v1:</span>' \
+                       "</h2>"
+    assert_equal expected_working, render_document_node(working_node)
+
+    # 2. Done group (green badge modifier)
+    done_node = NodeStub.new(
+      node_type: "heading",
+      heading_level: 1,
+      node_id: "block-h1-done",
+      meta: { "todo_keyword" => "DONE" },
+      children: [ NodeStub.new(node_type: "text", content: "Finished Task") ]
+    )
+    expected_done = '<h1 id="block-h1-done" class="document-node document-node--heading document-node--heading-1">' \
+                    '<span class="document-node document-node--org-todo document-node--org-todo--done">DONE</span> ' \
+                    'Finished Task' \
+                    "</h1>"
+    assert_equal expected_done, render_document_node(done_node)
+
+    # 3. Todo & Others (base badge)
+    todo_node = NodeStub.new(
+      node_type: "heading",
+      heading_level: 3,
+      node_id: "block-h3-todo",
+      meta: { "todo_keyword" => "TODO" },
+      children: [ NodeStub.new(node_type: "text", content: "Pending Task") ]
+    )
+    expected_todo = '<h3 id="block-h3-todo" class="document-node document-node--heading document-node--heading-3">' \
+                    '<span class="document-node document-node--org-todo">TODO</span> ' \
+                    'Pending Task' \
+                    "</h3>"
+    assert_equal expected_todo, render_document_node(todo_node)
+
+    custom_node = NodeStub.new(
+      node_type: "heading",
+      heading_level: 3,
+      node_id: "block-h3-custom",
+      meta: { "todo_keyword" => "MAYBE" },
+      children: [ NodeStub.new(node_type: "text", content: "Idea") ]
+    )
+    expected_custom = '<h3 id="block-h3-custom" class="document-node document-node--heading document-node--heading-3">' \
+                      '<span class="document-node document-node--org-todo">MAYBE</span> ' \
+                      'Idea' \
+                      "</h3>"
+    assert_equal expected_custom, render_document_node(custom_node)
+  end
+
+  test "renders underline node as u tag" do
+    node = NodeStub.new(
+      node_type: "underline",
+      children: [ NodeStub.new(node_type: "text", content: "underlined text") ]
+    )
+    assert_equal '<u class="document-node document-node--underline">underlined text</u>', render_document_node(node)
+  end
+
+  test "renders block_quote with anchor id and correct tag" do
+    node = NodeStub.new(
+      node_type: "block_quote",
+      node_id: "block-bq-1",
+      children: [ NodeStub.new(node_type: "text", content: "Markdown or Org quote") ]
+    )
+    assert_equal '<blockquote id="block-bq-1" class="document-node document-node--blockquote">Markdown or Org quote</blockquote>', render_document_node(node)
+  end
 end

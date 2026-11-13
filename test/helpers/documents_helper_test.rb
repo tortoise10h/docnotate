@@ -291,7 +291,7 @@ class DocumentsHelperTest < ActionView::TestCase
     )
 
     html = render_document_node(node)
-    assert_includes html, '<h1 class="document-node document-node--org-title">AIA-556 epic split plan: Voice session limits &amp; reliability</h1>'
+    assert_includes html, '<h1 class="document-node document-node--heading document-node--heading-1 document-node--org-title">AIA-556 epic split plan: Voice session limits &amp; reliability</h1>'
     assert_includes html, '<table class="document-node document-node--org-frontmatter"><tbody>'
     assert_includes html, '<th class="document-node--org-frontmatter-key">STARTUP</th><td class="document-node--org-frontmatter-value">overview</td>'
     assert_includes html, '<th class="document-node--org-frontmatter-key">OPTIONS</th><td class="document-node--org-frontmatter-value">toc:2 num:nil</td>'

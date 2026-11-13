@@ -132,7 +132,7 @@ module DocumentsHelper
   def append_org_document_header(node, buf)
     title = node.meta&.dig("title")
     if title.present?
-      buf << %(<h1 class="document-node document-node--org-title">#{ERB::Util.h(title)}</h1>)
+      buf << %(<h1 class="document-node document-node--heading document-node--heading-1 document-node--org-title">#{ERB::Util.h(title)}</h1>)
     end
 
     keywords = node.meta&.dig("keywords")

@@ -33,16 +33,12 @@
   color: var(--muted);
 }
 
-.document-node--org-title {
+.document-node.document-node--org-title {
   margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 2.25rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--title-color);
+  margin-bottom: 20px;
 }
 
-.document-node--org-frontmatter {
+.document-node.document-node--org-frontmatter {
   width: 100%;
   margin: 0 0 24px;
   border-collapse: collapse;

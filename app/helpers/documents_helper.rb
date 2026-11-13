@@ -22,6 +22,7 @@ module DocumentsHelper
   def append_document_node(node, buf)
     case node.node_type
     when "document"
+      append_org_document_header(node, buf)
       append_document_node_children(node, buf)
     when "paragraph"
       buf << %(<p id="#{ERB::Util.h(node.node_id)}" class="document-node document-node--paragraph">)
@@ -126,5 +127,26 @@ module DocumentsHelper
 
   def append_document_node_children(node, buf)
     node.children.each { |child| append_document_node(child, buf) }
+  end
+
+  def append_org_document_header(node, buf)
+    title = node.meta&.dig("title")
+    if title.present?
+      buf << %(<h1 class="document-node document-node--heading document-node--heading-1 document-node--org-title">#{ERB::Util.h(title)}</h1>)
+    end
+
+    keywords = node.meta&.dig("keywords")
+    return if keywords.blank? || !keywords.is_a?(Array)
+
+    buf << '<table class="document-node document-node--org-frontmatter"><tbody>'
+    keywords.each do |entry|
+      key = entry["key"] || entry[:key]
+      value = entry["value"] || entry[:value]
+      buf << "<tr>"
+      buf << %(<th class="document-node--org-frontmatter-key">#{ERB::Util.h(key)}</th>)
+      buf << %(<td class="document-node--org-frontmatter-value">#{ERB::Util.h(value)}</td>)
+      buf << "</tr>"
+    end
+    buf << "</tbody></table>"
   end
 end

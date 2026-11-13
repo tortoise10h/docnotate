@@ -12,10 +12,10 @@ class OrgParser
     BLOCKED WIP FIXED VERIFIED
   ].freeze
 
-  CODE_REGEX = /(?<=\A|[\s({\x27"\[])~(?![\s~])([^\n~]+?)(?<![\s~])~(?=\z|[\s)}\x27"\]:.,!?;])/
-  VERBATIM_REGEX = /(?<=\A|[\s({\x27"\[])=(?![\s=])([^\n=]+?)(?<![\s=])=(?=\z|[\s)}\x27"\]:.,!?;])/
-  BOLD_REGEX = /(?<=\A|[\s({\x27"\[])\*(?![\s*])([^\n*]+?)(?<![\s*])\*(?=\z|[\s)}\x27"\]:.,!?;])/
-  ITALIC_REGEX = /(?<=\A|[\s({\x27"\[])\/(?![\s\/])([^\n\/]+?)(?<![\s\/])\/(?=\z|[\s)}\x27"\]:.,!?;])/
+  CODE_REGEX = /(?<=\A|[\s({\x27"\[])~(?![\s~])([^\n]+?)(?<![\s~])~(?=\z|[\s)}\x27"\]:.,!?;])/
+  VERBATIM_REGEX = /(?<=\A|[\s({\x27"\[])=(?![\s=])([^\n]+?)(?<![\s=])=(?=\z|[\s)}\x27"\]:.,!?;])/
+  BOLD_REGEX = /(?<=\A|[\s({\x27"\[])\*(?![\s*])([^\n]+?)(?<![\s*])\*(?=\z|[\s)}\x27"\]:.,!?;])/
+  ITALIC_REGEX = /(?<=\A|[\s({\x27"\[])\/(?![\s\/])([^\n]+?)(?<![\s\/])\/(?=\z|[\s)}\x27"\]:.,!?;])/
   UNDERLINE_REGEX = /(?<=\A|[\s({\x27"\[])_(?![\s_])([^\s_]+)(?<![\s_])_(?=\z|[\s)}\x27"\]:.,!?;])/
   LINK_REGEX = /\[\[([^\]]+)\](?:\[([^\]]+)\])?\]/
 
@@ -35,9 +35,16 @@ class OrgParser
 
   def parse
     @now = Time.current
-    root = InternalNode.new(type: "document")
+    @document_title = nil
+    @file_keywords = []
+
     lines = @content.lines(chomp: true)
-    root.children = parse_blocks(lines)
+    children = parse_blocks(lines, top_level: true)
+
+    meta = {}
+    meta["title"] = @document_title if @document_title.present?
+    meta["keywords"] = @file_keywords if @file_keywords.any?
+    root = InternalNode.new(type: "document", meta: meta.presence, children:)
 
     @flat_nodes = []
     flatten_node(root, parent_id: nil, position: 0)
@@ -55,7 +62,7 @@ class OrgParser
     end
   end
 
-  def parse_blocks(lines)
+  def parse_blocks(lines, top_level: false)
     nodes = []
     i = 0
     total = lines.length
@@ -84,7 +91,16 @@ class OrgParser
         next
       end
 
-      if line =~ /\A\s*#\+[a-zA-Z0-9_]+:/i && line !~ /\A\s*#\+BEGIN_/i
+      if line !~ /\A\s*#\+(?:BEGIN|END)_/i && (kw_match = line.match(/\A\s*#\+([a-zA-Z0-9_-]+):(.*)\z/i))
+        if top_level
+          key = kw_match[1]
+          value = kw_match[2].strip
+          if key.casecmp?("TITLE")
+            @document_title = value
+          else
+            @file_keywords << { "key" => key, "value" => value }
+          end
+        end
         i += 1
         next
       end

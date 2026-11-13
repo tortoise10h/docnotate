@@ -37,25 +37,45 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
       <% end %>
     </div>
-    <% if @recent_documents.any? %>
-      <ul class="recent-files">
-        <% @recent_documents.each do |document| %>
-          <li class="recent-files__item">
-            <%= link_to open_documents_path(file_path: document.file_path), class: "recent-files__link" do %>
-              <span class="recent-files__file">
-                <%= render "application/file_badge", document: document %>
-                <span class="recent-files__name" data-tooltip="<%= document.file_path %>"><%= document.display_name %></span>
-              </span>
-              <span class="recent-files__time"><%= time_ago_in_words(document.last_opened_at) %> ago</span>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <div class="card card--transparent empty-state">
-        <p>No recent files yet. Open a file to get started.</p>
-      </div>
+
+    <%= form_with url: root_path, method: :get, class: "home__search-toolbar", data: { controller: "filter", turbo_frame: "recent_documents", turbo_action: "advance" } do |form| %>
+      <%= form.search_field :query,
+                            value: @query,
+                            placeholder: "Search files",
+                            autocomplete: "off",
+                            aria: { label: "Search files" },
+                            class: "home__search input",
+                            data: { action: "input->filter#search" } %>
+      <% if @query.present? %>
+        <%= link_to "Clear", root_path, class: "home__clear" %>
+      <% end %>
     <% end %>
+
+    <turbo-frame id="recent_documents" target="_top">
+      <% if @recent_documents.any? %>
+        <ul class="recent-files">
+          <% @recent_documents.each do |document| %>
+            <li class="recent-files__item">
+              <%= link_to open_documents_path(file_path: document.file_path), class: "recent-files__link", data: { turbo_frame: "_top" } do %>
+                <span class="recent-files__file">
+                  <%= render "application/file_badge", document: document %>
+                  <span class="recent-files__name" data-tooltip="<%= document.file_path %>"><%= document.display_name %></span>
+                </span>
+                <span class="recent-files__time"><%= time_ago_in_words(document.last_opened_at) %> ago</span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="card card--transparent empty-state">
+          <% if @query.present? %>
+            <p>No files match your search.</p>
+          <% else %>
+            <p>No recent files yet. Open a file to get started.</p>
+          <% end %>
+        </div>
+      <% end %>
+    </turbo-frame>
   </section>
 
   <%= render "settings" %>

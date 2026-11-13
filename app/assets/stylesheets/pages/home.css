@@ -65,6 +65,28 @@
   transform: translateY(0);
 }
 
+.home__search-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.home__search {
+  flex: 1;
+  min-width: 0;
+}
+
+.home__clear {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.home__clear:hover {
+  color: var(--full-contrast);
+}
+
 .home__action {
   text-align: center;
   margin-top: 40px;

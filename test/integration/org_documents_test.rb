@@ -114,4 +114,40 @@ class OrgDocumentsTest < ActionDispatch::IntegrationTest
   ensure
     file&.unlink
   end
+
+  test "regression: renders org file-level title, keywords table, and inline verbatim with equals" do
+    file = Tempfile.new([ "feedback", ".org" ])
+    file.write(<<~ORG)
+      #+TITLE: AIA-556 epic split plan: Voice session limits & reliability
+      #+STARTUP: overview
+      #+OPTIONS: toc:2 num:nil
+      #+TODO: TODO(t) | DONE(d)
+
+      * Timeout =MAX_CALL_SECONDS = 2700= as the task hard timeout
+
+      =MAX_CALL_SECONDS = 2700= as the task hard timeout
+
+      - =MAX_CALL_SECONDS = 2700= as the task hard timeout
+    ORG
+    file.close
+
+    get open_documents_path, params: { file_path: file.path }
+    assert_response :success
+
+    assert_select ".document-node--org-title", text: "AIA-556 epic split plan: Voice session limits & reliability"
+    assert_select ".document-node--org-frontmatter" do
+      assert_select ".document-node--org-frontmatter-key", text: "STARTUP"
+      assert_select ".document-node--org-frontmatter-value", text: "overview"
+      assert_select ".document-node--org-frontmatter-key", text: "OPTIONS"
+      assert_select ".document-node--org-frontmatter-value", text: "toc:2 num:nil"
+      assert_select ".document-node--org-frontmatter-key", text: "TODO"
+      assert_select ".document-node--org-frontmatter-value", text: "TODO(t) | DONE(d)"
+    end
+
+    assert_select "h1.document-node--heading-1 code.document-node--code", text: "MAX_CALL_SECONDS = 2700"
+    assert_select "p.document-node--paragraph code.document-node--code", text: "MAX_CALL_SECONDS = 2700"
+    assert_select "li.document-node--item code.document-node--code", text: "MAX_CALL_SECONDS = 2700"
+  ensure
+    file&.unlink
+  end
 end

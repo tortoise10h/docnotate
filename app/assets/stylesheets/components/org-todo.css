@@ -32,3 +32,48 @@
   font-weight: 500;
   color: var(--muted);
 }
+
+.document-node--org-title {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--title-color);
+}
+
+.document-node--org-frontmatter {
+  width: 100%;
+  margin: 0 0 24px;
+  border-collapse: collapse;
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: var(--pre-bg);
+}
+
+.document-node--org-frontmatter-key,
+.document-node--org-frontmatter-value {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-light);
+  text-align: left;
+  vertical-align: top;
+}
+
+.document-node--org-frontmatter tr:last-child .document-node--org-frontmatter-key,
+.document-node--org-frontmatter tr:last-child .document-node--org-frontmatter-value {
+  border-bottom: none;
+}
+
+.document-node--org-frontmatter-key {
+  width: 1%;
+  white-space: nowrap;
+  font-family: var(--mono-font);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.document-node--org-frontmatter-value {
+  font-family: var(--mono-font);
+  color: var(--full-contrast);
+}

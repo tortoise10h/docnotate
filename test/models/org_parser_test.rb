@@ -300,4 +300,62 @@ class OrgParserTest < ActiveSupport::TestCase
     inlines = nodes.select { |n| %w[text strong emph underline code link].include?(n[:node_type]) }
     assert inlines.all? { |n| n[:node_id].nil? }
   end
+
+  test "extracts file-level TITLE and keywords into document metadata and keeps them out of body" do
+    content = <<~ORG
+      #+TITLE: AIA-556 epic split plan: Voice session limits & reliability
+      #+STARTUP: overview
+      #+OPTIONS: toc:2 num:nil
+      #+TODO: TODO(t) | DONE(d)
+
+      * Body Heading
+      Body paragraph.
+    ORG
+
+    nodes = OrgParser.new(document_version_id: 1, content:).parse
+    doc_node = nodes.find { |n| n[:node_type] == "document" }
+
+    assert_equal "AIA-556 epic split plan: Voice session limits & reliability", doc_node[:meta]["title"]
+    assert_equal [
+      { "key" => "STARTUP", "value" => "overview" },
+      { "key" => "OPTIONS", "value" => "toc:2 num:nil" },
+      { "key" => "TODO", "value" => "TODO(t) | DONE(d)" }
+    ], doc_node[:meta]["keywords"]
+
+    body_children = nodes.select { |n| n[:parent_id] == doc_node[:id] }
+    assert_equal %w[heading paragraph], body_children.map { |n| n[:node_type] }
+
+    lowercase_nodes = OrgParser.new(document_version_id: 1, content: "#+title: Lowercase Title\n").parse
+    lowercase_doc = lowercase_nodes.find { |n| n[:node_type] == "document" }
+    assert_equal "Lowercase Title", lowercase_doc[:meta]["title"]
+  end
+
+  test "parses inline verbatim containing internal equals in paragraph, heading, and list item" do
+    content = <<~ORG
+      * Check =MAX_CALL_SECONDS = 2700= as the task hard timeout
+
+      =MAX_CALL_SECONDS = 2700= as the task hard timeout
+
+      - Set =MAX_CALL_SECONDS = 2700= as the task hard timeout
+    ORG
+
+    nodes = OrgParser.new(document_version_id: 1, content:).parse
+
+    heading = nodes.find { |n| n[:node_type] == "heading" }
+    heading_code = nodes.find { |n| n[:parent_id] == heading[:id] && n[:node_type] == "code" }
+    assert heading_code
+    assert_equal "MAX_CALL_SECONDS = 2700", heading_code[:content]
+
+    doc_node = nodes.find { |n| n[:node_type] == "document" }
+    para = nodes.find { |n| n[:parent_id] == doc_node[:id] && n[:node_type] == "paragraph" }
+    para_code = nodes.find { |n| n[:parent_id] == para[:id] && n[:node_type] == "code" }
+    assert para_code
+    assert_equal "MAX_CALL_SECONDS = 2700", para_code[:content]
+
+    item = nodes.find { |n| n[:node_type] == "item" }
+    item_para = nodes.find { |n| n[:parent_id] == item[:id] && n[:node_type] == "paragraph" }
+    item_code = nodes.find { |n| n[:parent_id] == item_para[:id] && n[:node_type] == "code" }
+    assert item_code
+    assert_equal "MAX_CALL_SECONDS = 2700", item_code[:content]
+  end
 end

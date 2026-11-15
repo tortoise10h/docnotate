@@ -1,27 +1,32 @@
 /* Org mode heading badges: TODO keywords and tags */
 
-.document-node--org-todo {
+.document-node.document-node--org-todo {
   display: inline-block;
-  vertical-align: middle;
-  padding: 2px 6px;
-  border-radius: 4px;
+  vertical-align: baseline;
+  margin-right: 0.3em;
+  padding: 0.12em 0.35em 0.09em;
+  border: 1px solid var(--table-border);
+  border-radius: 2px;
   font-family: var(--mono-font);
-  font-size: 0.65em;
+  font-size: 0.62em;
   font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: 0.04em;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
   color: var(--accent);
   background: var(--inline-code-bg);
 }
 
-.document-node--org-todo--working {
+.document-node--org-todo.document-node--org-todo--working {
   color: var(--amber);
-  background: rgba(153, 64, 0, 0.08);
+  background: var(--warn-bg);
+  border-color: var(--warn-border);
 }
 
-.document-node--org-todo--done {
+.document-node--org-todo.document-node--org-todo--done {
   color: var(--green);
-  background: rgba(24, 133, 84, 0.08);
+  background: var(--ok-bg);
+  border-color: var(--ok-border);
 }
 
 .document-node--org-tag {

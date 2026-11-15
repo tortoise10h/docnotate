@@ -19,6 +19,15 @@ class OrgParser
   UNDERLINE_REGEX = /(?<=\A|[\s({\x27"\[])_(?![\s_])([^\s_]+)(?<![\s_])_(?=\z|[\s)}\x27"\]:.,!?;])/
   LINK_REGEX = /\[\[([^\]]+)\](?:\[([^\]]+)\])?\]/
 
+  INLINE_PATTERNS = [
+    [ :link, LINK_REGEX ],
+    [ :code, CODE_REGEX ],
+    [ :code, VERBATIM_REGEX ],
+    [ :strong, BOLD_REGEX ],
+    [ :emph, ITALIC_REGEX ],
+    [ :underline, UNDERLINE_REGEX ]
+  ].freeze
+
   InternalNode = Struct.new(:type, :content, :meta, :children, :heading_level, keyword_init: true) do
     def initialize(**kwargs)
       super
@@ -462,74 +471,43 @@ class OrgParser
   def parse_inlines(text)
     return [] if text.empty?
 
-    match = text.match(LINK_REGEX)
-    unless match
-      return parse_code_and_verbatim(text)
+    earliest_type = nil
+    earliest_match = nil
+
+    INLINE_PATTERNS.each do |type, regex|
+      match = text.match(regex)
+      next unless match
+
+      if earliest_match.nil? || match.begin(0) < earliest_match.begin(0)
+        earliest_type = type
+        earliest_match = match
+      end
     end
 
-    pre = text[0...match.begin(0)]
-    url = match[1]
-    label = match[2]
-    post = text[match.end(0)..]
+    return [ InternalNode.new(type: "text", content: text) ] unless earliest_match
+
+    pre = text[0...earliest_match.begin(0)]
+    post = text[earliest_match.end(0)..]
 
     nodes = []
     nodes.concat(parse_inlines(pre)) unless pre.empty?
-    link_children = label.present? ? parse_inlines(label) : [InternalNode.new(type: "text", content: url)]
-    nodes << InternalNode.new(type: "link", meta: { "url" => url, "title" => "" }, children: link_children)
+    nodes << build_inline_node(earliest_type, earliest_match)
     nodes.concat(parse_inlines(post)) unless post.empty?
     normalize_text_nodes(nodes)
   end
 
-  def parse_code_and_verbatim(text)
-    return [] if text.empty?
-
-    matches = []
-    m = text.match(CODE_REGEX)
-    matches << [:code, m] if m
-    m = text.match(VERBATIM_REGEX)
-    matches << [:code, m] if m
-
-    if matches.empty?
-      return parse_emphasis(text)
+  def build_inline_node(type, match)
+    case type
+    when :link
+      url = match[1]
+      label = match[2]
+      children = label.present? ? parse_inlines(label) : [ InternalNode.new(type: "text", content: url) ]
+      InternalNode.new(type: "link", meta: { "url" => url, "title" => "" }, children:)
+    when :code
+      InternalNode.new(type: "code", content: match[1])
+    else
+      InternalNode.new(type: type.to_s, children: parse_inlines(match[1]))
     end
-
-    _, match = matches.min_by { |_, m| m.begin(0) }
-    pre = text[0...match.begin(0)]
-    body = match[1]
-    post = text[match.end(0)..]
-
-    nodes = []
-    nodes.concat(parse_code_and_verbatim(pre)) unless pre.empty?
-    nodes << InternalNode.new(type: "code", content: body)
-    nodes.concat(parse_code_and_verbatim(post)) unless post.empty?
-    normalize_text_nodes(nodes)
-  end
-
-  def parse_emphasis(text)
-    return [] if text.empty?
-
-    matches = []
-    m = text.match(BOLD_REGEX)
-    matches << [:strong, m] if m
-    m = text.match(ITALIC_REGEX)
-    matches << [:emph, m] if m
-    m = text.match(UNDERLINE_REGEX)
-    matches << [:underline, m] if m
-
-    if matches.empty?
-      return [InternalNode.new(type: "text", content: text)]
-    end
-
-    type, match = matches.min_by { |_, m| m.begin(0) }
-    pre = text[0...match.begin(0)]
-    body = match[1]
-    post = text[match.end(0)..]
-
-    nodes = []
-    nodes.concat(parse_emphasis(pre)) unless pre.empty?
-    nodes << InternalNode.new(type: type.to_s, children: parse_emphasis(body))
-    nodes.concat(parse_emphasis(post)) unless post.empty?
-    normalize_text_nodes(nodes)
   end
 
   def normalize_text_nodes(nodes)

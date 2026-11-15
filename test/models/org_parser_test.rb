@@ -358,4 +358,81 @@ class OrgParserTest < ActiveSupport::TestCase
     assert item_code
     assert_equal "MAX_CALL_SECONDS = 2700", item_code[:content]
   end
+
+  test "parses bold containing verbatim using the buddy doc repro line" do
+    repro = "2. *=hc ls= vs =hc get= schema discrepancy*: In =hc ls --all | cat= on v0.1.21, each item only had ={address, agent, cwd, state, status, turn, where}=—it *omitted =labels=*, =name=, and =foreground.cwd= (unlike =hc get=, which includes full =labels=)."
+
+    nodes = OrgParser.new(document_version_id: 1, content: repro).parse
+    item = nodes.find { |n| n[:node_type] == "item" }
+    para = nodes.find { |n| n[:parent_id] == item[:id] && n[:node_type] == "paragraph" }
+    para_children = nodes.select { |n| n[:parent_id] == para[:id] }
+
+    first_strong = para_children.first
+    assert_equal "strong", first_strong[:node_type]
+    assert_equal para[:id], first_strong[:parent_id]
+
+    strong_children = nodes.select { |n| n[:parent_id] == first_strong[:id] }
+    assert_equal %w[code text code text], strong_children.map { |n| n[:node_type] }
+    assert_equal [ "hc ls", " vs ", "hc get", " schema discrepancy" ], strong_children.map { |n| n[:content] }
+
+    assert_equal "text", para_children[1][:node_type]
+    assert para_children[1][:content].start_with?(": In ")
+
+    code_contents = para_children.select { |n| n[:node_type] == "code" }.map { |n| n[:content] }
+    assert_includes code_contents, "hc ls --all | cat"
+    assert_includes code_contents, "foreground.cwd"
+    assert_includes code_contents, "hc get"
+    assert_includes code_contents, "labels"
+
+    text_nodes = nodes.select { |n| n[:node_type] == "text" }
+    refute text_nodes.any? { |n| n[:content].include?("*") || n[:content].include?("=") }
+  end
+
+  test "parses bold whose body starts with a verbatim span" do
+    nodes = OrgParser.new(document_version_id: 1, content: "*=cmd= flag*").parse
+    para = nodes.find { |n| n[:node_type] == "paragraph" }
+    strong = nodes.find { |n| n[:parent_id] == para[:id] && n[:node_type] == "strong" }
+    assert strong
+
+    children = nodes.select { |n| n[:parent_id] == strong[:id] }
+    assert_equal %w[code text], children.map { |n| n[:node_type] }
+    assert_equal [ "cmd", " flag" ], children.map { |n| n[:content] }
+  end
+
+  test "parses code inside italic and inside underline" do
+    nodes = OrgParser.new(document_version_id: 1, content: "/run ~foo~ now/ and _~bar~_").parse
+    para = nodes.find { |n| n[:node_type] == "paragraph" }
+
+    emph = nodes.find { |n| n[:parent_id] == para[:id] && n[:node_type] == "emph" }
+    assert emph
+    emph_children = nodes.select { |n| n[:parent_id] == emph[:id] }
+    assert_equal %w[text code text], emph_children.map { |n| n[:node_type] }
+    assert_equal [ "run ", "foo", " now" ], emph_children.map { |n| n[:content] }
+
+    underline = nodes.find { |n| n[:parent_id] == para[:id] && n[:node_type] == "underline" }
+    assert underline
+    underline_children = nodes.select { |n| n[:parent_id] == underline[:id] }
+    assert_equal %w[code], underline_children.map { |n| n[:node_type] }
+    assert_equal "bar", underline_children.first[:content]
+  end
+
+  test "parses link label containing verbatim" do
+    nodes = OrgParser.new(document_version_id: 1, content: "[[https://example.com][see =hc ls= docs]]").parse
+    para = nodes.find { |n| n[:node_type] == "paragraph" }
+    link = nodes.find { |n| n[:parent_id] == para[:id] && n[:node_type] == "link" }
+    assert link
+
+    link_children = nodes.select { |n| n[:parent_id] == link[:id] }
+    assert_equal %w[text code text], link_children.map { |n| n[:node_type] }
+    assert_equal [ "see ", "hc ls", " docs" ], link_children.map { |n| n[:content] }
+  end
+
+  test "plain text with no markup parses to a single text node" do
+    nodes = OrgParser.new(document_version_id: 1, content: "Just plain text with no markup.").parse
+    para = nodes.find { |n| n[:node_type] == "paragraph" }
+    children = nodes.select { |n| n[:parent_id] == para[:id] }
+
+    assert_equal %w[text], children.map { |n| n[:node_type] }
+    assert_equal "Just plain text with no markup.", children.first[:content]
+  end
 end

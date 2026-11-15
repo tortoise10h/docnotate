@@ -435,4 +435,55 @@ class OrgParserTest < ActiveSupport::TestCase
     assert_equal %w[text], children.map { |n| n[:node_type] }
     assert_equal "Just plain text with no markup.", children.first[:content]
   end
+
+  test "parses full buddy doc line 323 with em dash boundary and nested omitted labels" do
+    line_323 = "2. *=hc ls= vs =hc get= schema discrepancy*: In =hc ls --all | cat= on v0.1.21, each item only had ={address, agent, cwd, state, status, turn, where}=—it *omitted =labels=*, =name=, and =foreground.cwd= (unlike =hc get=, which includes full =labels=)."
+
+    nodes = OrgParser.new(document_version_id: 1, content: line_323).parse
+    item = nodes.find { |n| n[:node_type] == "item" }
+    para = nodes.find { |n| n[:parent_id] == item[:id] && n[:node_type] == "paragraph" }
+    para_children = nodes.select { |n| n[:parent_id] == para[:id] }
+
+    strong_nodes = para_children.select { |n| n[:node_type] == "strong" }
+    assert_equal 2, strong_nodes.size
+
+    omitted_strong = strong_nodes[1]
+    omitted_children = nodes.select { |n| n[:parent_id] == omitted_strong[:id] }
+    assert_equal %w[text code], omitted_children.map { |n| n[:node_type] }
+    assert_equal [ "omitted ", "labels" ], omitted_children.map { |n| n[:content] }
+
+    address_code = para_children.find { |n| n[:node_type] == "code" && n[:content].start_with?("{address") }
+    assert address_code
+    assert_equal "{address, agent, cwd, state, status, turn, where}", address_code[:content]
+    refute_includes address_code[:content], "\u2014"
+    refute_includes address_code[:content], "omitted"
+
+    text_nodes = nodes.select { |n| n[:node_type] == "text" }
+    refute text_nodes.any? { |n| n[:content].include?("*") || n[:content].include?("=") }
+  end
+
+  test "closes verbatim span on em dash, en dash, ellipsis, asterisk, and closing parenthesis" do
+    cases = {
+      "=foo=—bar" => "foo",
+      "=foo=–bar" => "foo",
+      "=foo=…bar" => "foo",
+      "*=foo=*" => "foo",
+      "(=foo=)" => "foo"
+    }
+
+    cases.each do |input, expected|
+      nodes = OrgParser.new(document_version_id: 1, content: input).parse
+      code = nodes.find { |n| n[:node_type] == "code" }
+      assert code, "Expected code node for #{input.inspect}"
+      assert_equal expected, code[:content]
+    end
+  end
+
+  test "does not parse mid-word delimiters a*b, x/y, or 2=3" do
+    %w[a*b x/y 2=3].each do |input|
+      nodes = OrgParser.new(document_version_id: 1, content: input).parse
+      refute nodes.any? { |n| %w[strong emph code].include?(n[:node_type]) },
+             "Expected no strong/emph/code node for #{input.inspect}"
+    end
+  end
 end

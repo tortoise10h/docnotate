@@ -24,8 +24,9 @@ class FilePaletteSystemTest < ApplicationSystemTestCase
   test "opens with Cmd+K on home page, filters by name, opens with Enter, and works on document page" do
     visit root_path
 
-    assert_selector ".file-palette__hotkey-hint[aria-keyshortcuts='Meta+K Control+K']", text: /⌘k/i
+    assert_no_selector ".file-palette__trigger"
 
+    # Opens from editable target (autofocused home input)
     send_palette_shortcut
     assert_selector "#file_palette_dialog", visible: true
     assert_equal "file_palette_input", page.evaluate_script("document.activeElement.id")
@@ -36,7 +37,8 @@ class FilePaletteSystemTest < ApplicationSystemTestCase
     assert_no_selector "#file_palette_dialog", visible: true
     assert_equal "file_path", page.evaluate_script("document.activeElement.id")
 
-    # Pressing Cmd+K again while open closes it
+    # Also opens when focus is outside any input, and Cmd+K again closes it
+    page.execute_script("document.activeElement.blur()")
     send_palette_shortcut
     assert_selector "#file_palette_dialog", visible: true
     send_palette_shortcut

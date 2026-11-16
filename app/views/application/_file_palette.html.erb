@@ -14,21 +14,6 @@
      data-file-palette-search-url-value="<%= search_documents_path %>"
      data-file-palette-open-url-value="<%= open_documents_path %>"
      data-file-palette-recent-value="<%= recent_payload.to_json %>">
-  <button type="button"
-          class="file-palette__trigger"
-          data-controller="hotkey"
-          data-hotkey="Mod+k,Mod+K"
-          data-file-palette-target="toggle"
-          data-action="click->file-palette#toggle"
-          aria-haspopup="dialog"
-          aria-expanded="false"
-          aria-controls="file_palette_dialog"
-          aria-label="Open file palette">
-    <svg class="file-palette__trigger-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-    <span class="file-palette__trigger-label">Open file</span>
-    <kbd class="file-palette__hotkey-hint" data-hotkey-target="hint" aria-keyshortcuts="Meta+K Control+K"></kbd>
-  </button>
-
   <div class="file-palette__backdrop"
        data-file-palette-target="backdrop"
        data-action="click->file-palette#close"

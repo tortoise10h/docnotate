@@ -4,7 +4,7 @@ const DEBOUNCE_MS = 130
 const BADGE_LABELS = { markdown: "md", html: "html", org: "org" }
 
 export default class extends Controller {
-  static targets = ["toggle", "backdrop", "panel", "input", "heading", "list", "empty"]
+  static targets = ["backdrop", "panel", "input", "heading", "list", "empty"]
   static values = {
     searchUrl: String,
     openUrl: String,
@@ -14,14 +14,14 @@ export default class extends Controller {
   connect() {
     this.boundClickOutside = this.clickOutside.bind(this)
     this.boundKeydown = this.keydown.bind(this)
-    this.boundEditableShortcut = this.handleEditableShortcut.bind(this)
+    this.boundShortcut = this.handleShortcut.bind(this)
     this.boundBeforeCache = this.handleBeforeCache.bind(this)
     this.debounceTimer = null
     this.abortController = null
     this.selectedIndex = -1
     this.previousFocus = null
 
-    document.addEventListener("keydown", this.boundEditableShortcut)
+    document.addEventListener("keydown", this.boundShortcut)
     document.addEventListener("turbo:before-cache", this.boundBeforeCache)
   }
 
@@ -29,7 +29,7 @@ export default class extends Controller {
     this.cancelPendingSearch()
     document.removeEventListener("click", this.boundClickOutside)
     document.removeEventListener("keydown", this.boundKeydown)
-    document.removeEventListener("keydown", this.boundEditableShortcut)
+    document.removeEventListener("keydown", this.boundShortcut)
     document.removeEventListener("turbo:before-cache", this.boundBeforeCache)
   }
 
@@ -41,21 +41,12 @@ export default class extends Controller {
     return Array.from(this.listTarget.querySelectorAll("[role='option']"))
   }
 
-  toggle() {
-    if (this.isOpen) {
-      this.close()
-    } else {
-      this.open()
-    }
-  }
-
   open() {
     if (this.isOpen) return
 
     this.previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null
     this.backdropTarget.hidden = false
     this.panelTarget.hidden = false
-    this.toggleTarget.setAttribute("aria-expanded", "true")
     this.inputTarget.setAttribute("aria-expanded", "true")
     this.inputTarget.value = ""
     this.renderRecent()
@@ -71,7 +62,6 @@ export default class extends Controller {
     this.cancelPendingSearch()
     this.backdropTarget.hidden = true
     this.panelTarget.hidden = true
-    this.toggleTarget.setAttribute("aria-expanded", "false")
     this.inputTarget.setAttribute("aria-expanded", "false")
     this.inputTarget.removeAttribute("aria-activedescendant")
 
@@ -89,21 +79,18 @@ export default class extends Controller {
   restoreFocus() {
     if (this.previousFocus && this.previousFocus !== document.body && this.previousFocus.isConnected) {
       this.previousFocus.focus()
-    } else if (this.toggleTarget.isConnected) {
-      this.toggleTarget.focus()
     }
   }
 
   clickOutside(event) {
-    if (!this.panelTarget.contains(event.target) && !this.toggleTarget.contains(event.target)) {
+    if (!this.panelTarget.contains(event.target)) {
       this.close()
     }
   }
 
-  // @github/hotkey skips editable targets unless scoped to one ID; catch Cmd/Ctrl+K there when closed
-  handleEditableShortcut(event) {
+  handleShortcut(event) {
     if (event.defaultPrevented || this.isOpen) return
-    if (!this.isEditableTarget(event.target) || !this.isPaletteShortcut(event)) return
+    if (!this.isPaletteShortcut(event)) return
 
     event.preventDefault()
     this.open()
@@ -364,14 +351,5 @@ export default class extends Controller {
     const isMac = /Mac|iPod|iPhone|iPad/i.test(navigator.platform)
     const primaryMod = isMac ? event.metaKey && !event.ctrlKey : event.ctrlKey && !event.metaKey
     return primaryMod && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "k"
-  }
-
-  isEditableTarget(target) {
-    if (!(target instanceof HTMLElement)) return false
-
-    const tag = target.nodeName.toLowerCase()
-    const type = (target.getAttribute("type") || "").toLowerCase()
-    return tag === "select" || tag === "textarea" || target.isContentEditable ||
-      (tag === "input" && !["submit", "reset", "checkbox", "radio", "file"].includes(type))
   }
 }

@@ -34,6 +34,7 @@ Rails.application.routes.draw do
   resources :documents, only: [ :index, :show, :update, :destroy ] do
     collection do
       get :open
+      get :search
     end
     member do
       post :open_in_editor

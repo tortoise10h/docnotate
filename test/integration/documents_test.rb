@@ -312,6 +312,42 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     file.unlink
   end
 
+  test "search returns JSON matches for a partial name with expected keys" do
+    older = create_document("alpha-notes.md", last_opened_at: 2.hours.ago)
+    newer = create_document("alpha-plan.md", last_opened_at: 10.minutes.ago)
+    create_document("beta-spec.md", last_opened_at: 5.minutes.ago)
+
+    get search_documents_path, params: { query: "alpha" }, as: :json
+
+    assert_response :success
+    payload = JSON.parse(response.body)
+    assert_equal [ newer.id, older.id ], payload.map { |item| item["id"] }
+    assert_equal %w[display_name file_path file_type id], payload.first.keys.sort
+    assert_equal "alpha-plan.md", payload.first["display_name"]
+    assert_equal newer.file_path, payload.first["file_path"]
+    assert_equal "markdown", payload.first["file_type"]
+  end
+
+  test "search returns empty array for blank query" do
+    create_document("alpha-notes.md")
+
+    get search_documents_path, params: { query: "   " }, as: :json
+
+    assert_response :success
+    assert_equal [], JSON.parse(response.body)
+  end
+
+  test "search caps results at 20" do
+    25.times do |index|
+      create_document("match-#{index}.md", last_opened_at: Time.current - index.minutes)
+    end
+
+    get search_documents_path, params: { query: "match" }, as: :json
+
+    assert_response :success
+    assert_equal 20, JSON.parse(response.body).size
+  end
+
   private
 
   def create_document(file_path, last_opened_at: Time.current)

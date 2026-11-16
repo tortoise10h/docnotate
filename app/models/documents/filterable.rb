@@ -19,6 +19,17 @@ module Documents
           all
         end
       }
+
+      scope :search_by_title, ->(query, limit: 20) {
+        if query.blank?
+          none
+        else
+          matching_title(query)
+            .select(:id, :name, :file_path, :file_type, :last_opened_at)
+            .order(last_opened_at: :desc, id: :desc)
+            .limit(limit)
+        end
+      }
     end
   end
 end

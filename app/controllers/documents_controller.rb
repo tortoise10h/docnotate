@@ -7,6 +7,19 @@ class DocumentsController < ApplicationController
     @pagy, @documents = pagy(Document.matching_title(@query).with_file_type(@file_type).order(last_opened_at: :desc))
   end
 
+  def search
+    documents = Document.search_by_title(params[:query])
+
+    render json: documents.map { |document|
+      {
+        id: document.id,
+        display_name: document.display_name,
+        file_path: document.file_path,
+        file_type: document.file_type
+      }
+    }
+  end
+
   def open
     file_path = resolve_file_path
 

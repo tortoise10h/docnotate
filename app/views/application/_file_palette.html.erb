@@ -1,0 +1,100 @@
+<% recent_documents = palette_recent_documents %>
+<% recent_payload = recent_documents.map do |doc|
+     {
+       id: doc.id,
+       display_name: doc.display_name,
+       file_path: doc.file_path,
+       file_type: doc.file_type,
+       time_ago: "#{time_ago_in_words(doc.last_opened_at)} ago"
+     }
+   end %>
+
+<div class="file-palette"
+     data-controller="file-palette"
+     data-file-palette-search-url-value="<%= search_documents_path %>"
+     data-file-palette-open-url-value="<%= open_documents_path %>"
+     data-file-palette-recent-value="<%= recent_payload.to_json %>">
+  <button type="button"
+          class="file-palette__trigger"
+          data-controller="hotkey"
+          data-hotkey="Mod+k,Mod+K"
+          data-file-palette-target="toggle"
+          data-action="click->file-palette#toggle"
+          aria-haspopup="dialog"
+          aria-expanded="false"
+          aria-controls="file_palette_dialog"
+          aria-label="Open file palette">
+    <svg class="file-palette__trigger-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <span class="file-palette__trigger-label">Open file</span>
+    <kbd class="file-palette__hotkey-hint" data-hotkey-target="hint" aria-keyshortcuts="Meta+K Control+K"></kbd>
+  </button>
+
+  <div class="file-palette__backdrop"
+       data-file-palette-target="backdrop"
+       data-action="click->file-palette#close"
+       hidden></div>
+
+  <div class="file-palette__dialog"
+       id="file_palette_dialog"
+       role="dialog"
+       aria-modal="true"
+       aria-label="Quick open file"
+       data-file-palette-target="panel"
+       hidden>
+    <div class="file-palette__search">
+      <svg class="file-palette__search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text"
+             id="file_palette_input"
+             class="file-palette__input"
+             placeholder="Search files by name..."
+             autocomplete="off"
+             spellcheck="false"
+             role="combobox"
+             aria-autocomplete="list"
+             aria-expanded="false"
+             aria-controls="file_palette_list"
+             aria-label="Search files by name"
+             data-file-palette-target="input"
+             data-action="input->file-palette#search">
+      <kbd class="file-palette__esc-hint" aria-hidden="true">Esc</kbd>
+    </div>
+
+    <div class="file-palette__section-header" data-file-palette-target="heading">Recent files</div>
+
+    <ul class="file-palette__list"
+        id="file_palette_list"
+        role="listbox"
+        aria-label="Files"
+        data-file-palette-target="list"
+        <%= "hidden" if recent_documents.empty? %>>
+      <% recent_documents.each_with_index do |document, index| %>
+        <li class="file-palette__row" role="none">
+          <%= link_to open_documents_path(file_path: document.file_path),
+                      id: "file_palette_option_#{document.id}",
+                      role: "option",
+                      tabindex: -1,
+                      aria: { selected: (index == 0).to_s },
+                      class: class_names("file-palette__item", "file-palette__item--active": index == 0),
+                      data: {
+                        file_palette_index: index,
+                        action: "mouseenter->file-palette#selectFromHover click->file-palette#openFromClick"
+                      } do %>
+            <span class="file-palette__item-main">
+              <%= render "application/file_badge", document: document %>
+              <span class="file-palette__item-text">
+                <span class="file-palette__item-name"><%= document.display_name %></span>
+                <span class="file-palette__item-path"><%= document.file_path %></span>
+              </span>
+            </span>
+            <span class="file-palette__item-time"><%= time_ago_in_words(document.last_opened_at) %> ago</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+    <div class="file-palette__empty"
+         role="status"
+         data-file-palette-target="empty"
+         <%= "hidden" if recent_documents.any? %>>No recent files yet.</div>
+  </div>
+</div>

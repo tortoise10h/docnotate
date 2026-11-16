@@ -53,10 +53,11 @@ Keyboard shortcuts available across DocNotate:
 | Keybinding | Description |
 | --- | --- |
 | ⌘B | Toggle file sidebar |
+| ⌘K | Open quick-open file palette (Ctrl+K on non-Mac), search files by name, Enter opens the highlighted file |
 | ⌘/ | With text selected: open comment input |
 | ⌘↵ | In comment form: submit new comment |
 | ⌘↵ | In comment popover: save edited comment |
-| ⌘K | In document view: jump to previous comment |
+| ⌥⌘K | In document view: jump to previous comment |
 | ⌘J | In document view: jump to next comment |
 | ⇧⌘Y | In document view: copy comments to clipboard |
 | ⇧⌘" / ⇧⌘' / ⌘" | In document view: view previous comments |

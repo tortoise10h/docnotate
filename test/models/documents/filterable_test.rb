@@ -27,4 +27,65 @@ class Documents::FilterableTest < ActiveSupport::TestCase
     assert_equal 4, Document.with_file_type("pdf").count
     assert_equal 4, Document.with_file_type(nil).count
   end
+
+  test "matching_title treats space, hyphen, underscore, dot, and slash as equivalent separators" do
+    palette_doc = Document.create!(
+      file_path: "/docs/guides/how-file-search-palette-works.html",
+      content: "<h1>Palette</h1>",
+      file_type: "html"
+    )
+
+    assert_includes Document.matching_title("how file"), palette_doc
+    assert_includes Document.matching_title("how-file"), palette_doc
+    assert_includes Document.matching_title("how_file"), palette_doc
+    assert_includes Document.matching_title("works.html"), palette_doc
+    assert_includes Document.matching_title("guides/how"), palette_doc
+  end
+
+  test "matching_title requires all tokens regardless of order and returns empty when unmatched" do
+    palette_doc = Document.create!(
+      file_path: "/docs/how-file-search-palette-works.html",
+      content: "<h1>Palette</h1>",
+      file_type: "html"
+    )
+
+    assert_includes Document.matching_title("works palette"), palette_doc
+    assert_includes Document.matching_title("palette works"), palette_doc
+    assert_includes Document.matching_title("notes agenda"), @org
+    assert_empty Document.matching_title("palette nonexistent")
+  end
+
+  test "matching_title treats percent literally and does not treat bare underscore as a wildcard" do
+    percent_doc = Document.create!(file_path: "/notes/100%-done.md", content: "# Done", file_type: "markdown")
+
+    assert_equal [ percent_doc ], Document.matching_title("%").to_a
+    assert_equal [ percent_doc ], Document.matching_title("100%").to_a
+    assert_empty Document.matching_title("_")
+    assert_empty Document.matching_title("___")
+  end
+
+  test "search_by_title returns none for blank queries and ranks stronger display matches first" do
+    assert_empty Document.search_by_title("   ")
+
+    path_only = Document.create!(
+      file_path: "/docs/how-to/guide.md",
+      content: "# Guide",
+      file_type: "markdown",
+      last_opened_at: 1.minute.ago
+    )
+    contains_match = Document.create!(
+      file_path: "/docs/callouts-showcase.md",
+      content: "# Showcase",
+      file_type: "markdown",
+      last_opened_at: 2.minutes.ago
+    )
+    prefix_match = Document.create!(
+      file_path: "/docs/how-file-search-palette-works.html",
+      content: "<h1>How</h1>",
+      file_type: "html",
+      last_opened_at: 10.minutes.ago
+    )
+
+    assert_equal [ prefix_match, contains_match, path_only ], Document.search_by_title("how").to_a
+  end
 end

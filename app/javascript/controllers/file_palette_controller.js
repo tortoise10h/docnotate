@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 const DEBOUNCE_MS = 130
 const BADGE_LABELS = { markdown: "md", html: "html", org: "org" }
+const SEPARATOR_PATTERN = /[\s\-_./\\]+/
 
 export default class extends Controller {
   static targets = ["backdrop", "panel", "input", "heading", "list", "empty"]
@@ -254,30 +255,40 @@ export default class extends Controller {
   }
 
   appendHighlightedText(container, text, query) {
-    if (!query) {
+    const trimmed = (query || "").trim()
+    const tokens = trimmed.split(SEPARATOR_PATTERN).filter(Boolean)
+    if (tokens.length === 0) {
       container.textContent = text
       return
     }
 
-    const matchIndex = text.toLowerCase().indexOf(query.toLowerCase())
-    if (matchIndex === -1) {
+    // Prefer the full query first so literal separator matches (e.g. "palette-alpha") stay one <mark>.
+    const terms = Array.from(new Set([trimmed, ...tokens])).sort((a, b) => b.length - a.length)
+    const pattern = new RegExp(terms.map((term) => this.escapeRegExp(term)).join("|"), "gi")
+
+    let lastIndex = 0
+    for (const match of text.matchAll(pattern)) {
+      if (match.index > lastIndex) {
+        container.appendChild(document.createTextNode(text.slice(lastIndex, match.index)))
+      }
+
+      const mark = document.createElement("mark")
+      mark.className = "file-palette__match"
+      mark.textContent = match[0]
+      container.appendChild(mark)
+
+      lastIndex = match.index + match[0].length
+    }
+
+    if (lastIndex === 0) {
       container.textContent = text
-      return
+    } else if (lastIndex < text.length) {
+      container.appendChild(document.createTextNode(text.slice(lastIndex)))
     }
+  }
 
-    if (matchIndex > 0) {
-      container.appendChild(document.createTextNode(text.slice(0, matchIndex)))
-    }
-
-    const mark = document.createElement("mark")
-    mark.className = "file-palette__match"
-    mark.textContent = text.slice(matchIndex, matchIndex + query.length)
-    container.appendChild(mark)
-
-    const after = text.slice(matchIndex + query.length)
-    if (after) {
-      container.appendChild(document.createTextNode(after))
-    }
+  escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
   }
 
   buildOpenUrl(filePath) {

@@ -103,6 +103,26 @@ class FilePaletteSystemTest < ApplicationSystemTestCase
     html_file&.unlink
   end
 
+  test "matches hyphenated filename with space-separated query and highlights tokens" do
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, "how-file-search-palette-works.html")
+      File.write(path, "<h1>How file search palette works</h1>")
+      doc = Document.open(path)
+      doc.update!(last_opened_at: 1.minute.ago)
+
+      visit root_path
+      send_palette_shortcut
+      assert_selector "#file_palette_dialog", visible: true
+
+      find("#file_palette_input").fill_in with: "how file"
+      assert_selector "#file_palette_list [role='option']", count: 1
+      assert_selector ".file-palette__item-name", text: "how-file-search-palette-works.html"
+
+      marks = all(".file-palette__item-name .file-palette__match").map(&:text)
+      assert_equal [ "how", "file" ], marks
+    end
+  end
+
   private
 
   def send_palette_shortcut

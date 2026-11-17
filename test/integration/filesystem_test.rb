@@ -31,7 +31,7 @@ class FilesystemTest < ActionDispatch::IntegrationTest
       assert_select ".file-tree__name", text: "script.py"
 
       # Supported file has a link to open and active modifier
-      assert_select "a[href=?].file-tree__item--active", open_documents_path(file_path: active_file)
+      assert_select "a[href=?].file-tree__item--active[data-turbo-prefetch='false']", open_documents_path(file_path: active_file)
       assert_select ".file-badge", text: "md"
 
       # Unsupported file is disabled with no link

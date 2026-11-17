@@ -54,7 +54,7 @@
     <ul class="document__switcher-list">
       <% recent_docs.each do |recent_doc| %>
         <li>
-          <%= link_to open_documents_path(file_path: recent_doc.file_path), class: "document__switcher-item" do %>
+          <%= link_to open_documents_path(file_path: recent_doc.file_path), class: "document__switcher-item", data: { turbo_prefetch: false } do %>
             <span class="document__switcher-name" data-tooltip="<%= recent_doc.file_path %>"><%= recent_doc.display_name %></span>
             <span class="document__switcher-time"><%= time_ago_in_words(recent_doc.last_opened_at) %> ago</span>
           <% end %>

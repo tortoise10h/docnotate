@@ -39,7 +39,7 @@ class DocumentsController < ApplicationController
       return
     end
 
-    @document = Document.open(file_path)
+    @document = Document.open(file_path, touch_last_opened: !prefetch_request?)
 
     unless @document.persisted?
       redirect_to root_path, alert: "Failed to open file"
@@ -122,12 +122,19 @@ class DocumentsController < ApplicationController
   end
 
   def prepare_document
-    @document.touch_last_opened!
+    @document.touch_last_opened! unless prefetch_request?
     @recent_documents = Document.recently_opened.limit(5)
     @editor_preference = AppSetting.get("editor_application")
     @root_nodes = @document.root_node_tree
     @comment_payload = @document.comment_payload
     @archived_comments_by_version = @document.archived_comments_by_version
     @unresolved_archived_count = @document.archived_comments.where(is_resolved: false).count
+  end
+
+  def prefetch_request?
+    # Turbo 8 sends X-Sec-Purpose: prefetch on hover/preload; browsers send Sec-Purpose: prefetch.
+    %w[X-Sec-Purpose Sec-Purpose].any? do |header|
+      request.headers[header].to_s.split(";").any? { |token| token.strip.casecmp?("prefetch") }
+    end
   end
 end

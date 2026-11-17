@@ -62,6 +62,7 @@
                       class: class_names("file-palette__item", "file-palette__item--active": index == 0),
                       data: {
                         file_palette_index: index,
+                        turbo_prefetch: false,
                         action: "mouseenter->file-palette#selectFromHover click->file-palette#openFromClick"
                       } do %>
             <span class="file-palette__item-main">

@@ -93,7 +93,7 @@ module Documents
         end
       end
 
-      def open(file_path)
+      def open(file_path, touch_last_opened: true)
         file_path = normalize_file_path(file_path)
 
         # Always work with absolute file path instead of relative
@@ -115,9 +115,9 @@ module Documents
 
         document.assign_attributes(
           content: content,
-          file_type: file_type,
-          last_opened_at: Time.current
+          file_type: file_type
         )
+        document.last_opened_at = Time.current if touch_last_opened
 
         if document.save
           metadata = AstParseable::ParseMetadata.new(size: file_stats.size, last_modified_at: file_mtime)

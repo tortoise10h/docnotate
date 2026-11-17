@@ -214,6 +214,7 @@ export default class extends Controller {
     link.setAttribute("aria-selected", "false")
     link.tabIndex = -1
     link.dataset.filePaletteIndex = String(index)
+    link.dataset.turboPrefetch = "false"
     link.dataset.action = "mouseenter->file-palette#selectFromHover click->file-palette#openFromClick"
 
     const main = document.createElement("span")

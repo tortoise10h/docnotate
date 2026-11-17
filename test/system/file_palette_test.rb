@@ -123,6 +123,34 @@ class FilePaletteSystemTest < ApplicationSystemTestCase
     end
   end
 
+  test "hovering recent links or palette rows does not update last_opened_at, while opening via Enter does" do
+    original_timestamp = @first_doc.reload.last_opened_at
+
+    visit root_path
+    first_link = find(".recent-files__link", text: @first_doc.display_name)
+    assert_equal "false", first_link["data-turbo-prefetch"]
+    first_link.hover
+    sleep 0.25
+
+    assert_equal original_timestamp, @first_doc.reload.last_opened_at
+
+    send_palette_shortcut
+    assert_selector "#file_palette_dialog", visible: true
+    find("#file_palette_input").fill_in with: "palette-alpha"
+    assert_selector "#file_palette_list [role='option']", count: 1
+
+    palette_option = find("#file_palette_list [role='option']", text: @first_doc.display_name)
+    assert_equal "false", palette_option["data-turbo-prefetch"]
+    palette_option.hover
+    sleep 0.25
+
+    assert_equal original_timestamp, @first_doc.reload.last_opened_at
+
+    find("#file_palette_input").send_keys(:enter)
+    assert_selector ".document__title", text: @first_doc.display_name
+    assert_operator @first_doc.reload.last_opened_at, :>, original_timestamp
+  end
+
   private
 
   def send_palette_shortcut

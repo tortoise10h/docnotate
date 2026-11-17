@@ -348,6 +348,74 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     assert_equal 20, JSON.parse(response.body).size
   end
 
+  test "does not update last_opened_at or recent ordering on prefetch requests to open, while normal visits still touch" do
+    older_file = Tempfile.new([ "older-open", ".md" ])
+    older_file.write("# Older")
+    older_file.close
+
+    newer_file = Tempfile.new([ "newer-open", ".md" ])
+    newer_file.write("# Newer")
+    newer_file.close
+
+    older_doc = Document.open(older_file.path)
+    older_doc.update!(last_opened_at: 2.hours.ago)
+    older_timestamp = older_doc.reload.last_opened_at
+
+    newer_doc = Document.open(newer_file.path)
+    newer_doc.update!(last_opened_at: 10.minutes.ago)
+
+    # Turbo 8 hover prefetch header
+    get open_documents_path, params: { file_path: older_file.path }, headers: { "X-Sec-Purpose" => "prefetch" }
+
+    assert_response :success
+    assert_equal older_timestamp, older_doc.reload.last_opened_at
+    assert_equal [ newer_doc.id, older_doc.id ], Document.recently_opened.limit(2).pluck(:id)
+    assert_select ".document__switcher-item", count: 2
+    assert_select ".document__switcher-list li:first-child .document__switcher-name", text: newer_doc.display_name
+
+    # Browser native Sec-Purpose prefetch header
+    get open_documents_path, params: { file_path: older_file.path }, headers: { "Sec-Purpose" => "prefetch;prerender" }
+
+    assert_response :success
+    assert_equal older_timestamp, older_doc.reload.last_opened_at
+    assert_equal [ newer_doc.id, older_doc.id ], Document.recently_opened.limit(2).pluck(:id)
+
+    # Normal navigation without prefetch header updates last_opened_at and recent ordering
+    get open_documents_path, params: { file_path: older_file.path }
+
+    assert_response :success
+    assert_operator older_doc.reload.last_opened_at, :>, older_timestamp
+    assert_equal [ older_doc.id, newer_doc.id ], Document.recently_opened.limit(2).pluck(:id)
+    assert_select ".document__switcher-list li:first-child .document__switcher-name", text: older_doc.display_name
+  ensure
+    older_file&.unlink
+    newer_file&.unlink
+  end
+
+  test "disables turbo prefetch on document open links across views" do
+    file = Tempfile.new([ "prefetch-disabled", ".md" ])
+    file.write("# Test")
+    file.close
+
+    doc = Document.open(file.path)
+
+    get root_path
+    assert_response :success
+    assert_select "a.recent-files__link[data-turbo-prefetch='false']", count: 1
+    assert_select "a.file-palette__item[data-turbo-prefetch='false']", count: 1
+    assert_select "a.home__all-files:not([data-turbo-prefetch='false'])", count: 1
+
+    get documents_path
+    assert_response :success
+    assert_select "a.documents__file-link[data-turbo-prefetch='false']", count: 1
+
+    get open_documents_path, params: { file_path: doc.file_path }
+    assert_response :success
+    assert_select "a.document__switcher-item[data-turbo-prefetch='false']", count: 1
+  ensure
+    file&.unlink
+  end
+
   private
 
   def create_document(file_path, last_opened_at: Time.current)

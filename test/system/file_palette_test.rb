@@ -151,6 +151,24 @@ class FilePaletteSystemTest < ApplicationSystemTestCase
     assert_operator @first_doc.reload.last_opened_at, :>, original_timestamp
   end
 
+  test "bottom nav search control opens the file palette on home page" do
+    visit root_path
+
+    assert_selector "nav.bottom-nav"
+    search_button = find("nav.bottom-nav button.bottom-nav__item[data-file-palette-open][aria-label='Search files']")
+    assert_selector "nav.bottom-nav .bottom-nav__key", text: "⌘K"
+
+    search_button.click
+
+    assert_selector "#file_palette_dialog", visible: true, count: 1
+    assert_selector ".file-palette__backdrop", visible: true, count: 1
+    assert_equal "file_palette_input", page.evaluate_script("document.activeElement.id")
+
+    # Remains open rather than toggling immediately closed
+    sleep 0.1
+    assert_selector "#file_palette_dialog", visible: true, count: 1
+  end
+
   private
 
   def send_palette_shortcut

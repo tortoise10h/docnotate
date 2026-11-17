@@ -16,6 +16,7 @@ export default class extends Controller {
     this.boundClickOutside = this.clickOutside.bind(this)
     this.boundKeydown = this.keydown.bind(this)
     this.boundShortcut = this.handleShortcut.bind(this)
+    this.boundOpenTrigger = this.handleOpenTrigger.bind(this)
     this.boundBeforeCache = this.handleBeforeCache.bind(this)
     this.debounceTimer = null
     this.abortController = null
@@ -23,6 +24,7 @@ export default class extends Controller {
     this.previousFocus = null
 
     document.addEventListener("keydown", this.boundShortcut)
+    document.addEventListener("click", this.boundOpenTrigger)
     document.addEventListener("turbo:before-cache", this.boundBeforeCache)
   }
 
@@ -31,6 +33,7 @@ export default class extends Controller {
     document.removeEventListener("click", this.boundClickOutside)
     document.removeEventListener("keydown", this.boundKeydown)
     document.removeEventListener("keydown", this.boundShortcut)
+    document.removeEventListener("click", this.boundOpenTrigger)
     document.removeEventListener("turbo:before-cache", this.boundBeforeCache)
   }
 
@@ -92,6 +95,15 @@ export default class extends Controller {
   handleShortcut(event) {
     if (event.defaultPrevented || this.isOpen) return
     if (!this.isPaletteShortcut(event)) return
+
+    event.preventDefault()
+    this.open()
+  }
+
+  handleOpenTrigger(event) {
+    if (event.defaultPrevented || this.isOpen) return
+    const trigger = event.target instanceof Element ? event.target.closest("[data-file-palette-open]") : null
+    if (!trigger) return
 
     event.preventDefault()
     this.open()

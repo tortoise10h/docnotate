@@ -3,7 +3,12 @@
 .home {
   max-width: 720px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 32px 24px calc(72px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Keep the home settings trigger clear of the fixed bottom navigation bar */
+.home .home-settings {
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
 }
 
 .home__recent {

@@ -1,0 +1,15 @@
+<%# locals: (left: nil, right: nil) %>
+<nav class="bottom-nav" aria-label="Quick navigation">
+  <div class="bottom-nav__zone bottom-nav__zone--left"><%= left %></div>
+  <div class="bottom-nav__zone bottom-nav__zone--center">
+    <button type="button"
+            class="bottom-nav__item"
+            data-file-palette-open
+            aria-label="Search files"
+            aria-keyshortcuts="Meta+K Control+K">
+      <span class="bottom-nav__label">Search</span>
+      <kbd class="bottom-nav__key" aria-hidden="true">⌘K</kbd>
+    </button>
+  </div>
+  <div class="bottom-nav__zone bottom-nav__zone--right"><%= right %></div>
+</nav>

@@ -52,7 +52,7 @@ Keyboard shortcuts available across DocNotate:
 
 | Keybinding | Description |
 | --- | --- |
-| ⌘B | Toggle file sidebar |
+| ⌘⌥T | Toggle file sidebar |
 | ⌘K | Open quick-open file palette (Ctrl+K on non-Mac), search files by name, Enter opens the highlighted file |
 | ⌘/ | With text selected: open comment input |
 | ⌘↵ | In comment form: submit new comment |

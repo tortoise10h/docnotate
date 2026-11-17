@@ -3,14 +3,16 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
     static values = {
         text: String,
-        sourceSelector: String
+        sourceSelector: String,
+        liveSourceSelector: String
     }
 
-    static targets = ["defaultIcon", "successIcon"]
+    static targets = ["defaultIcon", "successIcon", "label"]
 
     connect() {
         this.originalTooltip = this.element.dataset.tooltip || null
         this.originalAriaLabel = this.element.getAttribute("aria-label")
+        this.originalLabelText = this.hasLabelTarget ? this.labelTarget.textContent : null
     }
 
     async copy(event) {
@@ -40,6 +42,12 @@ export default class extends Controller {
     }
 
     readText() {
+        if (this.hasLiveSourceSelectorValue) {
+            const liveSource = document.querySelector(this.liveSourceSelectorValue)
+            if (liveSource) {
+                return "value" in liveSource ? liveSource.value : liveSource.textContent
+            }
+        }
         if (this.hasSourceSelectorValue) {
             const source = document.querySelector(this.sourceSelectorValue)
             if (!source) return null
@@ -68,8 +76,13 @@ export default class extends Controller {
 
     showSuccess() {
         this.captureOriginals()
-        this.element.classList.remove("document__copy-button--error")
-        this.element.dataset.tooltip = "Copied!"
+        this.element.classList.remove("document__copy-error")
+        if (this.originalTooltip !== null) {
+            this.element.dataset.tooltip = "Copied!"
+        }
+        if (this.hasLabelTarget) {
+            this.labelTarget.textContent = "Copied!"
+        }
         this.element.setAttribute("aria-label", "Copied!")
 
         if (this.hasDefaultIconTarget && this.hasSuccessIconTarget) {
@@ -82,8 +95,13 @@ export default class extends Controller {
 
     showFailure() {
         this.captureOriginals()
-        this.element.classList.add("document__copy-button--error")
-        this.element.dataset.tooltip = "Copy failed"
+        this.element.classList.add("document__copy-error")
+        if (this.originalTooltip !== null) {
+            this.element.dataset.tooltip = "Copy failed"
+        }
+        if (this.hasLabelTarget) {
+            this.labelTarget.textContent = "Copy failed"
+        }
         this.element.setAttribute("aria-label", "Copy failed")
 
         if (this.hasDefaultIconTarget && this.hasSuccessIconTarget) {
@@ -101,6 +119,9 @@ export default class extends Controller {
         if (this.originalAriaLabel === undefined) {
             this.originalAriaLabel = this.element.getAttribute("aria-label")
         }
+        if (this.originalLabelText === undefined) {
+            this.originalLabelText = this.hasLabelTarget ? this.labelTarget.textContent : null
+        }
     }
 
     scheduleReset() {
@@ -113,7 +134,7 @@ export default class extends Controller {
     }
 
     resetState() {
-        this.element.classList.remove("document__copy-button--error")
+        this.element.classList.remove("document__copy-error")
         if (this.hasDefaultIconTarget && this.hasSuccessIconTarget) {
             this.defaultIconTarget.classList.remove("document__copy-icon--hidden")
             this.successIconTarget.classList.add("document__copy-icon--hidden")
@@ -122,6 +143,9 @@ export default class extends Controller {
             this.element.dataset.tooltip = this.originalTooltip
         } else if (this.originalTooltip === null) {
             delete this.element.dataset.tooltip
+        }
+        if (this.hasLabelTarget && this.originalLabelText !== null) {
+            this.labelTarget.textContent = this.originalLabelText
         }
         if (this.originalAriaLabel) {
             this.element.setAttribute("aria-label", this.originalAriaLabel)

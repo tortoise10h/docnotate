@@ -92,4 +92,35 @@ class MarkdownEditorTest < ApplicationSystemTestCase
     assert_equal "false", edit_button["aria-pressed"]
     assert_no_selector "button[aria-label='Edit markdown'].icon-button--active"
   end
+
+  test "copy document text in hub dropdown copies raw markdown and live OverType edits without a header button" do
+    visit open_documents_path(file_path: @file.path)
+
+    assert_no_selector ".document__actions button[data-controller~='clipboard']"
+
+    page.execute_script(<<~JS)
+      window.__copiedText = null
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: async (text) => { window.__copiedText = text }
+        }
+      })
+    JS
+
+    find("button[aria-label='Switch file']").click
+    find("#document_switcher_panel .document__hub-actions button[aria-label='Copy document text']").click
+    assert_selector "#document_switcher_panel .document__hub-actions button[aria-label='Copied!']", text: "Copied!"
+    assert_equal "# Initial Heading\n\nInitial paragraph text.", page.evaluate_script("window.__copiedText")
+
+    # Close dropdown, open OverType editor, edit without saving, and copy live draft
+    find("button[aria-label='Switch file']").click
+    find("button[aria-label='Edit markdown']").click
+    dirty_md = "# Unsaved Markdown\n\nLive edit."
+    find(".overtype-input").fill_in(with: dirty_md)
+
+    find("button[aria-label='Switch file']").click
+    find("#document_switcher_panel .document__hub-actions button[data-clipboard-source-selector-value='#document_source_content']").click
+    assert_equal dirty_md, page.evaluate_script("window.__copiedText")
+  end
 end

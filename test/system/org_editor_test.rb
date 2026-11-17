@@ -81,12 +81,11 @@ class OrgEditorTest < ApplicationSystemTestCase
     assert_equal @initial_org, File.read(@file.path)
   end
 
-  test "copy raw org button copies raw source without embedding it in button attribute and surfaces failure" do
+  test "copy document text in hub dropdown copies raw org source without opening editor, copies dirty edits, and surfaces failure" do
     visit open_documents_path(file_path: @file.path)
 
-    copy_button = find("button[aria-label='Copy raw org']")
-    assert_equal "Copy raw org", copy_button["data-tooltip"]
-    assert_nil copy_button["data-clipboard-text-value"]
+    # Top header stays clean: no copy button in header actions
+    assert_no_selector ".document__actions button[data-controller~='clipboard']"
 
     page.execute_script(<<~JS)
       window.__copiedText = null
@@ -98,10 +97,28 @@ class OrgEditorTest < ApplicationSystemTestCase
       })
     JS
 
+    # Open the chevron dropdown without opening the editor
+    find("button[aria-label='Switch file']").click
+    assert_selector "#document_switcher_panel", visible: true
+
+    copy_button = find("#document_switcher_panel .document__hub-actions button[aria-label='Copy document text']")
+    assert_nil copy_button["data-clipboard-text-value"]
+    assert_text "Copy document text"
+
     copy_button.click
 
-    assert_selector "button[aria-label='Copied!'][data-tooltip='Copied!']"
+    assert_selector "#document_switcher_panel .document__hub-actions button[aria-label='Copied!']", text: "Copied!"
     assert_equal @initial_org, page.evaluate_script("window.__copiedText")
+
+    # Close dropdown, open editor, make unsaved edits, and copy from dropdown
+    find("button[aria-label='Switch file']").click
+    find("button[aria-label='Edit org file']").click
+    dirty_org = "* Unsaved Org Draft\n\nEdited in textarea."
+    find("textarea.document__plain-editor").fill_in(with: dirty_org)
+
+    find("button[aria-label='Switch file']").click
+    find("#document_switcher_panel .document__hub-actions button[data-clipboard-source-selector-value='#document_source_content']").click
+    assert_equal dirty_org, page.evaluate_script("window.__copiedText")
 
     # Verify clipboard failure surfaces feedback rather than a silent no-op
     page.execute_script(<<~JS)
@@ -113,7 +130,7 @@ class OrgEditorTest < ApplicationSystemTestCase
       })
     JS
 
-    find("button[data-clipboard-source-selector-value='#document_source_content']").click
-    assert_selector "button[aria-label='Copy failed'][data-tooltip='Copy failed'].document__copy-button--error"
+    find("#document_switcher_panel .document__hub-actions button[data-clipboard-source-selector-value='#document_source_content']").click
+    assert_selector "#document_switcher_panel .document__hub-actions button[aria-label='Copy failed'].document__copy-error", text: "Copy failed"
   end
 end

@@ -3,9 +3,14 @@ module Documents
     extend ActiveSupport::Concern
 
     FILE_TYPES = %w[markdown html org text pdf].freeze
+    EDITABLE_TYPES = %w[markdown org].freeze
 
     FILE_TYPES.each do |type|
       define_method("#{type}?") { file_type == type }
+    end
+
+    def editable?
+      EDITABLE_TYPES.include?(file_type)
     end
 
     def file_type_from_path

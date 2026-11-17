@@ -41,7 +41,7 @@ Rails.application.routes.draw do
     end
     get "content", to: "document_contents#show", as: :content, format: false
     get "content/*path", to: "document_contents#asset", as: :content_asset, format: false
-    resource :markdown_files, only: [ :update ], module: :documents
+    resource :source_files, only: [ :update ], module: :documents
     resources :comments, only: [ :create, :destroy, :update ] do
       resource :resolver, only: [ :update ], controller: "resolver", module: :comments
     end

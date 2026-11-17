@@ -8,8 +8,8 @@ module Documents
       "#{self.class.browser_base_url}/documents/open?file_path=#{ERB::Util.url_encode(file_path)}"
     end
 
-    def save_markdown_file!(new_content)
-      raise ArgumentError, "Only Markdown documents can be edited" unless markdown?
+    def save_source_file!(new_content)
+      raise ArgumentError, "Only Markdown and Org documents can be edited" unless editable?
       raise ArgumentError, "Content cannot be blank" if new_content.blank?
 
       normalized_content = new_content.to_s.gsub("\r\n", "\n")

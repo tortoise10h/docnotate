@@ -21,17 +21,24 @@
 
   <div class="document__markdown-editor-error" id="markdown_editor_error" data-markdown-editor-target="error" hidden></div>
 
-  <div class="document__markdown-editor-container" data-markdown-editor-target="editorContainer"></div>
+  <% if document.org? %>
+    <textarea class="document__plain-editor"
+              data-markdown-editor-target="plainTextarea"
+              aria-label="Edit org file source"
+              spellcheck="false"><%= document.content %></textarea>
+  <% else %>
+    <div class="document__markdown-editor-container" data-markdown-editor-target="editorContainer"></div>
+  <% end %>
 
   <%= form_with scope: :document,
-                url: document_markdown_files_path(document),
+                url: document_source_files_path(document),
                 method: :patch,
                 class: "document__markdown-editor-form",
                 data: {
                   markdown_editor_target: "form",
                   action: "submit->markdown-editor#save turbo:submit-end->markdown-editor#handleSubmitEnd"
                 } do |form| %>
-    <%= form.hidden_field :content, value: document.content, data: { markdown_editor_target: "contentInput" } %>
+    <%= form.hidden_field :content, value: document.content, id: "document_source_content", data: { markdown_editor_target: "contentInput" } %>
   <% end %>
 
   <dialog class="document__save-dialog"

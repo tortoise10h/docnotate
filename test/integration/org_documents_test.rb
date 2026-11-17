@@ -77,9 +77,11 @@ class OrgDocumentsTest < ActionDispatch::IntegrationTest
     assert_select "table.document-node--table th", text: "Task"
     assert_select "table.document-node--table td", text: "Ada"
 
-    # Editing scope: web editor and edit button are not present for .org files
-    assert_select ".document__markdown-editor", count: 0
-    assert_select "[data-action='click->markdown-editor#edit']", count: 0
+    # Editing & copy scope: plain textarea editor, edit button, and raw copy button are present for .org files
+    assert_select "button.document__edit-button[aria-label='Edit org file'][data-tooltip='Edit org file (⌘⇧E)']"
+    assert_select "button.document__copy-button[aria-label='Copy raw org'][data-tooltip='Copy raw org'][data-clipboard-source-selector-value='#document_source_content']"
+    assert_select ".document__markdown-editor textarea.document__plain-editor[aria-label='Edit org file source']"
+    assert_select ".document__markdown-editor-container", count: 0
   ensure
     file&.unlink
   end

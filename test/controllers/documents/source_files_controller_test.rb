@@ -1,13 +1,13 @@
 require "test_helper"
 
-class Documents::MarkdownFilesControllerTest < ActionDispatch::IntegrationTest
+class Documents::SourceFilesControllerTest < ActionDispatch::IntegrationTest
   test "updates markdown file on disk and redirects with see_other to open_documents_path" do
     Dir.mktmpdir do |dir|
       file_path = File.join(dir, "editable.md")
       File.write(file_path, "# Initial text")
       document = Document.open(file_path)
 
-      patch document_markdown_files_url(document), params: {
+      patch document_source_files_url(document), params: {
         document: { content: "# Updated text\n\nNew paragraph." }
       }
 
@@ -19,13 +19,31 @@ class Documents::MarkdownFilesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "updates org file on disk and redirects with see_other to open_documents_path" do
+    Dir.mktmpdir do |dir|
+      file_path = File.join(dir, "editable.org")
+      File.write(file_path, "* Initial heading\n\nInitial text.")
+      document = Document.open(file_path)
+
+      patch document_source_files_url(document), params: {
+        document: { content: "* Updated heading\n\nNew paragraph." }
+      }
+
+      assert_response :see_other
+      assert_redirected_to open_documents_path(file_path: document.file_path)
+      assert_equal "* Updated heading\n\nNew paragraph.", File.read(file_path)
+      assert_equal "* Updated heading\n\nNew paragraph.", document.reload.content
+      assert_equal "v2", document.current_version.version
+    end
+  end
+
   test "returns unprocessable_entity when content is blank" do
     Dir.mktmpdir do |dir|
       file_path = File.join(dir, "editable.md")
       File.write(file_path, "# Initial text")
       document = Document.open(file_path)
 
-      patch document_markdown_files_url(document), params: {
+      patch document_source_files_url(document), params: {
         document: { content: "   " }
       }
 
@@ -34,13 +52,13 @@ class Documents::MarkdownFilesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "returns unprocessable_entity when document is not markdown" do
+  test "returns unprocessable_entity when document is not editable" do
     Dir.mktmpdir do |dir|
       file_path = File.join(dir, "editable.html")
       File.write(file_path, "<h1>Initial text</h1>")
       document = Document.open(file_path)
 
-      patch document_markdown_files_url(document), params: {
+      patch document_source_files_url(document), params: {
         document: { content: "<h1>New text</h1>" }
       }
 
@@ -57,7 +75,7 @@ class Documents::MarkdownFilesControllerTest < ActionDispatch::IntegrationTest
 
       File.chmod(0o444, dir)
 
-      patch document_markdown_files_url(document), params: {
+      patch document_source_files_url(document), params: {
         document: { content: "# Updated text" }
       }
 
@@ -73,7 +91,7 @@ class Documents::MarkdownFilesControllerTest < ActionDispatch::IntegrationTest
       File.write(file_path, "# Initial text")
       document = Document.open(file_path)
 
-      patch document_markdown_files_url(document),
+      patch document_source_files_url(document),
             params: { document: { content: "" } },
             as: :turbo_stream
 

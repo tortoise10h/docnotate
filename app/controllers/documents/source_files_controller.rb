@@ -1,10 +1,10 @@
 module Documents
-  class MarkdownFilesController < ApplicationController
+  class SourceFilesController < ApplicationController
     before_action :set_document
 
     def update
       content = params.require(:document).permit(:content)[:content]
-      @document.save_markdown_file!(content)
+      @document.save_source_file!(content)
 
       redirect_to open_documents_path(file_path: @document.file_path), status: :see_other
     rescue ActionController::ParameterMissing, ArgumentError, ActiveRecord::RecordInvalid, Errno::EACCES, Errno::ENOENT => e

@@ -1084,9 +1084,15 @@
   background: rgba(25, 29, 38, 0.045);
 }
 
-/* Copy button uses the shared .icon-button component; only the icon-swap state lives here */
+/* Copy button uses the shared .icon-button component; only the icon-swap and error states live here */
 .document__copy-icon--hidden {
   display: none;
+}
+
+.document__copy-button--error,
+.document__copy-button--error:hover {
+  color: var(--red);
+  border-color: var(--warn-border);
 }
 
 .document__switcher-panel {
@@ -2289,6 +2295,27 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.document__plain-editor {
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 320px;
+  padding: 24px 32px;
+  border: none;
+  background: var(--pre-bg);
+  color: var(--fg);
+  caret-color: var(--accent);
+  font-family: var(--mono-font), monospace;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  resize: vertical;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.document__plain-editor:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--accent);
 }
 
 /* Match OverType editor surface and typography to document paper */

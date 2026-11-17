@@ -6,6 +6,7 @@ export default class extends Controller {
     "editButton",
     "editorPanel",
     "editorContainer",
+    "plainTextarea",
     "form",
     "contentInput",
     "dialog",
@@ -15,11 +16,14 @@ export default class extends Controller {
   ]
 
   static values = {
-    initialContent: String
+    initialContent: String,
+    mode: { type: String, default: "markdown" },
+    editLabel: { type: String, default: "Edit markdown" }
   }
 
   connect() {
     this.confirmed = false
+    this.plainInitialized = false
     this.boundKeydown = this.handleKeydown.bind(this)
     window.addEventListener("keydown", this.boundKeydown)
 
@@ -47,6 +51,10 @@ export default class extends Controller {
     return this.element.classList.contains("document--editing")
   }
 
+  get isPlainMode() {
+    return this.modeValue === "plain"
+  }
+
   get currentTheme() {
     const isDark = document.documentElement.getAttribute("data-theme") === "dark" ||
       (window.matchMedia("(prefers-color-scheme: dark)").matches && document.documentElement.getAttribute("data-theme") !== "light")
@@ -65,10 +73,6 @@ export default class extends Controller {
     } else {
       this.enterEditMode()
     }
-  }
-
-  get isEditing() {
-    return this.element.classList.contains("document--editing")
   }
 
   enterEditMode() {
@@ -95,25 +99,29 @@ export default class extends Controller {
   resetScrollAndFocus() {
     window.scrollTo(0, 0)
 
-    if (this.editor?.textarea) {
-      this.editor.textarea.setSelectionRange(0, 0)
-      this.editor.textarea.focus({ preventScroll: true })
-      this.editor.textarea.scrollTop = 0
+    const textarea = this.isPlainMode
+      ? (this.hasPlainTextareaTarget ? this.plainTextareaTarget : null)
+      : this.editor?.textarea
+
+    if (textarea) {
+      textarea.setSelectionRange(0, 0)
+      textarea.focus({ preventScroll: true })
+      textarea.scrollTop = 0
     } else {
-      this.editor?.focus()
+      this.focusEditor()
     }
 
-    if (this.editor?.preview) {
+    if (!this.isPlainMode && this.editor?.preview) {
       this.editor.preview.scrollTop = 0
     }
 
     requestAnimationFrame(() => {
       window.scrollTo(0, 0)
-      if (this.editor?.textarea) {
-        this.editor.textarea.setSelectionRange(0, 0)
-        this.editor.textarea.scrollTop = 0
+      if (textarea) {
+        textarea.setSelectionRange(0, 0)
+        textarea.scrollTop = 0
       }
-      if (this.editor?.preview) {
+      if (!this.isPlainMode && this.editor?.preview) {
         this.editor.preview.scrollTop = 0
       }
     })
@@ -129,7 +137,7 @@ export default class extends Controller {
     if (this.hasEditButtonTarget) {
       this.editButtonTarget.setAttribute("aria-pressed", "false")
       this.editButtonTarget.classList.remove("icon-button--active")
-      this.editButtonTarget.dataset.tooltip = "Edit markdown (⌘⇧E)"
+      this.editButtonTarget.dataset.tooltip = `${this.editLabelValue} (⌘⇧E)`
     }
 
     if (this.hasEditorPanelTarget) {
@@ -140,6 +148,14 @@ export default class extends Controller {
   }
 
   initEditor() {
+    if (this.isPlainMode) {
+      if (!this.plainInitialized && this.hasPlainTextareaTarget) {
+        this.plainTextareaTarget.value = this.initialContent
+        this.plainInitialized = true
+      }
+      return
+    }
+
     if (this.editor) return
 
     if (this.hasEditorContainerTarget) {
@@ -177,10 +193,35 @@ export default class extends Controller {
     }
   }
 
-  cancel() {
-    if (this.editor) {
-      this.editor.setValue(this.initialContent)
+  getEditorValue() {
+    if (this.isPlainMode) {
+      return this.hasPlainTextareaTarget ? this.plainTextareaTarget.value : ""
     }
+    return this.editor ? this.editor.getValue() : ""
+  }
+
+  setEditorValue(value) {
+    if (this.isPlainMode) {
+      if (this.hasPlainTextareaTarget) {
+        this.plainTextareaTarget.value = value
+      }
+      return
+    }
+    if (this.editor) {
+      this.editor.setValue(value)
+    }
+  }
+
+  focusEditor() {
+    if (this.isPlainMode) {
+      this.plainTextareaTarget?.focus()
+    } else {
+      this.editor?.focus()
+    }
+  }
+
+  cancel() {
+    this.setEditorValue(this.initialContent)
     this.exitEditMode()
   }
 
@@ -188,11 +229,12 @@ export default class extends Controller {
     if (this.confirmed) return
 
     if (event) event.preventDefault()
-    if (!this.editor) return
+    if (!this.isPlainMode && !this.editor) return
+    if (this.isPlainMode && !this.hasPlainTextareaTarget) return
 
-    const markdown = this.editor.getValue()
+    const content = this.getEditorValue()
     if (this.hasContentInputTarget) {
-      this.contentInputTarget.value = markdown
+      this.contentInputTarget.value = content
     }
 
     this.hideError()
@@ -220,7 +262,7 @@ export default class extends Controller {
       this.dialogTarget.close()
     }
     this.confirmed = false
-    this.editor?.focus()
+    this.focusEditor()
   }
 
   handleDialogCancel(event) {

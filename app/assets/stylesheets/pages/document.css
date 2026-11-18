@@ -777,7 +777,8 @@
   background-color: var(--pre-bg);
 }
 
-.html-document-page .document__header {
+.html-document-page .document__header,
+.html-document-page .document__header::before {
   background: var(--pre-bg);
 }
 
@@ -816,6 +817,25 @@
   margin-bottom: 12px;
   padding: 4px 0 2px;
   background: var(--bg);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+/* Mask the paper's outer box-shadow behind the header so left/right corners don't notch */
+.document__header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: -1px;
+  left: -4px;
+  right: -4px;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--bg);
+}
+
+.document__header--scrolled {
+  border-bottom-color: var(--border-light);
 }
 
 /* Explicit header slots so adding buttons never reshuffles the whole bar: */

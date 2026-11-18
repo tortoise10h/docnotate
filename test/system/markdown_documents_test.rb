@@ -238,6 +238,27 @@ class MarkdownDocumentsSystemTest < ApplicationSystemTestCase
     code_file.unlink
   end
 
+  test "sticky header toggles scrolled state without horizontal overflow" do
+    long_file = Tempfile.new([ "long-markdown", ".md" ])
+    long_file.write("# Long Document\n\n" + Array.new(40) { |i| "Paragraph #{i + 1} with enough content to scroll past the sticky header." }.join("\n\n"))
+    long_file.close
+
+    visit open_documents_path(file_path: long_file.path)
+    assert_selector ".document__header"
+    assert_no_selector ".document__header--scrolled"
+    assert_no_horizontal_page_overflow
+
+    page.execute_script("window.scrollTo(0, 400)")
+    assert_selector ".document__header--scrolled"
+    assert_selector ".document__scroll-top-button--visible"
+    assert_no_horizontal_page_overflow
+
+    page.execute_script("window.scrollTo(0, 0)")
+    assert_no_selector ".document__header--scrolled"
+  ensure
+    long_file.unlink
+  end
+
   private
 
   def assert_no_horizontal_page_overflow

@@ -259,6 +259,27 @@ class MarkdownDocumentsSystemTest < ApplicationSystemTestCase
     long_file.unlink
   end
 
+  test "table of contents panel aligns with far-left toggle in wide view" do
+    page.current_window.resize_to(1600, 900)
+
+    visit open_documents_path(file_path: @file.path)
+    find(".document__toc-toggle").click
+    assert_selector ".document__toc-panel"
+    normal_panel_left = find(".document__toc-panel").rect.x
+    find(".document__toc-close").click
+
+    find("button[aria-label='Wide view']").click
+    assert_selector ".document--markdown-wide"
+
+    wide_toggle_left = find(".document__toc-toggle").rect.x
+    find(".document__toc-toggle").click
+    assert_selector ".document__toc-panel"
+    wide_panel_left = find(".document__toc-panel").rect.x
+
+    assert_equal wide_toggle_left, wide_panel_left
+    assert_operator wide_panel_left, :<, normal_panel_left
+  end
+
   private
 
   def assert_no_horizontal_page_overflow

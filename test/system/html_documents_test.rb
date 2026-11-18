@@ -13,6 +13,11 @@ class HtmlDocumentsSystemTest < ApplicationSystemTestCase
     end
     assert_selector ".document__toc-item", text: "Intro", visible: :all
     assert_no_selector "button[aria-label='Wide view']"
+
+    toggle_left = find(".document__toc-toggle").rect.x
+    find(".document__toc-toggle").click
+    assert_selector ".document__toc-panel"
+    assert_equal toggle_left, find(".document__toc-panel").rect.x
   ensure
     file.unlink
   end

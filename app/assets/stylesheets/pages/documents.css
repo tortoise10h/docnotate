@@ -50,7 +50,7 @@
 }
 
 .documents__row {
-  border-bottom: 1px solid var(--border-light);
+  border-bottom: 1px dashed var(--border-light);
 }
 
 .documents__row:last-child {
@@ -60,6 +60,7 @@
 /* Row text matches the recent-files list sizing */
 .documents__row-display,
 .documents__rename-form {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -104,20 +105,33 @@
   flex-shrink: 0;
   font-size: 0.75rem;
   color: var(--muted);
+  transition: opacity 0.15s ease;
 }
 
 .documents__actions {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 2px;
-  flex-shrink: 0;
+  padding-left: 8px;
+  background: var(--bg);
   opacity: 0;
+  pointer-events: none;
   transition: opacity 0.15s ease;
 }
 
 .documents__row-display:hover .documents__actions,
 .documents__row-display:focus-within .documents__actions {
   opacity: 1;
+  pointer-events: auto;
+}
+
+.documents__row-display:hover .documents__last-opened,
+.documents__row-display:focus-within .documents__last-opened {
+  opacity: 0;
 }
 
 .documents__icon-button {
@@ -143,6 +157,11 @@
 .documents__icon-button--danger:hover {
   color: var(--red);
   background: rgba(194, 42, 30, 0.05);
+}
+
+.documents__icon-button.document__copy-error,
+.documents__icon-button.document__copy-error:hover {
+  color: var(--red);
 }
 
 .documents__icon-button svg {
@@ -267,6 +286,16 @@
 
 @media (hover: none) {
   .documents__actions {
+    position: static;
+    transform: none;
+    padding-left: 0;
+    background: transparent;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .documents__row-display:hover .documents__last-opened,
+  .documents__row-display:focus-within .documents__last-opened {
     opacity: 1;
   }
 }

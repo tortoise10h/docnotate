@@ -416,6 +416,24 @@ class DocumentsTest < ActionDispatch::IntegrationTest
     file&.unlink
   end
 
+  test "renders copy file path button before rename button in all files row actions" do
+    document = create_document("copyable.md")
+
+    get documents_path
+
+    assert_response :success
+    assert_select "#document_#{document.id} .documents__actions" do
+      assert_select "button[data-controller='clipboard'][data-clipboard-text-value='#{document.file_path}'][data-action='click->clipboard#copy'][title='Copy file path']" do
+        assert_select "svg[data-clipboard-target='defaultIcon']:not(.document__copy-icon--hidden)"
+        assert_select "svg[data-clipboard-target='successIcon'].document__copy-icon--hidden"
+      end
+
+      actions = css_select("#document_#{document.id} .documents__actions > button, #document_#{document.id} .documents__actions > form")
+      assert_equal "Copy file path", actions[0]["title"]
+      assert_equal "Rename", actions[1]["title"]
+    end
+  end
+
   private
 
   def create_document(file_path, last_opened_at: Time.current)

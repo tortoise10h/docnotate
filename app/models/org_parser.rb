@@ -402,110 +402,113 @@ class OrgParser
     return [ nil, start_idx + 1 ] unless first_info
 
     base_indent = first_info[:indent]
-    list_type = first_info[:is_ordered] ? "ordered" : "unordered"
+    is_ordered = first_info[:is_ordered]
+    list_type = is_ordered ? "ordered" : "unordered"
     list_node = InternalNode.new(type: "list", meta: { "list_type" => list_type, "tight" => true })
 
     i = start_idx
     total = lines.length
 
     while i < total
-      line = lines[i]
-      trimmed, indent = trim_leading(line)
+      trimmed, indent = trim_leading(lines[i])
 
       if trimmed.empty?
-        peek = i + 1
-        peek += 1 while peek < total && lines[peek].lstrip.empty?
-        break if peek >= total
+        peek = next_non_blank_index(lines, i + 1)
+        break if peek.nil?
 
         next_info = list_bullet_match(lines[peek])
-        if next_info && next_info[:indent] == base_indent && next_info[:is_ordered] == (list_type == "ordered")
-          i = peek
-          line = lines[i]
-          trimmed, indent = trim_leading(line)
-        else
-          break
-        end
+        break unless next_info && next_info[:indent] == base_indent && next_info[:is_ordered] == is_ordered
+
+        i = peek
+        trimmed, indent = trim_leading(lines[i])
       end
 
-      info = list_bullet_match(line, trimmed:, indent:)
-      break if info.nil?
-      break if info[:indent] < base_indent || info[:is_ordered] != (list_type == "ordered")
+      info = list_bullet_match(lines[i], trimmed:, indent:)
+      break if info.nil? || info[:indent] < base_indent || info[:is_ordered] != is_ordered
 
       if info[:indent] > base_indent
-        if list_node.children.any?
-          sublist, i = parse_list_block(lines, i)
-          list_node.children.last.children << sublist if sublist
-          next
-        else
-          break
-        end
+        break if list_node.children.empty?
+
+        sublist, i = parse_list_block(lines, i)
+        list_node.children.last.children << sublist if sublist
+        next
       end
 
-      i += 1
-      item_node = InternalNode.new(type: "item")
+      item_node, i = parse_list_item(lines, i + 1, base_indent:, initial_text: info[:text])
       list_node.children << item_node
-
-      initial_text = info[:text]
-      pending_para_lines = initial_text.strip.empty? ? [] : [ initial_text ]
-
-      flush_para = lambda do
-        if pending_para_lines.any?
-          item_node.children << build_paragraph_node(pending_para_lines)
-          pending_para_lines = []
-        end
-      end
-
-      while i < total
-        cur = lines[i]
-        cur_trimmed, cur_indent = trim_leading(cur)
-
-        if cur_trimmed.empty?
-          peek = i + 1
-          peek += 1 while peek < total && lines[peek].lstrip.empty?
-          break if peek >= total
-
-          _, next_line_indent = trim_leading(lines[peek])
-          break if next_line_indent <= base_indent
-
-          flush_para.call
-          i = peek
-          next
-        end
-
-        break if cur_indent <= base_indent
-
-        sub_info = list_bullet_match(cur, trimmed: cur_trimmed, indent: cur_indent)
-        if sub_info && sub_info[:indent] > base_indent
-          flush_para.call
-          sublist, i = parse_list_block(lines, i)
-          item_node.children << sublist if sublist
-          next
-        end
-
-        cur_first = cur_trimmed.getbyte(0)
-
-        if cur_first == HASH_BYTE && cur_trimmed.start_with?("#+") && (block_match = match_begin_block(cur_trimmed))
-          flush_para.call
-          node, i = parse_delimited_block(lines, i, block_match, cur_indent)
-          item_node.children << node
-          next
-        end
-
-        if cur_first == PIPE_BYTE
-          flush_para.call
-          table_node, i = parse_table_block(lines, i)
-          item_node.children << table_node if table_node
-          next
-        end
-
-        pending_para_lines << cur_trimmed.rstrip
-        i += 1
-      end
-
-      flush_para.call
     end
 
     [ list_node, i ]
+  end
+
+  def parse_list_item(lines, start_idx, base_indent:, initial_text:)
+    item_node = InternalNode.new(type: "item")
+    pending_lines = initial_text.strip.empty? ? [] : [ initial_text ]
+    i = start_idx
+    total = lines.length
+
+    while i < total
+      cur = lines[i]
+      cur_trimmed, cur_indent = trim_leading(cur)
+
+      if cur_trimmed.empty?
+        peek = next_non_blank_index(lines, i + 1)
+        break if peek.nil?
+
+        _, next_indent = trim_leading(lines[peek])
+        break if next_indent <= base_indent
+
+        flush_list_paragraph(item_node, pending_lines)
+        i = peek
+        next
+      end
+
+      break if cur_indent <= base_indent
+
+      sub_info = list_bullet_match(cur, trimmed: cur_trimmed, indent: cur_indent)
+      if sub_info && sub_info[:indent] > base_indent
+        flush_list_paragraph(item_node, pending_lines)
+        sublist, i = parse_list_block(lines, i)
+        item_node.children << sublist if sublist
+        next
+      end
+
+      cur_first = cur_trimmed.getbyte(0)
+
+      if cur_first == HASH_BYTE && cur_trimmed.start_with?("#+") && (block_match = match_begin_block(cur_trimmed))
+        flush_list_paragraph(item_node, pending_lines)
+        node, i = parse_delimited_block(lines, i, block_match, cur_indent)
+        item_node.children << node
+        next
+      end
+
+      if cur_first == PIPE_BYTE
+        flush_list_paragraph(item_node, pending_lines)
+        table_node, i = parse_table_block(lines, i)
+        item_node.children << table_node if table_node
+        next
+      end
+
+      pending_lines << cur_trimmed.rstrip
+      i += 1
+    end
+
+    flush_list_paragraph(item_node, pending_lines)
+    [ item_node, i ]
+  end
+
+  def flush_list_paragraph(item_node, pending_lines)
+    return if pending_lines.empty?
+
+    item_node.children << build_paragraph_node(pending_lines)
+    pending_lines.clear
+  end
+
+  def next_non_blank_index(lines, start_idx)
+    peek = start_idx
+    total = lines.length
+    peek += 1 while peek < total && lines[peek].lstrip.empty?
+    peek < total ? peek : nil
   end
 
   # --- Inline Tokenizer ---

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class OrgParser
-  BLOCK_LEVEL_TYPES = %w[
-    paragraph heading code_block list item
-    block_quote thematic_break table table_row table_cell
+  BLOCK_LEVEL_TYPES = Set[
+    "paragraph", "heading", "code_block", "list", "item",
+    "block_quote", "thematic_break", "table", "table_row", "table_cell"
   ].freeze
 
   DEFAULT_TODO_KEYWORDS = %w[
@@ -60,16 +60,16 @@ class OrgParser
   def initialize(document_version_id:, content:)
     @document_version_id = document_version_id
     @content = content.to_s
-    @todo_keywords = Set.new(DEFAULT_TODO_KEYWORDS)
-    extract_custom_todo_keywords
   end
 
   def parse
     @now = Time.current
     @document_title = nil
     @file_keywords = []
+    @todo_keywords = Set.new(DEFAULT_TODO_KEYWORDS)
 
     lines = @content.lines(chomp: true)
+    extract_custom_todo_keywords(lines)
     children = parse_blocks(lines, top_level: true)
 
     meta = {}
@@ -84,8 +84,8 @@ class OrgParser
 
   private
 
-  def extract_custom_todo_keywords
-    @content.each_line(chomp: true) do |line|
+  def extract_custom_todo_keywords(lines)
+    lines.each do |line|
       trimmed, = trim_leading(line)
       next unless trimmed.start_with?("#+")
 
@@ -185,7 +185,7 @@ class OrgParser
 
   def trim_leading(line)
     first_byte = line.getbyte(0)
-    if first_byte && first_byte <= SPACE_BYTE
+    if first_byte == SPACE_BYTE || first_byte == TAB_BYTE
       trimmed = line.lstrip
       [ trimmed, line.length - trimmed.length ]
     else
@@ -207,8 +207,8 @@ class OrgParser
     heading_level = [ org_level, 6 ].min
     meta = { "org_level" => org_level }
 
-    # Parse tags on header, eg: ":company:project:"
-    if (tag_match = raw_text.match(HEADING_TAGS_REGEX))
+    # Org tags always sit at EOL ending with ":" (e.g. ":company:project:"); short-circuit to skip regex on untagged headings
+    if raw_text.end_with?(":") && (tag_match = raw_text.match(HEADING_TAGS_REGEX))
       tags = tag_match[1].split(":")
       raw_text = raw_text[0...tag_match.begin(0)].strip
       meta["tags"] = tags if tags.any?
@@ -287,7 +287,7 @@ class OrgParser
     removed = 0
     while removed < max_indent
       b = line.getbyte(removed)
-      break unless b && b <= SPACE_BYTE
+      break unless b == SPACE_BYTE || b == TAB_BYTE
 
       removed += 1
     end

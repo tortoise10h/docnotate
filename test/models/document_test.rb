@@ -253,4 +253,75 @@ class DocumentTest < ActiveSupport::TestCase
       assert_match(/blank/i, blank_error.message)
     end
   end
+
+  test "destroy! removes versions, nested nodes, html contents, and comments while keeping the file on disk" do
+    Dir.mktmpdir do |dir|
+      file_path = File.join(dir, "keep-me.html")
+      File.write(file_path, "<h1>Title</h1><p>Body</p>")
+
+      document = Document.open(file_path)
+      first_version = document.current_version
+      first_html_id = first_version.content_id
+      first_comment = first_version.comments.create!(content: "First version note")
+
+      File.write(file_path, "<h1>Updated</h1><p>More text</p>")
+      document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 32, last_modified_at: Time.current + 1.second))
+      second_version = document.reload.current_version
+      second_html_id = second_version.content_id
+      second_comment = second_version.comments.create!(content: "Second version note")
+
+      other_document = Document.create!(file_path: File.join(dir, "other.md"), content: "# Other", file_type: "markdown")
+      other_document.parse_ast_and_save!(metadata: Documents::AstParseable::ParseMetadata.new(size: 10, last_modified_at: Time.current))
+
+      assert document.destroy!
+      assert document.destroyed?
+      assert File.exist?(file_path)
+      assert_not Document.exists?(document.id)
+      assert_not DocumentVersion.where(id: [ first_version.id, second_version.id ]).exists?
+      assert_not DocumentNode.where(document_version_id: [ first_version.id, second_version.id ]).exists?
+      assert_not HtmlContent.where(id: [ first_html_id, second_html_id ]).exists?
+      assert_not Comment.where(id: [ first_comment.id, second_comment.id ]).exists?
+
+      assert Document.exists?(other_document.id)
+      assert other_document.current_version.document_nodes.exists?
+    end
+  end
+
+  test "destroy! deletes large documents with nested nodes in constant SQL queries" do
+    document = Document.create!(file_path: "/tmp/large-destroy.org", content: "* Large", file_type: "org")
+    version = document.document_versions.create!(version: "v1", size: 1000, last_modified_at: Time.current)
+    document.update_column(:current_version_id, version.id)
+    version.comments.create!(content: "Large doc comment")
+
+    now = Time.current
+    rows = []
+    4_000.times do |i|
+      root_id = "large-root-#{i}"
+      rows << { id: root_id, document_version_id: version.id, parent_id: nil, node_type: "heading", position: i, content: "Section #{i}", created_at: now, updated_at: now }
+      2.times do |j|
+        child_id = "large-child-#{i}-#{j}"
+        rows << { id: child_id, document_version_id: version.id, parent_id: root_id, node_type: "paragraph", position: j, content: "Para #{j}", created_at: now, updated_at: now }
+        rows << { id: "large-leaf-#{i}-#{j}", document_version_id: version.id, parent_id: child_id, node_type: "text", position: 0, content: "Text", created_at: now, updated_at: now }
+      end
+    end
+    rows.each_slice(2_000) { |slice| DocumentNode.insert_all!(slice) }
+    assert_equal 20_000, version.document_nodes.count
+
+    query_count = 0
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      query_count += 1 unless payload[:name] == "SCHEMA"
+    end
+
+    begin
+      document.destroy!
+    ensure
+      ActiveSupport::Notifications.unsubscribe(subscriber)
+    end
+
+    assert_operator query_count, :<=, 12
+    assert_not Document.exists?(document.id)
+    assert_not DocumentVersion.exists?(version.id)
+    assert_not DocumentNode.where(document_version_id: version.id).exists?
+    assert_not Comment.where(document_id: document.id).exists?
+  end
 end
